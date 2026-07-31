@@ -53,10 +53,10 @@
       } else {
         monitor.status = normalizedStatus;
         status = normalizedStatus;
-        toast.success("Monitor status updated successfully");
+        toast.success("监控项状态已成功更新");
       }
     } catch (e) {
-      const message = e instanceof Error ? e.message : "Failed to update monitor status";
+      const message = e instanceof Error ? e.message : "更新监控项状态失败";
       toast.error(message);
     } finally {
       updatingStatus = false;
@@ -65,12 +65,12 @@
 
   async function deleteMonitorData() {
     if (!monitorTag) return;
-    if (deleteDataConfirmText !== `delete ${monitorTag} data`) {
-      toast.error("Please type the correct confirmation text");
+    if (deleteDataConfirmText !== `删除 ${monitorTag} 数据`) {
+      toast.error("请输入正确的确认文本");
       return;
     }
     if (!deleteDataStart || !deleteDataEnd) {
-      toast.error("Start and end dates are required");
+      toast.error("开始和结束日期不能为空");
       return;
     }
 
@@ -78,7 +78,7 @@
     const endTimestamp = Math.floor(new Date(deleteDataEnd).getTime() / 1000);
 
     if (startTimestamp >= endTimestamp) {
-      toast.error("Start date must be before end date");
+      toast.error("开始日期必须早于结束日期");
       return;
     }
 
@@ -97,13 +97,13 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Monitoring data deleted successfully");
+        toast.success("监控数据已成功删除");
         deleteDataConfirmText = "";
         deleteDataStart = "";
         deleteDataEnd = "";
       }
     } catch (e) {
-      toast.error("Failed to delete monitoring data");
+      toast.error("删除监控数据失败");
     } finally {
       deletingData = false;
     }
@@ -111,8 +111,8 @@
 
   async function deleteMonitor() {
     if (!monitorTag) return;
-    if (deleteConfirmText !== `delete ${monitorTag}`) {
-      toast.error("Please type the correct confirmation text");
+    if (deleteConfirmText !== `删除 ${monitorTag}`) {
+      toast.error("请输入正确的确认文本");
       return;
     }
 
@@ -131,11 +131,11 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Monitor deleted successfully");
+        toast.success("监控项已成功删除");
         goto(clientResolver(resolve, "/manage/app/monitors"));
       }
     } catch (e) {
-      toast.error("Failed to delete monitor");
+      toast.error("删除监控项失败");
     } finally {
       deleting = false;
     }
@@ -146,13 +146,13 @@
   <Card.Header>
     <Card.Title class="text-destructive flex items-center gap-2">
       <TrashIcon class="size-5" />
-      Danger Zone
+      危险操作
     </Card.Title>
   </Card.Header>
   <Card.Content class="">
-    <h2 class="text-lg font-semibold">Update Status</h2>
+    <h2 class="text-lg font-semibold">更新状态</h2>
     <div class="mb-5 flex items-center justify-between border-b pb-5">
-      <div>Set Status of the monitor</div>
+      <div>设置监控项状态</div>
       <div class="flex gap-2">
         <Select.Root
           type="single"
@@ -172,71 +172,69 @@
         <Button onclick={updateStatus} disabled={updatingStatus || status === (monitor.status || "INACTIVE")}>
           {#if updatingStatus}
             <Loader class="size-4 animate-spin" />
-            Updating...
+            正在更新...
           {:else}
-            Update Status
+            更新状态
           {/if}
         </Button>
       </div>
     </div>
     <div class="mb-5 space-y-4 border-b pb-5">
-      <h2 class="text-lg font-semibold">Delete Monitoring Data</h2>
+      <h2 class="text-lg font-semibold">删除监控数据</h2>
       <div class="grid grid-cols-2 gap-4">
         <div class="space-y-2">
-          <Label for="deleteDataStart">Start Date & Time <span class="text-destructive">*</span></Label>
+          <Label for="deleteDataStart">开始日期和时间 <span class="text-destructive">*</span></Label>
           <Input id="deleteDataStart" type="datetime-local" bind:value={deleteDataStart} />
         </div>
         <div class="space-y-2">
-          <Label for="deleteDataEnd">End Date & Time <span class="text-destructive">*</span></Label>
+          <Label for="deleteDataEnd">结束日期和时间 <span class="text-destructive">*</span></Label>
           <Input id="deleteDataEnd" type="datetime-local" bind:value={deleteDataEnd} min={deleteDataStart} />
         </div>
       </div>
       <div class="flex items-end gap-4">
         <div class="flex-1 space-y-2">
           <Label for="deleteDataConfirm">
-            Type <span class="text-destructive font-mono">delete {monitorTag} data</span> to confirm
+            输入 <span class="text-destructive font-mono">删除 {monitorTag} 数据</span> 以确认
           </Label>
-          <p class="text-muted-foreground">
-            This will delete monitoring data for the selected time range. The monitor itself will not be deleted.
-          </p>
-          <Input id="deleteDataConfirm" bind:value={deleteDataConfirmText} placeholder="delete {monitorTag} data" />
+          <p class="text-muted-foreground">这将删除所选时间范围内的监控数据，不会删除监控项本身。</p>
+          <Input id="deleteDataConfirm" bind:value={deleteDataConfirmText} placeholder="删除 {monitorTag} 数据" />
         </div>
         <Button
           variant="destructive"
           onclick={deleteMonitorData}
-          disabled={deletingData || deleteDataConfirmText !== `delete ${monitorTag} data`}
+          disabled={deletingData || deleteDataConfirmText !== `删除 ${monitorTag} 数据`}
         >
           {#if deletingData}
             <Loader class="size-4 animate-spin" />
-            Deleting...
+            正在删除...
           {:else}
             <TrashIcon class="size-4" />
-            Delete Data
+            删除数据
           {/if}
         </Button>
       </div>
     </div>
     <div>
-      <h2 class="text-lg font-semibold">Delete Monitor</h2>
+      <h2 class="text-lg font-semibold">删除监控项</h2>
       <div class="flex items-end gap-4">
         <div class="flex-1 space-y-2">
           <Label for="deleteConfirm">
-            Type <span class="text-destructive font-mono">delete {monitorTag}</span> to confirm
+            输入 <span class="text-destructive font-mono">删除 {monitorTag}</span> 以确认
           </Label>
-          <p class="text-muted-foreground">Deleting monitor is irreversible. Please be sure before deleting.</p>
-          <Input id="deleteConfirm" bind:value={deleteConfirmText} placeholder="delete {monitorTag}" />
+          <p class="text-muted-foreground">删除监控项后无法恢复，请谨慎操作。</p>
+          <Input id="deleteConfirm" bind:value={deleteConfirmText} placeholder="删除 {monitorTag}" />
         </div>
         <Button
           variant="destructive"
           onclick={deleteMonitor}
-          disabled={deleting || deleteConfirmText !== `delete ${monitorTag}`}
+          disabled={deleting || deleteConfirmText !== `删除 ${monitorTag}`}
         >
           {#if deleting}
             <Loader class="size-4 animate-spin" />
-            Deleting...
+            正在删除...
           {:else}
             <TrashIcon class="size-4" />
-            Delete Monitor
+            删除监控项
           {/if}
         </Button>
       </div>

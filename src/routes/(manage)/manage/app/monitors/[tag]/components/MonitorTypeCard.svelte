@@ -11,7 +11,14 @@
   import type { GroupMonitorTypeData, MonitoringResult } from "$lib/server/types/monitor.js";
   import { MONITOR_TYPES, type MonitorType } from "$lib/types/monitor.js";
   import { toast } from "svelte-sonner";
-  import { ValidateIpAddress, IsValidHost, IsValidNameServer, IsValidDnsResolver, IsValidURL, IsValidPort } from "$lib/clientTools";
+  import {
+    ValidateIpAddress,
+    IsValidHost,
+    IsValidNameServer,
+    IsValidDnsResolver,
+    IsValidURL,
+    IsValidPort
+  } from "$lib/clientTools";
   import { GAMEDIG_SOCKET_TIMEOUT } from "$lib/anywhere";
   import { resolve } from "$app/paths";
   import clientResolver from "$lib/client/resolver.js";
@@ -100,16 +107,16 @@
 
   const monitorTypeLabels: Record<MonitorType, string> = {
     API: "HTTP/API",
-    PING: "Ping",
-    TCP: "TCP Port",
+    PING: "Ping 检测",
+    TCP: "TCP 端口",
     DNS: "DNS",
-    NONE: "Manual",
-    GROUP: "Group",
-    SSL: "SSL Certificate",
-    SQL: "Database",
-    HEARTBEAT: "Heartbeat",
-    GAMEDIG: "Game Server",
-    GRPC: "gRPC Health"
+    NONE: "手动",
+    GROUP: "组合",
+    SSL: "SSL 证书",
+    SQL: "数据库",
+    HEARTBEAT: "心跳",
+    GAMEDIG: "游戏服务器",
+    GRPC: "gRPC 健康检查"
   };
 
   // Validation for each monitor type
@@ -249,10 +256,10 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Monitor type settings saved successfully");
+        toast.success("监控类型设置已成功保存");
       }
     } catch (e) {
-      const message = e instanceof Error ? e.message : "Failed to save monitor type settings";
+      const message = e instanceof Error ? e.message : "保存监控类型设置失败";
       toast.error(message);
     } finally {
       savingType = false;
@@ -277,7 +284,7 @@
       const result = await response.json();
       testResult = result;
     } catch (e) {
-      testResult = { error_message: "Failed to test monitor", status: "NO_DATA", latency: 0, type: "error" };
+      testResult = { error_message: "测试监控项失败", status: "NO_DATA", latency: 0, type: "error" };
     } finally {
       testingMonitor = false;
     }
@@ -286,12 +293,12 @@
 
 <Card.Root>
   <Card.Header>
-    <Card.Title>Monitor Type Configuration</Card.Title>
-    <Card.Description>Configure how this monitor checks your service</Card.Description>
+    <Card.Title>监控类型配置</Card.Title>
+    <Card.Description>配置此监控项检查服务的方式</Card.Description>
   </Card.Header>
   <Card.Content class="space-y-4">
     <div class="flex flex-col gap-2">
-      <Label for="monitor-type">Monitor Type</Label>
+      <Label for="monitor-type">监控类型</Label>
       <Select.Root
         type="single"
         value={monitor.monitor_type}
@@ -349,7 +356,7 @@
         {#snippet child({ props })}
           <Button {...props} variant="secondary">
             <PlayIcon class="size-4" />
-            Test Monitor
+            测试监控项
           </Button>
         {/snippet}
       </Dialog.Trigger>
@@ -357,11 +364,11 @@
         <Dialog.Header>
           <Dialog.Title>
             {#if testingMonitor}
-              Running Test
+              正在测试
             {:else if testResult}
-              Test Result
+              测试结果
             {:else}
-              Test Monitor
+              测试监控项
             {/if}
           </Dialog.Title>
         </Dialog.Header>
@@ -369,7 +376,7 @@
           {#if testingMonitor}
             <div class="flex flex-col items-center gap-2 py-8">
               <Loader class="size-8 animate-spin" />
-              <p class="text-muted-foreground mt-4 text-center">Please wait while the test is being performed...</p>
+              <p class="text-muted-foreground mt-4 text-center">正在执行测试，请稍候...</p>
             </div>
           {:else if testResult}
             <div class="mt-4 flex flex-col gap-4">
@@ -380,13 +387,13 @@
               {/if}
               <div class="grid grid-cols-2 gap-4">
                 <div class="rounded-lg border p-4 text-center">
-                  <div class="text-muted-foreground text-xs uppercase">Status</div>
+                  <div class="text-muted-foreground text-xs uppercase">状态</div>
                   <div class="mt-1 text-2xl font-bold text-{testResult.status.toLowerCase()}">
                     {testResult.status}
                   </div>
                 </div>
                 <div class="rounded-lg border p-4 text-center">
-                  <div class="text-muted-foreground text-xs uppercase">Latency (milliseconds)</div>
+                  <div class="text-muted-foreground text-xs uppercase">延迟（毫秒）</div>
                   <div class="mt-1 truncate text-2xl font-bold">
                     {testResult.latency}
                   </div>
@@ -395,7 +402,7 @@
               <div class="flex justify-end">
                 <Button variant="outline" size="sm" onclick={testMonitor} disabled={testingMonitor}>
                   <PlayIcon class="size-3" />
-                  Run Test Again
+                  再次测试
                 </Button>
               </div>
             </div>
@@ -410,7 +417,7 @@
       {:else}
         <SaveIcon class="size-4" />
       {/if}
-      Save Monitor Type Settings
+      保存监控类型设置
     </Button>
   </Card.Footer>
 </Card.Root>

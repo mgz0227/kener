@@ -81,7 +81,7 @@
     !isNew &&
       currentPage &&
       currentPage.page_path !== "" &&
-      deleteConfirmText === `delete ${currentPage?.page_path || "home"}`
+      deleteConfirmText === `删除 ${currentPage?.page_path || "home"}`
   );
 
   // Page settings state
@@ -148,11 +148,11 @@
           pageSettings = structuredClone(defaultPageSettings);
         }
       } else {
-        toast.error("Page not found");
+        toast.error("未找到页面");
         goto(clientResolver(resolve, "/manage/app/pages"));
       }
     } catch (e) {
-      toast.error("Failed to load page");
+      toast.error("加载页面失败");
       goto(clientResolver(resolve, "/manage/app/pages"));
     } finally {
       loading = false;
@@ -171,7 +171,7 @@
         monitors = result;
       }
     } catch (e) {
-      console.error("Failed to fetch monitors", e);
+      console.error("获取监控项失败", e);
     }
   }
 
@@ -209,7 +209,7 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success(isNew ? "Page created successfully" : "Page updated successfully");
+        toast.success(isNew ? "页面创建成功" : "页面更新成功");
         if (isNew && result.id) {
           // Navigate to the newly created page
           goto(clientResolver(resolve, `/manage/app/pages/${result.id}`));
@@ -219,7 +219,7 @@
         }
       }
     } catch (e) {
-      toast.error(isNew ? "Failed to create page" : "Failed to update page");
+      toast.error(isNew ? "创建页面失败" : "更新页面失败");
     } finally {
       saving = false;
     }
@@ -246,12 +246,12 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Monitor added to page");
+        toast.success("监控项已添加到页面");
         selectedMonitors = [...selectedMonitors, selectedMonitorTag];
         selectedMonitorTag = "";
       }
     } catch (e) {
-      toast.error("Failed to add monitor");
+      toast.error("添加监控项失败");
     } finally {
       addingMonitor = false;
     }
@@ -275,11 +275,11 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Page deleted successfully");
+        toast.success("页面已删除");
         goto(clientResolver(resolve, "/manage/app/pages"));
       }
     } catch (e) {
-      toast.error("Failed to delete page");
+      toast.error("删除页面失败");
     } finally {
       deleting = false;
     }
@@ -306,11 +306,11 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Monitor removed from page");
+        toast.success("监控项已从页面移除");
         selectedMonitors = selectedMonitors.filter((t) => t !== monitorTag);
       }
     } catch (e) {
-      toast.error("Failed to remove monitor");
+      toast.error("移除监控项失败");
     } finally {
       removingMonitor = null;
     }
@@ -346,7 +346,7 @@
         toast.error(result.error);
       }
     } catch (e) {
-      toast.error("Failed to reorder monitors");
+      toast.error("调整监控项顺序失败");
     } finally {
       reordering = false;
     }
@@ -361,13 +361,13 @@
     // Validate file type
     const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/svg+xml", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
-      toast.error("Invalid file type. Allowed: PNG, JPG, SVG, WebP");
+      toast.error("文件类型无效，允许：PNG、JPG、SVG、WebP");
       return;
     }
 
     // Validate file size (max 2MB)
     if (file.size > GC.MAX_UPLOAD_BYTES) {
-      toast.error(`File too large. Maximum size is ${GC.MAX_UPLOAD_BYTES / (1024 * 1024)}MB`);
+      toast.error(`文件过大，最大为 ${GC.MAX_UPLOAD_BYTES / (1024 * 1024)}MB`);
       return;
     }
 
@@ -393,7 +393,7 @@
       });
 
       if (!response.ok) {
-        toast.error("Failed to upload logo");
+        toast.error("上传徽标失败");
         return;
       }
       const result = await response.json();
@@ -401,10 +401,10 @@
         toast.error(result.error);
       } else {
         formData.page_logo = result.url;
-        toast.success("Logo uploaded successfully");
+        toast.success("徽标上传成功");
       }
     } catch (e) {
-      toast.error("Failed to upload logo");
+      toast.error("上传徽标失败");
     } finally {
       uploadingLogo = false;
       input.value = "";
@@ -439,12 +439,12 @@
 
     const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
-      toast.error("Invalid file type. Allowed: PNG, JPG, WebP");
+      toast.error("文件类型无效，允许：PNG、JPG、WebP");
       return;
     }
 
     if (file.size > GC.MAX_UPLOAD_BYTES) {
-      toast.error(`File too large. Maximum size is ${GC.MAX_UPLOAD_BYTES / (1024 * 1024)}MB`);
+      toast.error(`文件过大，最大为 ${GC.MAX_UPLOAD_BYTES / (1024 * 1024)}MB`);
       return;
     }
 
@@ -468,7 +468,7 @@
       });
 
       if (!response.ok) {
-        toast.error("Failed to upload social preview image");
+        toast.error("上传社交预览图失败");
         return;
       }
       const result = await response.json();
@@ -476,10 +476,10 @@
         toast.error(result.error);
       } else {
         pageSettings.socialPagePreviewImage = result.url;
-        toast.success("Social preview image uploaded");
+        toast.success("社交预览图已上传");
       }
     } catch (e) {
-      toast.error("Failed to upload social preview image");
+      toast.error("上传社交预览图失败");
     } finally {
       uploadingSocialPreview = false;
       input.value = "";
@@ -490,9 +490,7 @@
     if (!currentPage) return;
 
     if (source === "display" && (!isHistoryDesktopValid || !isHistoryMobileValid)) {
-      toast.error(
-        `Days must be a whole number between ${GC.STATUS_HISTORY_DAYS_MIN} and ${GC.STATUS_HISTORY_DAYS_MAX}`
-      );
+      toast.error(`天数必须是 ${GC.STATUS_HISTORY_DAYS_MIN} 到 ${GC.STATUS_HISTORY_DAYS_MAX} 之间的整数`);
       return;
     }
 
@@ -515,10 +513,10 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Page settings saved successfully");
+        toast.success("页面设置已保存");
       }
     } catch (e) {
-      toast.error("Failed to save page settings");
+      toast.error("保存页面设置失败");
     } finally {
       if (source === "display") savingDisplaySettings = false;
       else savingSeoSettings = false;
@@ -542,11 +540,11 @@
       <Breadcrumb.Root>
         <Breadcrumb.List>
           <Breadcrumb.Item>
-            <Breadcrumb.Link href={clientResolver(resolve, "/manage/app/pages")}>Pages</Breadcrumb.Link>
+            <Breadcrumb.Link href={clientResolver(resolve, "/manage/app/pages")}>页面</Breadcrumb.Link>
           </Breadcrumb.Item>
           <Breadcrumb.Separator />
           <Breadcrumb.Item>
-            <Breadcrumb.Page>{isNew ? "New Page" : currentPage?.page_title || "Edit Page"}</Breadcrumb.Page>
+            <Breadcrumb.Page>{isNew ? "新建页面" : currentPage?.page_title || "编辑页面"}</Breadcrumb.Page>
           </Breadcrumb.Item>
         </Breadcrumb.List>
       </Breadcrumb.Root>
@@ -558,7 +556,7 @@
             size="sm"
             href={clientResolver(resolve, `/${currentPage?.page_path}`)}
           >
-            View
+            查看
           </Button>
         {/if}
       </div>
@@ -567,16 +565,16 @@
     <!-- General Information Card -->
     <Card.Root>
       <Card.Header>
-        <Card.Title>General Information</Card.Title>
+        <Card.Title>基本信息</Card.Title>
         <Card.Description>
-          {isNew ? "Create a new status page" : "Update page settings"}
+          {isNew ? "创建新的状态页" : "更新页面设置"}
         </Card.Description>
       </Card.Header>
       <Card.Content class="space-y-4">
         <!-- Path -->
         <div class="space-y-2">
           <Label for="page-path">
-            Path <span class="text-destructive">*</span>
+            路径 <span class="text-destructive">*</span>
           </Label>
           <Input
             id="page-path"
@@ -586,32 +584,32 @@
           />
           <p class="text-muted-foreground text-xs">
             {!isNew && currentPage?.page_path === ""
-              ? "Home page path cannot be changed"
-              : "URL path for the page (e.g., services, infrastructure). Will be made URL-friendly."}
+              ? "首页路径无法修改"
+              : "页面的 URL 路径（例如 services、infrastructure），系统会自动转换为适合 URL 的格式。"}
           </p>
         </div>
 
         <!-- Title -->
         <div class="space-y-2">
           <Label for="page-title">
-            Title <span class="text-destructive">*</span>
+            标题 <span class="text-destructive">*</span>
           </Label>
-          <Input id="page-title" type="text" bind:value={formData.page_title} placeholder="Services Status" />
-          <p class="text-muted-foreground text-xs">Page title shown in browser tab</p>
+          <Input id="page-title" type="text" bind:value={formData.page_title} placeholder="服务状态" />
+          <p class="text-muted-foreground text-xs">浏览器标签页中显示的页面标题</p>
         </div>
 
         <!-- Header -->
         <div class="space-y-2">
           <Label for="page-header">
-            Header <span class="text-destructive">*</span>
+            页头标题 <span class="text-destructive">*</span>
           </Label>
-          <Input id="page-header" type="text" bind:value={formData.page_header} placeholder="Services Status" />
-          <p class="text-muted-foreground text-xs">Main heading displayed on the page</p>
+          <Input id="page-header" type="text" bind:value={formData.page_header} placeholder="服务状态" />
+          <p class="text-muted-foreground text-xs">页面中显示的主标题</p>
         </div>
 
         <!-- Subheader -->
         <div class="space-y-2">
-          <Label for="page-subheader">Page Content</Label>
+          <Label for="page-subheader">页面内容</Label>
           <div class="overflow-hidden rounded-md border">
             <CodeMirror
               bind:value={formData.page_subheader}
@@ -626,18 +624,18 @@
               }}
             />
           </div>
-          <p class="text-muted-foreground text-xs">Supports Markdown. Optional content below the header.</p>
+          <p class="text-muted-foreground text-xs">支持 Markdown，可选内容将显示在页头标题下方。</p>
         </div>
 
         <!-- Logo Upload -->
         <div class="space-y-2">
-          <Label>Page Logo</Label>
+          <Label>页面徽标</Label>
           <div class="flex items-start gap-4">
             <div class="bg-muted flex h-16 w-16 items-center justify-center rounded-lg border">
               {#if formData.page_logo}
                 <img
                   src={clientResolver(resolve, formData.page_logo)}
-                  alt="Logo"
+                  alt="徽标"
                   class="max-h-14 max-w-14 object-contain"
                 />
               {:else}
@@ -654,10 +652,10 @@
                 >
                   {#if uploadingLogo}
                     <Loader class="h-4 w-4 animate-spin" />
-                    Uploading...
+                    正在上传...
                   {:else}
                     <UploadIcon class="h-4 w-4" />
-                    Upload
+                    上传
                   {/if}
                 </Button>
                 <input
@@ -674,7 +672,7 @@
                   </Button>
                 {/if}
               </div>
-              <p class="text-muted-foreground text-xs">Optional logo for this page (max 256x256px)</p>
+              <p class="text-muted-foreground text-xs">可选的页面徽标（最大 256x256 像素）</p>
             </div>
           </div>
         </div>
@@ -683,10 +681,10 @@
         <Button onclick={savePage} disabled={saving || !isFormValid}>
           {#if saving}
             <Loader class="h-4 w-4 animate-spin" />
-            {isNew ? "Creating..." : "Saving..."}
+            {isNew ? "正在创建..." : "正在保存..."}
           {:else}
             <SaveIcon class="h-4 w-4" />
-            {isNew ? "Create Page" : "Save Changes"}
+            {isNew ? "创建页面" : "保存更改"}
           {/if}
         </Button>
       </Card.Footer>
@@ -696,8 +694,8 @@
     {#if !isNew && currentPage}
       <Card.Root>
         <Card.Header>
-          <Card.Title>Page Monitors</Card.Title>
-          <Card.Description>Select which monitors to display on this page</Card.Description>
+          <Card.Title>页面监控项</Card.Title>
+          <Card.Description>选择要在此页面显示的监控项</Card.Description>
         </Card.Header>
         <Card.Content class="space-y-4">
           <!-- Add Monitor -->
@@ -707,7 +705,7 @@
                 {#if selectedMonitorTag}
                   {monitors.find((m) => m.tag === selectedMonitorTag)?.name || selectedMonitorTag}
                 {:else}
-                  Select a monitor to add
+                  选择要添加的监控项
                 {/if}
               </Select.Trigger>
               <Select.Content>
@@ -715,7 +713,7 @@
                   <Select.Item value={monitor.tag}>{monitor.name} ({monitor.tag})</Select.Item>
                 {/each}
                 {#if availableMonitors.length === 0}
-                  <div class="text-muted-foreground px-2 py-1 text-sm">No available monitors</div>
+                  <div class="text-muted-foreground px-2 py-1 text-sm">没有可添加的监控项</div>
                 {/if}
               </Select.Content>
             </Select.Root>
@@ -724,14 +722,14 @@
                 <Loader class="h-4 w-4 animate-spin" />
               {:else}
                 <PlusIcon class="h-4 w-4" />
-                Add
+                添加
               {/if}
             </Button>
           </div>
 
           <!-- Current Monitors -->
           <div class="space-y-2">
-            <Label>Current Monitors</Label>
+            <Label>当前监控项</Label>
             {#if selectedMonitors.length > 0}
               <div class="space-y-2">
                 {#each selectedMonitors as monitorTag, i (monitorTag)}
@@ -775,9 +773,7 @@
                 {/each}
               </div>
             {:else}
-              <div class="text-muted-foreground bg-muted rounded-lg p-4 text-center text-sm">
-                No monitors added to this page yet
-              </div>
+              <div class="text-muted-foreground bg-muted rounded-lg p-4 text-center text-sm">此页面尚未添加监控项</div>
             {/if}
           </div>
         </Card.Content>
@@ -786,22 +782,20 @@
       <!-- Page Settings Card -->
       <Card.Root>
         <Card.Header>
-          <Card.Title>Display Settings</Card.Title>
-          <Card.Description>Configure what content is shown on this status page</Card.Description>
+          <Card.Title>显示设置</Card.Title>
+          <Card.Description>配置此状态页显示的内容</Card.Description>
         </Card.Header>
         <Card.Content class="space-y-6">
           <!-- Monitor Status History Days -->
           <div class="space-y-4">
             <div>
-              <Label class="text-base font-medium">Monitor Status History</Label>
-              <p class="text-muted-foreground text-sm">
-                Configure how many days of status history to display on the status page
-              </p>
+              <Label class="text-base font-medium">监控状态历史</Label>
+              <p class="text-muted-foreground text-sm">配置状态页显示多少天的状态历史</p>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
               <div class="space-y-2">
-                <Label for="history-desktop">Desktop (days)</Label>
+                <Label for="history-desktop">桌面端（天）</Label>
                 <Input
                   id="history-desktop"
                   type="number"
@@ -811,10 +805,10 @@
                   bind:value={pageSettings.monitor_status_history_days.desktop}
                   class={isHistoryDesktopValid ? "" : "border-destructive"}
                 />
-                <p class="text-muted-foreground text-xs">Number of days shown on desktop screens</p>
+                <p class="text-muted-foreground text-xs">桌面屏幕显示的天数</p>
               </div>
               <div class="space-y-2">
-                <Label for="history-mobile">Mobile (days)</Label>
+                <Label for="history-mobile">移动端（天）</Label>
                 <Input
                   id="history-mobile"
                   type="number"
@@ -824,7 +818,7 @@
                   bind:value={pageSettings.monitor_status_history_days.mobile}
                   class={isHistoryMobileValid ? "" : "border-destructive"}
                 />
-                <p class="text-muted-foreground text-xs">Number of days shown on mobile screens</p>
+                <p class="text-muted-foreground text-xs">移动屏幕显示的天数</p>
               </div>
             </div>
           </div>
@@ -834,30 +828,30 @@
           <!-- Monitor Layout Style -->
           <div class="space-y-4">
             <div>
-              <Label class="text-base font-medium">Monitor Layout Style</Label>
-              <p class="text-muted-foreground text-sm">Choose how monitors are displayed on the status page</p>
+              <Label class="text-base font-medium">监控项布局样式</Label>
+              <p class="text-muted-foreground text-sm">选择监控项在状态页中的显示方式</p>
             </div>
             <Select.Root type="single" bind:value={pageSettings.monitor_layout_style}>
               <Select.Trigger class="w-full">
                 {#if pageSettings.monitor_layout_style === "default-list"}
-                  Default List
+                  默认列表
                 {:else if pageSettings.monitor_layout_style === "default-grid"}
-                  Default Grid
+                  默认网格
                 {:else if pageSettings.monitor_layout_style === "compact-list"}
-                  Compact List
+                  紧凑列表
                 {:else}
-                  Compact Grid
+                  紧凑网格
                 {/if}
               </Select.Trigger>
               <Select.Content>
-                <Select.Item value="default-list">Default List</Select.Item>
-                <Select.Item value="default-grid">Default Grid</Select.Item>
-                <Select.Item value="compact-list">Compact List</Select.Item>
-                <Select.Item value="compact-grid">Compact Grid</Select.Item>
+                <Select.Item value="default-list">默认列表</Select.Item>
+                <Select.Item value="default-grid">默认网格</Select.Item>
+                <Select.Item value="compact-list">紧凑列表</Select.Item>
+                <Select.Item value="compact-grid">紧凑网格</Select.Item>
               </Select.Content>
             </Select.Root>
             <p class="text-muted-foreground text-xs">
-              Default is <code class="bg-muted rounded px-1 font-mono">default-list</code>
+              默认值为 <code class="bg-muted rounded px-1 font-mono">default-list</code>
             </p>
           </div>
         </Card.Content>
@@ -865,10 +859,10 @@
           <Button onclick={() => savePageSettings("display")} disabled={savingDisplaySettings}>
             {#if savingDisplaySettings}
               <Loader class="h-4 w-4 animate-spin" />
-              Saving...
+              正在保存...
             {:else}
               <SaveIcon class="h-4 w-4" />
-              Save Preferences
+              保存显示设置
             {/if}
           </Button>
         </Card.Footer>
@@ -877,10 +871,8 @@
       <!-- Social Preview & SEO Card -->
       <Card.Root>
         <Card.Header>
-          <Card.Title>Social Preview & SEO</Card.Title>
-          <Card.Description
-            >Optional social preview image and meta tags for this page. Leave empty to use site defaults.</Card.Description
-          >
+          <Card.Title>社交预览和 SEO</Card.Title>
+          <Card.Description>配置此页面的社交预览图和元标签，留空则使用站点默认值。</Card.Description>
         </Card.Header>
         <Card.Content class="space-y-4">
           <div class="flex items-start gap-4">
@@ -889,7 +881,7 @@
               {#if pageSettings.socialPagePreviewImage}
                 <img
                   src={clientResolver(resolve, pageSettings.socialPagePreviewImage)}
-                  alt="Social preview"
+                  alt="社交预览"
                   class="h-full w-full rounded-lg object-cover"
                 />
               {:else}
@@ -908,10 +900,10 @@
                 >
                   {#if uploadingSocialPreview}
                     <Loader class="h-4 w-4 animate-spin" />
-                    Uploading...
+                    正在上传...
                   {:else}
                     <UploadIcon class="h-4 w-4" />
-                    Upload Social Preview
+                    上传社交预览图
                   {/if}
                 </Button>
                 <input
@@ -931,40 +923,40 @@
               {#if pageSettings.socialPagePreviewImage}
                 <p class="text-muted-foreground truncate text-xs">{pageSettings.socialPagePreviewImage}</p>
               {:else}
-                <p class="text-muted-foreground text-xs">Optional. Leave empty to use site default.</p>
+                <p class="text-muted-foreground text-xs">可选，留空则使用站点默认值。</p>
               {/if}
             </div>
           </div>
 
           <div class="space-y-2">
-            <Label for="page-metaPageTitle">Meta Title</Label>
+            <Label for="page-metaPageTitle">Meta 标题</Label>
             <Input
               id="page-metaPageTitle"
               type="text"
               bind:value={pageSettings.metaPageTitle}
-              placeholder="Custom page title for search engines"
+              placeholder="搜索引擎使用的自定义页面标题"
             />
-            <p class="text-muted-foreground text-xs">Overrides the default page title in search results</p>
+            <p class="text-muted-foreground text-xs">覆盖搜索结果中的默认页面标题</p>
           </div>
           <div class="space-y-2">
-            <Label for="page-metaPageDescription">Meta Description</Label>
+            <Label for="page-metaPageDescription">Meta 描述</Label>
             <Textarea
               id="page-metaPageDescription"
               bind:value={pageSettings.metaPageDescription}
-              placeholder="Custom description for search engines"
+              placeholder="搜索引擎使用的自定义描述"
               rows={3}
             />
-            <p class="text-muted-foreground text-xs">Shown as the snippet text in search engine results</p>
+            <p class="text-muted-foreground text-xs">作为搜索结果中的摘要文字显示</p>
           </div>
         </Card.Content>
         <Card.Footer class="flex justify-end">
           <Button onclick={() => savePageSettings("seo")} disabled={savingSeoSettings}>
             {#if savingSeoSettings}
               <Loader class="h-4 w-4 animate-spin" />
-              Saving...
+              正在保存...
             {:else}
               <SaveIcon class="h-4 w-4" />
-              Save
+              保存
             {/if}
           </Button>
         </Card.Footer>
@@ -974,23 +966,21 @@
       {#if currentPage.page_path !== ""}
         <Card.Root class="border-destructive">
           <Card.Header>
-            <Card.Title class="text-destructive">Danger Zone</Card.Title>
-            <Card.Description>Irreversible actions for this page</Card.Description>
+            <Card.Title class="text-destructive">危险操作</Card.Title>
+            <Card.Description>对该页面执行不可撤销的操作</Card.Description>
           </Card.Header>
           <Card.Content class="space-y-4">
             <div class="space-y-2">
-              <Label for="delete-confirm">Delete Page</Label>
+              <Label for="delete-confirm">删除页面</Label>
+              <p class="text-muted-foreground text-sm">页面删除后无法恢复，请确认后再操作。</p>
               <p class="text-muted-foreground text-sm">
-                Once you delete a page, there is no going back. Please be certain.
-              </p>
-              <p class="text-muted-foreground text-sm">
-                Type <code class="bg-muted rounded px-1 font-mono">delete {currentPage.page_path || "home"}</code> to confirm:
+                输入 <code class="bg-muted rounded px-1 font-mono">删除 {currentPage.page_path || "home"}</code> 以确认：
               </p>
               <Input
                 id="delete-confirm"
                 type="text"
                 bind:value={deleteConfirmText}
-                placeholder="delete {currentPage.page_path || 'home'}"
+                placeholder="删除 {currentPage.page_path || 'home'}"
               />
             </div>
           </Card.Content>
@@ -998,10 +988,10 @@
             <Button variant="destructive" onclick={deletePage} disabled={!canDelete || deleting}>
               {#if deleting}
                 <Loader class="h-4 w-4 animate-spin" />
-                Deleting...
+                正在删除...
               {:else}
                 <TrashIcon class="h-4 w-4" />
-                Delete Page
+                删除页面
               {/if}
             </Button>
           </Card.Footer>

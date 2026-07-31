@@ -64,24 +64,24 @@
 
   // Options
   const alertForOptions: { value: AlertForType; label: string }[] = [
-    { value: GC.STATUS, label: GC.STATUS },
-    { value: GC.LATENCY, label: GC.LATENCY },
-    { value: GC.UPTIME, label: GC.UPTIME }
+    { value: GC.STATUS, label: "状态" },
+    { value: GC.LATENCY, label: "延迟" },
+    { value: GC.UPTIME, label: "可用率" }
   ];
 
   const statusValueOptions = [
-    { value: GC.DOWN, label: GC.DOWN },
-    { value: GC.DEGRADED, label: GC.DEGRADED }
+    { value: GC.DOWN, label: "中断" },
+    { value: GC.DEGRADED, label: "性能下降" }
   ];
 
   const severityOptions: { value: AlertSeverityType; label: string }[] = [
-    { value: GC.CRITICAL, label: GC.CRITICAL },
-    { value: GC.WARNING, label: GC.WARNING }
+    { value: GC.CRITICAL, label: "严重" },
+    { value: GC.WARNING, label: "警告" }
   ];
 
   const yesNoOptions: { value: YesNoType; label: string }[] = [
-    { value: GC.YES, label: GC.YES },
-    { value: GC.NO, label: GC.NO }
+    { value: GC.YES, label: "是" },
+    { value: GC.NO, label: "否" }
   ];
 
   // Computed labels
@@ -194,14 +194,14 @@
       }
     } catch (error) {
       console.error("Failed to load alert config", error);
-      toast.error("Failed to load alert configuration");
+      toast.error("加载告警配置失败");
       goto(clientResolver(resolve, "/manage/app/alerts"));
     }
   }
 
   async function saveAlertConfig() {
     if (form.monitor_tags.length === 0) {
-      toast.error("Please select at least one monitor");
+      toast.error("请至少选择一个监控器");
       return;
     }
 
@@ -235,13 +235,13 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success(isNew ? "Alert created successfully" : "Alert updated successfully");
+        toast.success(isNew ? "告警创建成功" : "告警更新成功");
         if (isNew) {
           goto(clientResolver(resolve, `/manage/app/alerts/${result.id}`));
         }
       }
     } catch (error) {
-      toast.error("Failed to save alert");
+      toast.error("保存告警失败");
     } finally {
       saving = false;
     }
@@ -262,11 +262,11 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Alert deleted successfully");
+        toast.success("告警删除成功");
         goto(clientResolver(resolve, "/manage/app/alerts"));
       }
     } catch (error) {
-      toast.error("Failed to delete alert");
+      toast.error("删除告警失败");
     } finally {
       deleteDialogOpen = false;
     }
@@ -284,11 +284,11 @@
   <Breadcrumb.Root>
     <Breadcrumb.List>
       <Breadcrumb.Item>
-        <Breadcrumb.Link href={clientResolver(resolve, "/manage/app/alerts")}>Alerts</Breadcrumb.Link>
+        <Breadcrumb.Link href={clientResolver(resolve, "/manage/app/alerts")}>告警</Breadcrumb.Link>
       </Breadcrumb.Item>
       <Breadcrumb.Separator />
       <Breadcrumb.Item>
-        <Breadcrumb.Page>{isNew ? "New Alert" : `Edit Alert #${alertConfigId}`}</Breadcrumb.Page>
+        <Breadcrumb.Page>{isNew ? "新建告警" : `编辑告警 #${alertConfigId}`}</Breadcrumb.Page>
       </Breadcrumb.Item>
     </Breadcrumb.List>
   </Breadcrumb.Root>
@@ -296,40 +296,39 @@
   {#if loading}
     <div class="flex flex-col items-center gap-4 py-16">
       <Spinner class="size-8" />
-      <p class="text-muted-foreground">Loading...</p>
+      <p class="text-muted-foreground">加载中...</p>
     </div>
   {:else}
     <Card.Root>
       <Card.Content class="space-y-6 pt-6">
         <!-- Monitor Selection (Searchable Multi-select) -->
         <div class="flex flex-col gap-2">
-          <Label>Monitors</Label>
-          <p class="text-muted-foreground text-xs">Select which monitors this alert applies to</p>
+          <Label>监控器</Label>
+          <p class="text-muted-foreground text-xs">选择此告警适用的监控器</p>
           <Popover.Root bind:open={monitorPopoverOpen}>
             <Popover.Trigger>
               <Button variant="outline" role="combobox" class="w-full justify-between font-normal">
                 {#if form.monitor_tags.length === 0}
-                  Select monitors...
+                  选择监控器...
                 {:else if form.monitor_tags.length === 1}
                   {monitors.find((m) => m.tag === form.monitor_tags[0])?.name || form.monitor_tags[0]}
                 {:else}
-                  {form.monitor_tags.length} monitors selected
+                  已选择 {form.monitor_tags.length} 个监控器
                 {/if}
                 <ChevronsUpDownIcon class="text-muted-foreground size-4 shrink-0" />
               </Button>
             </Popover.Trigger>
             <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
               <Command.Root>
-                <Command.Input placeholder="Search monitors..." />
+                <Command.Input placeholder="搜索监控器..." />
                 <Command.List>
-                  <Command.Empty>No monitors found.</Command.Empty>
+                  <Command.Empty>未找到监控器。</Command.Empty>
                   <Command.Group>
                     {#each monitors as monitor (monitor.tag)}
-                      <Command.Item
-                        value={monitor.name}
-                        onSelect={() => toggleMonitor(monitor.tag)}
-                      >
-                        <CheckIcon class="size-4 {form.monitor_tags.includes(monitor.tag) ? 'opacity-100' : 'opacity-0'}" />
+                      <Command.Item value={monitor.name} onSelect={() => toggleMonitor(monitor.tag)}>
+                        <CheckIcon
+                          class="size-4 {form.monitor_tags.includes(monitor.tag) ? 'opacity-100' : 'opacity-0'}"
+                        />
                         {monitor.name}
                       </Command.Item>
                     {/each}
@@ -343,11 +342,7 @@
               {#each form.monitor_tags as tag (tag)}
                 <Badge variant="secondary" class="gap-1 pr-1">
                   {monitors.find((m) => m.tag === tag)?.name || tag}
-                  <button
-                    type="button"
-                    class="hover:bg-muted rounded-sm p-0.5"
-                    onclick={() => toggleMonitor(tag)}
-                  >
+                  <button type="button" class="hover:bg-muted rounded-sm p-0.5" onclick={() => toggleMonitor(tag)}>
                     <XIcon class="size-3" />
                   </button>
                 </Badge>
@@ -358,14 +353,14 @@
 
         <!-- Alert For -->
         <div class="flex flex-col gap-2">
-          <Label for="alert-for">Alert Type</Label>
+          <Label for="alert-for">告警类型</Label>
           <Select.Root
             type="single"
             value={form.alert_for}
             onValueChange={(v) => v && handleAlertForChange(v as AlertForType)}
           >
             <Select.Trigger id="alert-for" class="w-full">
-              {alertForOptions.find((o) => o.value === form.alert_for)?.label || "Select type"}
+              {alertForOptions.find((o) => o.value === form.alert_for)?.label || "选择类型"}
             </Select.Trigger>
             <Select.Content>
               {#each alertForOptions as option}
@@ -381,7 +376,7 @@
           {#if form.alert_for === "STATUS"}
             <Select.Root type="single" value={form.alert_value} onValueChange={(v) => v && (form.alert_value = v)}>
               <Select.Trigger id="alert-value" class="w-full">
-                {form.alert_value}
+                {statusValueOptions.find((o) => o.value === form.alert_value)?.label || form.alert_value}
               </Select.Trigger>
               <Select.Content>
                 {#each statusValueOptions as option}
@@ -404,34 +399,34 @@
         <!-- Thresholds -->
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-2">
-            <Label for="failure-threshold">Failure Threshold</Label>
+            <Label for="failure-threshold">失败阈值</Label>
             <Input id="failure-threshold" type="number" min="1" bind:value={form.failure_threshold} />
-            <p class="text-muted-foreground text-xs">Consecutive failures before alert</p>
+            <p class="text-muted-foreground text-xs">触发告警前允许的连续失败次数</p>
           </div>
 
           <div class="flex flex-col gap-2">
-            <Label for="success-threshold">Success Threshold</Label>
+            <Label for="success-threshold">恢复阈值</Label>
             <Input id="success-threshold" type="number" min="1" bind:value={form.success_threshold} />
-            <p class="text-muted-foreground text-xs">Consecutive successes to resolve</p>
+            <p class="text-muted-foreground text-xs">解除告警所需的连续成功次数</p>
           </div>
         </div>
 
         <!-- Generated Alert Text -->
         <div class="flex flex-col gap-2">
-          <Label>Details</Label>
+          <Label>详细信息</Label>
           <p class="text-muted-foreground bg-muted/40 rounded-md border p-3 text-sm">{alertDescriptionText}</p>
         </div>
 
         <!-- Severity -->
         <div class="flex flex-col gap-2">
-          <Label for="severity">Severity</Label>
+          <Label for="severity">严重程度</Label>
           <Select.Root
             type="single"
             value={form.severity}
             onValueChange={(v) => v && (form.severity = v as AlertSeverityType)}
           >
             <Select.Trigger id="severity" class="w-full">
-              {severityOptions.find((o) => o.value === form.severity)?.label || "Select severity"}
+              {severityOptions.find((o) => o.value === form.severity)?.label || "选择严重程度"}
             </Select.Trigger>
             <Select.Content>
               {#each severityOptions as option}
@@ -443,14 +438,14 @@
 
         <!-- Create Incident -->
         <div class="flex flex-col gap-2">
-          <Label for="create-incident">Create Incident</Label>
+          <Label for="create-incident">创建事件</Label>
           <Select.Root
             type="single"
             value={form.create_incident}
             onValueChange={(v) => v && (form.create_incident = v as YesNoType)}
           >
             <Select.Trigger id="create-incident" class="w-full">
-              {form.create_incident}
+              {yesNoOptions.find((o) => o.value === form.create_incident)?.label || form.create_incident}
             </Select.Trigger>
             <Select.Content>
               {#each yesNoOptions as option}
@@ -458,15 +453,15 @@
               {/each}
             </Select.Content>
           </Select.Root>
-          <p class="text-muted-foreground text-xs">Automatically create an incident when this alert triggers</p>
+          <p class="text-muted-foreground text-xs">此告警触发时自动创建事件</p>
         </div>
 
         <!-- Is Active (only when editing) -->
         {#if !isNew}
           <div class="flex items-center justify-between">
             <div>
-              <Label>Active</Label>
-              <p class="text-muted-foreground text-xs">Enable or disable this alert</p>
+              <Label>启用</Label>
+              <p class="text-muted-foreground text-xs">启用或停用此告警</p>
             </div>
             <Switch
               checked={form.is_active === GC.YES}
@@ -477,10 +472,10 @@
 
         <!-- Description -->
         <div class="flex flex-col gap-2">
-          <Label for="alert-description">Description (optional)</Label>
+          <Label for="alert-description">描述（可选）</Label>
           <Textarea
             id="alert-description"
-            placeholder="Add a description for this alert..."
+            placeholder="添加此告警的描述..."
             bind:value={form.alert_description}
             rows={2}
           />
@@ -489,8 +484,8 @@
         <!-- Triggers -->
         {#if triggers.length > 0}
           <div class="flex flex-col gap-2">
-            <Label>Notification Triggers</Label>
-            <p class="text-muted-foreground text-xs">Select which triggers to notify when this alert fires</p>
+            <Label>通知触发器</Label>
+            <p class="text-muted-foreground text-xs">选择此告警触发时要通知的触发器</p>
             <div class="mt-2 grid gap-2">
               {#each triggers as trigger (trigger.id)}
                 <label
@@ -513,21 +508,21 @@
           </div>
         {:else}
           <p class="text-muted-foreground text-sm">
-            No notification triggers available. <a
+            暂无可用的通知触发器。<a
               href={clientResolver(resolve, "/manage/app/triggers")}
-              class="text-primary underline">Create a trigger</a
-            > to receive notifications.
+              class="text-primary underline">创建触发器</a
+            > 以接收通知。
           </p>
         {/if}
       </Card.Content>
 
       <Card.Footer class="flex justify-between">
-        <Button variant="outline" onclick={() => goto(clientResolver(resolve, "/manage/app/alerts"))}>Cancel</Button>
+        <Button variant="outline" onclick={() => goto(clientResolver(resolve, "/manage/app/alerts"))}>取消</Button>
         <Button onclick={saveAlertConfig} disabled={saving}>
           {#if saving}
             <Spinner class="size-4" />
           {/if}
-          {isNew ? "Create Alert" : "Save Changes"}
+          {isNew ? "创建告警" : "保存更改"}
         </Button>
       </Card.Footer>
     </Card.Root>
@@ -536,13 +531,13 @@
     {#if !isNew}
       <Card.Root class="border-destructive">
         <Card.Header>
-          <Card.Title class="text-destructive">Danger Zone</Card.Title>
-          <Card.Description>Irreversible actions for this alert configuration.</Card.Description>
+          <Card.Title class="text-destructive">危险操作</Card.Title>
+          <Card.Description>此告警配置的不可逆操作。</Card.Description>
         </Card.Header>
         <Card.Content>
           <Button variant="destructive" onclick={() => (deleteDialogOpen = true)}>
             <TrashIcon class="size-4" />
-            Delete Alert
+            删除告警
           </Button>
         </Card.Content>
       </Card.Root>
@@ -554,14 +549,12 @@
 <AlertDialog.Root bind:open={deleteDialogOpen}>
   <AlertDialog.Content>
     <AlertDialog.Header>
-      <AlertDialog.Title>Delete Alert</AlertDialog.Title>
-      <AlertDialog.Description>
-        Are you sure you want to delete this alert? This action cannot be undone.
-      </AlertDialog.Description>
+      <AlertDialog.Title>删除告警</AlertDialog.Title>
+      <AlertDialog.Description>确定要删除此告警吗？此操作无法撤销。</AlertDialog.Description>
     </AlertDialog.Header>
     <AlertDialog.Footer>
-      <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-      <AlertDialog.Action onclick={deleteAlertConfig}>Delete</AlertDialog.Action>
+      <AlertDialog.Cancel>取消</AlertDialog.Cancel>
+      <AlertDialog.Action onclick={deleteAlertConfig}>删除</AlertDialog.Action>
     </AlertDialog.Footer>
   </AlertDialog.Content>
 </AlertDialog.Root>

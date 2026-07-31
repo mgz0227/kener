@@ -30,17 +30,17 @@
 
   async function handleAcceptInvitation() {
     if (!newPassword || !confirmPassword) {
-      toast.error("Please fill in all fields");
+      toast.error("请填写所有字段");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error("两次密码不一致");
       return;
     }
 
     if (newPassword.length < 8) {
-      toast.error("Password must be at least 8 characters");
+      toast.error("密码至少需要 8 个字符");
       return;
     }
 
@@ -55,14 +55,14 @@
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.error || "Failed to set password");
+        toast.error(data.error || "设置密码失败");
         return;
       }
 
       accountActivated = true;
-      toast.success("Account activated successfully!");
+      toast.success("账户激活成功！");
     } catch (e) {
-      toast.error("An error occurred. Please try again.");
+      toast.error("发生错误，请重试。");
     } finally {
       loading = false;
     }
@@ -75,7 +75,7 @@
 </script>
 
 <svelte:head>
-  <title>Accept Invitation</title>
+  <title>接受邀请</title>
 </svelte:head>
 
 <div class="flex min-h-screen items-center justify-center p-4">
@@ -86,13 +86,13 @@
         <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
           <AlertCircleIcon class="h-8 w-8 text-red-600" />
         </div>
-        <Card.Title>Invalid Invitation</Card.Title>
+        <Card.Title>邀请无效</Card.Title>
         <Card.Description>{error}</Card.Description>
       </Card.Header>
       <Card.Content>
         <Button href={clientResolver(resolve, "/account/signin")} class="w-full">
           <ArrowLeftIcon class="mr-2 h-4 w-4" />
-          Go to Sign In
+          前往登录
         </Button>
       </Card.Content>
     {:else if accountActivated}
@@ -101,31 +101,28 @@
         <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
           <CheckCircleIcon class="h-8 w-8 text-green-600" />
         </div>
-        <Card.Title>Account Activated</Card.Title>
-        <Card.Description>
-          Your account has been set up successfully. You can now sign in with your new password.
-        </Card.Description>
+        <Card.Title>账户已激活</Card.Title>
+        <Card.Description>账户已成功设置，现在可以使用新密码登录。</Card.Description>
       </Card.Header>
       <Card.Content>
         <Button href={clientResolver(resolve, "/account/signin")} class="w-full">
           <ArrowLeftIcon class="mr-2 h-4 w-4" />
-          Go to Sign In
+          前往登录
         </Button>
       </Card.Content>
     {:else}
       <!-- Set Password View -->
       <Card.Header>
-        <Card.Title>Welcome, {name}!</Card.Title>
+        <Card.Title>欢迎，{name}！</Card.Title>
         <Card.Description>
-          You've been invited to join as <strong>{email}</strong>. Create a password to activate your account and get
-          started.
+          你已受邀以 <strong>{email}</strong> 加入。请创建密码以激活账户并开始使用。
         </Card.Description>
       </Card.Header>
       <Card.Content>
         <form onsubmit={handleSubmit}>
           <Field.Group>
             <Field.Field class="relative flex flex-col gap-1">
-              <Field.Label for="newPassword">Password</Field.Label>
+              <Field.Label for="newPassword">密码</Field.Label>
               <InputGroup.Root>
                 <InputGroup.Addon>
                   <LockIcon />
@@ -140,8 +137,8 @@
                 <InputGroup.Addon align="inline-end">
                   <InputGroup.Button
                     type="button"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                    title={showPassword ? "Hide password" : "Show password"}
+                    aria-label={showPassword ? "隐藏密码" : "显示密码"}
+                    title={showPassword ? "隐藏密码" : "显示密码"}
                     size="icon-xs"
                     onclick={() => (showPassword = !showPassword)}
                   >
@@ -153,13 +150,11 @@
                   </InputGroup.Button>
                 </InputGroup.Addon>
               </InputGroup.Root>
-              <Field.Description>
-                Password must contain at least 8 characters, one uppercase, one lowercase, and one number.
-              </Field.Description>
+              <Field.Description>密码至少需要 8 个字符，并包含一个大写字母、一个小写字母和一个数字。</Field.Description>
             </Field.Field>
 
             <Field.Field class="relative flex flex-col gap-1">
-              <Field.Label for="confirmPassword">Confirm Password</Field.Label>
+              <Field.Label for="confirmPassword">确认密码</Field.Label>
               <InputGroup.Root>
                 <InputGroup.Addon>
                   <LockIcon />
@@ -174,8 +169,8 @@
                 <InputGroup.Addon align="inline-end">
                   <InputGroup.Button
                     type="button"
-                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                    title={showConfirmPassword ? "Hide password" : "Show password"}
+                    aria-label={showConfirmPassword ? "隐藏密码" : "显示密码"}
+                    title={showConfirmPassword ? "隐藏密码" : "显示密码"}
                     size="icon-xs"
                     onclick={() => (showConfirmPassword = !showConfirmPassword)}
                   >
@@ -193,9 +188,9 @@
           <div class="mt-6">
             <Button type="submit" class="w-full" disabled={loading}>
               {#if loading}
-                Activating Account...
+                正在激活账户……
               {:else}
-                Activate Account
+                激活账户
               {/if}
             </Button>
           </div>
@@ -203,7 +198,7 @@
           <div class="mt-4 text-center">
             <Button variant="link" href={clientResolver(resolve, "/account/signin")} class="text-sm">
               <ArrowLeftIcon class="mr-1 h-3 w-3" />
-              Back to Sign In
+              返回登录
             </Button>
           </div>
         </form>

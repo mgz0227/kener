@@ -30,7 +30,7 @@
 
   async function handleRequestReset() {
     if (!email) {
-      toast.error("Please enter your email address");
+      toast.error("请输入邮箱地址");
       return;
     }
 
@@ -45,14 +45,14 @@
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.error || "Failed to send reset email");
+        toast.error(data.error || "发送重置邮件失败");
         return;
       }
 
       emailSent = true;
-      toast.success("Password reset email sent!");
+      toast.success("密码重置邮件已发送！");
     } catch (e) {
-      toast.error("An error occurred. Please try again.");
+      toast.error("发生错误，请重试。");
     } finally {
       loading = false;
     }
@@ -60,17 +60,17 @@
 
   async function handlePasswordReset() {
     if (!newPassword || !confirmPassword) {
-      toast.error("Please fill in all fields");
+      toast.error("请填写所有字段");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error("两次密码不一致");
       return;
     }
 
     if (newPassword.length < 8) {
-      toast.error("Password must be at least 8 characters");
+      toast.error("密码至少需要 8 个字符");
       return;
     }
 
@@ -85,14 +85,14 @@
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.error || "Failed to reset password");
+        toast.error(data.error || "重置密码失败");
         return;
       }
 
       passwordReset = true;
-      toast.success("Password reset successfully!");
+      toast.success("密码重置成功！");
     } catch (e) {
-      toast.error("An error occurred. Please try again.");
+      toast.error("发生错误，请重试。");
     } finally {
       loading = false;
     }
@@ -109,7 +109,7 @@
 </script>
 
 <svelte:head>
-  <title>{view === "confirm_token" ? "Reset Password" : "Forgot Password"}</title>
+  <title>{view === "confirm_token" ? "重置密码" : "忘记密码"}</title>
 </svelte:head>
 <div class="flex min-h-screen items-center justify-center p-4">
   <Card.Root class="kener-card w-full max-w-md">
@@ -120,27 +120,25 @@
           <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
             <CheckCircleIcon class="h-8 w-8 text-green-600" />
           </div>
-          <Card.Title>Password Reset Complete</Card.Title>
-          <Card.Description>
-            Your password has been reset successfully. You can now sign in with your new password.
-          </Card.Description>
+          <Card.Title>密码重置完成</Card.Title>
+          <Card.Description>密码已成功重置，现在可以使用新密码登录。</Card.Description>
         </Card.Header>
         <Card.Content>
           <Button href={clientResolver(resolve, "/account/signin")} class="w-full">
             <ArrowLeftIcon class="mr-2 h-4 w-4" />
-            Back to Sign In
+            返回登录
           </Button>
         </Card.Content>
       {:else}
         <Card.Header>
-          <Card.Title>Set New Password</Card.Title>
-          <Card.Description>Enter your new password below to complete the reset process.</Card.Description>
+          <Card.Title>设置新密码</Card.Title>
+          <Card.Description>请输入新密码以完成重置。</Card.Description>
         </Card.Header>
         <Card.Content>
           <form onsubmit={handleSubmit}>
             <Field.Group>
               <Field.Field class="relative flex flex-col gap-1">
-                <Field.Label for="newPassword">New Password</Field.Label>
+                <Field.Label for="newPassword">新密码</Field.Label>
                 <InputGroup.Root>
                   <InputGroup.Addon>
                     <LockIcon />
@@ -155,8 +153,8 @@
                   <InputGroup.Addon align="inline-end">
                     <InputGroup.Button
                       type="button"
-                      aria-label={showPassword ? "Hide password" : "Show password"}
-                      title={showPassword ? "Hide password" : "Show password"}
+                      aria-label={showPassword ? "隐藏密码" : "显示密码"}
+                      title={showPassword ? "隐藏密码" : "显示密码"}
                       size="icon-xs"
                       onclick={() => (showPassword = !showPassword)}
                     >
@@ -168,11 +166,11 @@
                     </InputGroup.Button>
                   </InputGroup.Addon>
                 </InputGroup.Root>
-                <Field.Description>Password must be at least 8 characters.</Field.Description>
+                <Field.Description>密码至少需要 8 个字符。</Field.Description>
               </Field.Field>
 
               <Field.Field class="relative flex flex-col gap-1">
-                <Field.Label for="confirmPassword">Confirm Password</Field.Label>
+                <Field.Label for="confirmPassword">确认密码</Field.Label>
                 <InputGroup.Root>
                   <InputGroup.Addon>
                     <LockIcon />
@@ -187,8 +185,8 @@
                   <InputGroup.Addon align="inline-end">
                     <InputGroup.Button
                       type="button"
-                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                      title={showConfirmPassword ? "Hide password" : "Show password"}
+                      aria-label={showConfirmPassword ? "隐藏密码" : "显示密码"}
+                      title={showConfirmPassword ? "隐藏密码" : "显示密码"}
                       size="icon-xs"
                       onclick={() => (showConfirmPassword = !showConfirmPassword)}
                     >
@@ -206,9 +204,9 @@
             <div class="mt-6">
               <Button type="submit" class="w-full" disabled={loading}>
                 {#if loading}
-                  Resetting Password...
+                  正在重置密码……
                 {:else}
-                  Reset Password
+                  重置密码
                 {/if}
               </Button>
             </div>
@@ -216,7 +214,7 @@
             <div class="mt-4 text-center">
               <Button variant="link" href={clientResolver(resolve, "/account/signin")} class="text-sm">
                 <ArrowLeftIcon class="mr-1 h-3 w-3" />
-                Back to Sign In
+                返回登录
               </Button>
             </div>
           </form>
@@ -229,36 +227,31 @@
           <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
             <MailIcon class="h-8 w-8 text-blue-600" />
           </div>
-          <Card.Title>Check Your Email</Card.Title>
+          <Card.Title>请检查邮箱</Card.Title>
           <Card.Description>
-            We've sent a password reset link to <strong>{email}</strong>. Please check your inbox and click the link to
-            reset your password.
+            我们已将密码重置链接发送到 <strong>{email}</strong>，请检查收件箱并点击链接重置密码。
           </Card.Description>
         </Card.Header>
         <Card.Content>
-          <p class="text-muted-foreground mb-4 text-center text-sm">
-            Didn't receive the email? Check your spam folder or try again.
-          </p>
-          <Button variant="outline" class="w-full" onclick={() => (emailSent = false)}>Try Again</Button>
+          <p class="text-muted-foreground mb-4 text-center text-sm">没有收到邮件？请检查垃圾邮件文件夹，或重试。</p>
+          <Button variant="outline" class="w-full" onclick={() => (emailSent = false)}>重试</Button>
           <div class="mt-4 text-center">
             <Button variant="link" href={clientResolver(resolve, "/account/signin")} class="text-sm">
               <ArrowLeftIcon class="mr-1 h-3 w-3" />
-              Back to Sign In
+              返回登录
             </Button>
           </div>
         </Card.Content>
       {:else}
         <Card.Header>
-          <Card.Title>Forgot Password</Card.Title>
-          <Card.Description>
-            Enter your email address and we'll send you a link to reset your password.
-          </Card.Description>
+          <Card.Title>忘记密码</Card.Title>
+          <Card.Description>输入邮箱地址，我们会向你发送密码重置链接。</Card.Description>
         </Card.Header>
         <Card.Content>
           <form onsubmit={handleSubmit}>
             <Field.Group>
               <Field.Field class="relative flex flex-col gap-1">
-                <Field.Label for="email">Email</Field.Label>
+                <Field.Label for="email">邮箱</Field.Label>
                 <InputGroup.Root>
                   <InputGroup.Addon>
                     <MailIcon />
@@ -271,9 +264,9 @@
             <div class="mt-6">
               <Button type="submit" class="w-full" disabled={loading}>
                 {#if loading}
-                  Sending Reset Link...
+                  正在发送重置链接……
                 {:else}
-                  Send Reset Link
+                  发送重置链接
                 {/if}
               </Button>
             </div>
@@ -281,7 +274,7 @@
             <div class="mt-4 text-center">
               <Button variant="link" href={clientResolver(resolve, "/account/signin")} class="text-sm">
                 <ArrowLeftIcon class="mr-1 h-3 w-3" />
-                Back to Sign In
+                返回登录
               </Button>
             </div>
           </form>

@@ -61,9 +61,9 @@
   </Popover.Trigger>
   <Popover.Content class="w-[280px] p-0">
     <Command.Root>
-      <Command.Input placeholder="Search timezone..." />
+      <Command.Input placeholder="搜索时区……" />
       <Command.List class="max-h-60">
-        <Command.Empty>No timezone found.</Command.Empty>
+        <Command.Empty>未找到时区。</Command.Empty>
         <Command.Group>
           {#each $timezone.availableTimezones as tz (tz)}
             <Command.Item value={tz} onSelect={() => handleTimezoneSelect(tz)} class="text-xs">

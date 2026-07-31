@@ -36,13 +36,13 @@ export const load: LayoutServerLoad = async ({ cookies, route }) => {
 
   const requiredPermission = ROUTE_PERMISSION_MAP[routeId];
   if (requiredPermission === undefined) {
-    throw error(403, "Forbidden");
+    throw error(403, "禁止访问");
   }
   if (requiredPermission !== null) {
     try {
       RequirePermission(userPermissions, requiredPermission);
     } catch {
-      throw error(403, "Forbidden");
+      throw error(403, "禁止访问");
     }
   }
 

@@ -89,6 +89,17 @@
   let savingComment = $state<boolean>(false);
 
   const states = [GC.INVESTIGATING, GC.IDENTIFIED, GC.MONITORING, GC.RESOLVED];
+  const stateLabels: Record<string, string> = {
+    [GC.INVESTIGATING]: "调查中",
+    [GC.IDENTIFIED]: "已定位",
+    [GC.MONITORING]: "监控中",
+    [GC.RESOLVED]: "已解决"
+  };
+  const impactLabels: Record<string, string> = {
+    DOWN: "中断",
+    DEGRADED: "性能下降",
+    MAINTENANCE: "维护中"
+  };
 
   // Convert timestamp to local datetime string for input (YYYY-MM-DDTHH:MM format)
   function timestampToLocalDatetime(ts: number): string {
@@ -156,10 +167,10 @@
         // Fetch comments and monitors
         await Promise.all([fetchComments(), fetchIncidentMonitors()]);
       } else {
-        error = "Incident not found";
+        error = "未找到事件";
       }
     } catch (e) {
-      error = e instanceof Error ? e.message : "Failed to fetch incident";
+      error = e instanceof Error ? e.message : "获取事件失败";
     } finally {
       loading = false;
     }
@@ -296,7 +307,7 @@
               })
             });
           }
-          toast.success("Incident created successfully");
+          toast.success("事件创建成功");
           goto(clientResolver(resolve, `/manage/app/incidents/${incidentId}`));
         }
       } else {
@@ -384,11 +395,11 @@
           // Update originalMonitors to reflect current state
           originalMonitors = [...incidentMonitors];
 
-          toast.success("Changes saved successfully");
+          toast.success("更改已保存");
         }
       }
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to save");
+      toast.error(e instanceof Error ? e.message : "保存失败");
     } finally {
       saving = false;
     }
@@ -415,14 +426,14 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Monitor added to incident");
+        toast.success("监控器已添加到事件");
         await fetchIncidentMonitors();
         addMonitorDialogOpen = false;
         selectedMonitorTag = "";
         selectedMonitorImpact = "DOWN";
       }
     } catch (e) {
-      toast.error("Failed to add monitor");
+      toast.error("添加监控器失败");
     } finally {
       addingMonitor = false;
     }
@@ -446,11 +457,11 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Monitor removed from incident");
+        toast.success("监控器已从事件中移除");
         await fetchIncidentMonitors();
       }
     } catch {
-      toast.error("Failed to remove monitor");
+      toast.error("移除监控器失败");
     }
   }
 
@@ -512,7 +523,7 @@
         if (result.error) {
           toast.error(result.error);
         } else {
-          toast.success("Update saved");
+          toast.success("更新已保存");
           await fetchComments();
           await fetchIncident();
           cancelEditComment();
@@ -536,14 +547,14 @@
         if (result.error) {
           toast.error(result.error);
         } else {
-          toast.success("Update added");
+          toast.success("更新已添加");
           await fetchComments();
           await fetchIncident();
           cancelAddComment();
         }
       }
     } catch {
-      toast.error("Failed to save update");
+      toast.error("保存更新失败");
     } finally {
       savingComment = false;
     }
@@ -567,11 +578,11 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Update deleted");
+        toast.success("更新已删除");
         await fetchComments();
       }
     } catch {
-      toast.error("Failed to delete update");
+      toast.error("删除更新失败");
     }
   }
 
@@ -643,7 +654,7 @@
   let deleteDialogOpen = $state(false);
   let deleteConfirmText = $state("");
   let deleting = $state(false);
-  const deleteConfirmPhrase = $derived(`delete incident ${params.incident_id}`);
+  const deleteConfirmPhrase = $derived(`删除事件 ${params.incident_id}`);
   const deleteConfirmed = $derived(deleteConfirmText === deleteConfirmPhrase);
 
   async function deleteIncident() {
@@ -662,11 +673,11 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Incident deleted successfully");
+        toast.success("事件删除成功");
         window.location.replace(clientResolver(resolve, "/manage/app/incidents"));
       }
     } catch {
-      toast.error("Failed to delete incident");
+      toast.error("删除事件失败");
     } finally {
       deleting = false;
     }
@@ -684,11 +695,11 @@
     <Breadcrumb.Root>
       <Breadcrumb.List>
         <Breadcrumb.Item>
-          <Breadcrumb.Link href={clientResolver(resolve, "/manage/app/incidents")}>Incidents</Breadcrumb.Link>
+          <Breadcrumb.Link href={clientResolver(resolve, "/manage/app/incidents")}>事件</Breadcrumb.Link>
         </Breadcrumb.Item>
         <Breadcrumb.Separator />
         <Breadcrumb.Item>
-          <Breadcrumb.Page>{isNew ? "New Incident" : `Edit Incident #${params.incident_id}`}</Breadcrumb.Page>
+          <Breadcrumb.Page>{isNew ? "新建事件" : `编辑事件 #${params.incident_id}`}</Breadcrumb.Page>
         </Breadcrumb.Item>
       </Breadcrumb.List>
     </Breadcrumb.Root>
@@ -700,38 +711,37 @@
           size="sm"
           href={clientResolver(resolve, `/incidents/${params.incident_id}`)}
         >
-          View
+          查看
         </Button>
         <Dialog.Root bind:open={deleteDialogOpen} onOpenChange={() => (deleteConfirmText = "")}>
           <Dialog.Trigger>
             {#snippet child({ props })}
               <Button {...props} variant="destructive" size="sm">
                 <TrashIcon class="size-4" />
-                Delete
+                删除
               </Button>
             {/snippet}
           </Dialog.Trigger>
           <Dialog.Content>
             <Dialog.Header>
-              <Dialog.Title>Delete Incident</Dialog.Title>
+              <Dialog.Title>删除事件</Dialog.Title>
               <Dialog.Description>
-                This action cannot be undone. This will permanently delete the incident, its updates, and remove all
-                associated monitor links.
+                此操作无法撤销，将永久删除该事件及其更新，并移除所有关联的监控器链接。
               </Dialog.Description>
             </Dialog.Header>
             <div class="space-y-4 py-4">
               <div class="flex flex-col gap-2">
-                <Label>Type <span class="font-mono font-semibold">{deleteConfirmPhrase}</span> to confirm</Label>
+                <Label>请输入 <span class="font-mono font-semibold">{deleteConfirmPhrase}</span> 进行确认</Label>
                 <Input bind:value={deleteConfirmText} placeholder={deleteConfirmPhrase} />
               </div>
             </div>
             <Dialog.Footer>
-              <Button variant="outline" onclick={() => (deleteDialogOpen = false)}>Cancel</Button>
+              <Button variant="outline" onclick={() => (deleteDialogOpen = false)}>取消</Button>
               <Button variant="destructive" onclick={deleteIncident} disabled={!deleteConfirmed || deleting}>
                 {#if deleting}
                   <Loader class="size-4 animate-spin" />
                 {/if}
-                Delete Incident
+                删除事件
               </Button>
             </Dialog.Footer>
           </Dialog.Content>
@@ -757,12 +767,12 @@
     <!-- Incident Details -->
     <Card.Root>
       <Card.Header>
-        <Card.Title>{isNew ? "Create New Incident" : "Incident Details"}</Card.Title>
+        <Card.Title>{isNew ? "创建新事件" : "事件详情"}</Card.Title>
         <Card.Description>
           {#if isNew}
-            Create a new incident to track
+            创建要跟踪的新事件
           {:else}
-            Edit incident details and manage updates
+            编辑事件详情并管理更新
           {/if}
         </Card.Description>
       </Card.Header>
@@ -773,34 +783,34 @@
             <Badge
               variant="outline"
               class="text-{incident.state.toLowerCase()} border-{incident.state.toLowerCase()} font-semibold"
-              >{incident.state}</Badge
+              >{stateLabels[incident.state] || incident.state}</Badge
             >
           </div>
         {/if}
 
         <!-- Title -->
         <div class="flex flex-col gap-2">
-          <Label for="incident-title">Title <span class="text-destructive">*</span></Label>
-          <Input id="incident-title" bind:value={incident.title} placeholder="Brief description of the incident" />
+          <Label for="incident-title">标题 <span class="text-destructive">*</span></Label>
+          <Input id="incident-title" bind:value={incident.title} placeholder="简要描述此事件" />
         </div>
 
         <!-- Start Date/Time -->
         <div class="flex flex-col gap-2">
-          <Label for="incident-start">Start Date/Time <span class="text-destructive">*</span></Label>
+          <Label for="incident-start">开始日期/时间 <span class="text-destructive">*</span></Label>
           <Input
             id="incident-start"
             type="datetime-local"
             value={startDateTimeLocal}
             onchange={handleStartDateChange}
           />
-          <p class="text-muted-foreground text-xs">Enter time in your local timezone. It will be stored as UTC.</p>
+          <p class="text-muted-foreground text-xs">请输入本地时区时间，系统将以 UTC 存储。</p>
         </div>
 
         <!-- Global Visibility -->
         <div class="flex items-center justify-between rounded-md border p-3">
           <div class="flex flex-col gap-1">
-            <Label for="is-global">Global Incident</Label>
-            <p class="text-muted-foreground text-xs">When enabled, this incident will be visible on all status pages</p>
+            <Label for="is-global">全局事件</Label>
+            <p class="text-muted-foreground text-xs">启用后，此事件将在所有状态页上显示</p>
           </div>
           <Switch
             id="is-global"
@@ -814,7 +824,7 @@
         <!-- First Comment (only for new) -->
         {#if isNew}
           <div class="flex flex-col gap-2">
-            <Label for="first-comment">Initial Update (Optional)</Label>
+            <Label for="first-comment">初始更新（可选）</Label>
             <div class="overflow-hidden rounded-md border">
               <CodeMirror
                 bind:value={firstComment}
@@ -829,33 +839,31 @@
                 }}
               />
             </div>
-            <p class="text-muted-foreground text-xs">
-              Supports Markdown. This will be added as the first update for this incident.
-            </p>
+            <p class="text-muted-foreground text-xs">支持 Markdown。此内容将作为该事件的第一条更新。</p>
           </div>
         {/if}
 
         <!-- Affected Monitors (for both new and existing incidents) -->
         <div class="flex flex-col gap-2">
           <div class="flex items-center justify-between">
-            <Label>Affected Monitors (Optional)</Label>
+            <Label>受影响的监控器（可选）</Label>
             <Dialog.Root bind:open={addMonitorDialogOpen}>
               <Dialog.Trigger>
                 {#snippet child({ props })}
                   <Button {...props} size="sm" variant="outline" disabled={unassignedMonitors.length === 0}>
                     <PlusIcon class="size-4" />
-                    Add Monitor
+                    添加监控器
                   </Button>
                 {/snippet}
               </Dialog.Trigger>
               <Dialog.Content>
                 <Dialog.Header>
-                  <Dialog.Title>Add Affected Monitor</Dialog.Title>
-                  <Dialog.Description>Select a monitor and its impact level</Dialog.Description>
+                  <Dialog.Title>添加受影响的监控器</Dialog.Title>
+                  <Dialog.Description>选择监控器及其影响级别</Dialog.Description>
                 </Dialog.Header>
                 <div class="space-y-4 py-4">
                   <div class="flex flex-col gap-2">
-                    <Label>Monitor</Label>
+                    <Label>监控器</Label>
                     <Select.Root
                       type="single"
                       value={selectedMonitorTag}
@@ -864,7 +872,7 @@
                       }}
                     >
                       <Select.Trigger class="w-full">
-                        {selectedMonitorTag ? getMonitorName(selectedMonitorTag) : "Select a monitor"}
+                        {selectedMonitorTag ? getMonitorName(selectedMonitorTag) : "选择监控器"}
                       </Select.Trigger>
                       <Select.Content>
                         {#each unassignedMonitors as monitor}
@@ -874,7 +882,7 @@
                     </Select.Root>
                   </div>
                   <div class="flex flex-col gap-2">
-                    <Label>Impact Level</Label>
+                    <Label>影响级别</Label>
                     <Select.Root
                       type="single"
                       value={selectedMonitorImpact}
@@ -883,24 +891,24 @@
                       }}
                     >
                       <Select.Trigger class="w-full">
-                        {selectedMonitorImpact}
+                        {impactLabels[selectedMonitorImpact] || selectedMonitorImpact}
                       </Select.Trigger>
                       <Select.Content>
-                        <Select.Item value="DOWN">Down</Select.Item>
-                        <Select.Item value="DEGRADED">Degraded</Select.Item>
+                        <Select.Item value="DOWN">中断</Select.Item>
+                        <Select.Item value="DEGRADED">性能下降</Select.Item>
                       </Select.Content>
                     </Select.Root>
                   </div>
                 </div>
                 <Dialog.Footer>
-                  <Button variant="outline" onclick={() => (addMonitorDialogOpen = false)}>Cancel</Button>
-                  <Button onclick={addMonitorToList} disabled={!selectedMonitorTag}>Add Monitor</Button>
+                  <Button variant="outline" onclick={() => (addMonitorDialogOpen = false)}>取消</Button>
+                  <Button onclick={addMonitorToList} disabled={!selectedMonitorTag}>添加监控器</Button>
                 </Dialog.Footer>
               </Dialog.Content>
             </Dialog.Root>
           </div>
           {#if incidentMonitors.length === 0}
-            <p class="text-muted-foreground text-sm">No monitors selected</p>
+            <p class="text-muted-foreground text-sm">未选择监控器</p>
           {:else}
             <div class="space-y-2">
               {#each incidentMonitors as monitor}
@@ -912,7 +920,7 @@
                       class="text-{monitor.monitor_impact?.toLowerCase() ||
                         'default'} font-semibold border-{monitor.monitor_impact?.toLowerCase() || 'default'}"
                     >
-                      {monitor.monitor_impact || "Unknown"}
+                      {impactLabels[monitor.monitor_impact || ""] || monitor.monitor_impact || "未知"}
                     </Badge>
                   </div>
                   <DropdownMenu.Root>
@@ -924,7 +932,7 @@
                       {/snippet}
                     </DropdownMenu.Trigger>
                     <DropdownMenu.Content align="end">
-                      <DropdownMenu.Label>Update Impact</DropdownMenu.Label>
+                      <DropdownMenu.Label>更新影响</DropdownMenu.Label>
                       <DropdownMenu.Group>
                         <DropdownMenu.Item
                           class="cursor-pointer"
@@ -936,7 +944,7 @@
                             {:else}
                               <span class="size-4"></span>
                             {/if}
-                            Down
+                            中断
                           </span>
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
@@ -949,7 +957,7 @@
                             {:else}
                               <span class="size-4"></span>
                             {/if}
-                            Degraded
+                            性能下降
                           </span>
                         </DropdownMenu.Item>
                       </DropdownMenu.Group>
@@ -959,7 +967,7 @@
                         onclick={() => removeMonitorFromList(monitor.monitor_tag)}
                       >
                         <TrashIcon class="size-4" />
-                        Remove
+                        移除
                       </DropdownMenu.Item>
                     </DropdownMenu.Content>
                   </DropdownMenu.Root>
@@ -976,7 +984,7 @@
           {:else}
             <SaveIcon class="size-4" />
           {/if}
-          {isNew ? "Create Incident" : "Save Changes"}
+          {isNew ? "创建事件" : "保存更改"}
         </Button>
       </Card.Footer>
     </Card.Root>
@@ -987,13 +995,13 @@
         <Card.Header>
           <div class="flex items-center justify-between">
             <div>
-              <Card.Title>Updates</Card.Title>
-              <Card.Description>Timeline of status updates for this incident</Card.Description>
+              <Card.Title>更新</Card.Title>
+              <Card.Description>此事件的状态更新时间线</Card.Description>
             </div>
             {#if !addingNewComment}
               <Button size="sm" onclick={startAddComment}>
                 <PlusIcon class="size-4" />
-                Add Update
+                添加更新
               </Button>
             {/if}
           </div>
@@ -1003,7 +1011,7 @@
           {#if addingNewComment}
             <div class="mb-4 space-y-4 rounded-md border p-4">
               <div class="flex flex-col gap-2">
-                <Label>Update Message</Label>
+                <Label>更新内容</Label>
                 <div class="overflow-hidden rounded-md border">
                   <CodeMirror
                     bind:value={commentText}
@@ -1018,11 +1026,11 @@
                     }}
                   />
                 </div>
-                <p class="text-muted-foreground text-xs">Supports Markdown formatting</p>
+                <p class="text-muted-foreground text-xs">支持 Markdown 格式</p>
               </div>
               <div class="grid grid-cols-2 gap-4">
                 <div class="flex flex-col gap-2">
-                  <Label>State</Label>
+                  <Label>状态</Label>
                   <Select.Root
                     type="single"
                     value={commentState}
@@ -1030,26 +1038,26 @@
                       if (v) commentState = v;
                     }}
                   >
-                    <Select.Trigger class="w-full">{commentState}</Select.Trigger>
+                    <Select.Trigger class="w-full">{stateLabels[commentState] || commentState}</Select.Trigger>
                     <Select.Content>
                       {#each states as state}
-                        <Select.Item value={state}>{state}</Select.Item>
+                        <Select.Item value={state}>{stateLabels[state] || state}</Select.Item>
                       {/each}
                     </Select.Content>
                   </Select.Root>
                 </div>
                 <div class="flex flex-col gap-2">
-                  <Label>Date/Time</Label>
+                  <Label>日期/时间</Label>
                   <Input type="datetime-local" bind:value={commentDateTime} />
                 </div>
               </div>
               <div class="flex justify-end gap-2">
-                <Button variant="outline" size="sm" onclick={cancelAddComment}>Cancel</Button>
+                <Button variant="outline" size="sm" onclick={cancelAddComment}>取消</Button>
                 <Button size="sm" onclick={saveComment} disabled={!commentText.trim() || savingComment}>
                   {#if savingComment}
                     <Loader class="size-4 animate-spin" />
                   {/if}
-                  Add Update
+                  添加更新
                 </Button>
               </div>
             </div>
@@ -1060,7 +1068,7 @@
               <Spinner class="size-6" />
             </div>
           {:else if comments.length === 0 && !addingNewComment}
-            <p class="text-muted-foreground py-4 text-center text-sm">No updates yet</p>
+            <p class="text-muted-foreground py-4 text-center text-sm">暂无更新</p>
           {:else}
             <div class="space-y-4">
               {#each comments as comment (comment.id)}
@@ -1069,7 +1077,7 @@
                     <!-- Inline edit mode -->
                     <div class="space-y-4">
                       <div class="flex flex-col gap-2">
-                        <Label>Update Message</Label>
+                        <Label>更新内容</Label>
                         <div class="overflow-hidden rounded-md border">
                           <CodeMirror
                             bind:value={commentText}
@@ -1084,11 +1092,11 @@
                             }}
                           />
                         </div>
-                        <p class="text-muted-foreground text-xs">Supports Markdown formatting</p>
+                        <p class="text-muted-foreground text-xs">支持 Markdown 格式</p>
                       </div>
                       <div class="grid grid-cols-2 gap-4">
                         <div class="flex flex-col gap-2">
-                          <Label>State</Label>
+                          <Label>状态</Label>
                           <Select.Root
                             type="single"
                             value={commentState}
@@ -1096,26 +1104,26 @@
                               if (v) commentState = v;
                             }}
                           >
-                            <Select.Trigger class="w-full">{commentState}</Select.Trigger>
+                            <Select.Trigger class="w-full">{stateLabels[commentState] || commentState}</Select.Trigger>
                             <Select.Content>
                               {#each states as state}
-                                <Select.Item value={state}>{state}</Select.Item>
+                                <Select.Item value={state}>{stateLabels[state] || state}</Select.Item>
                               {/each}
                             </Select.Content>
                           </Select.Root>
                         </div>
                         <div class="flex flex-col gap-2">
-                          <Label>Date/Time</Label>
+                          <Label>日期/时间</Label>
                           <Input type="datetime-local" bind:value={commentDateTime} />
                         </div>
                       </div>
                       <div class="flex justify-end gap-2">
-                        <Button variant="outline" size="sm" onclick={cancelEditComment}>Cancel</Button>
+                        <Button variant="outline" size="sm" onclick={cancelEditComment}>取消</Button>
                         <Button size="sm" onclick={saveComment} disabled={!commentText.trim() || savingComment}>
                           {#if savingComment}
                             <Loader class="size-4 animate-spin" />
                           {/if}
-                          Save
+                          保存
                         </Button>
                       </div>
                     </div>
@@ -1124,9 +1132,11 @@
                     <div class="flex items-start justify-between">
                       <div class="flex-1 space-y-2">
                         <div class="flex items-center gap-2">
-                          <Badge variant={getStateBadgeVariant(comment.state)}>{comment.state}</Badge>
+                          <Badge variant={getStateBadgeVariant(comment.state)}>
+                            {stateLabels[comment.state] || comment.state}
+                          </Badge>
                           <span class="text-muted-foreground text-sm">
-                            {format(new Date(comment.commented_at * 1000), "MMM d, yyyy HH:mm")}
+                            {format(new Date(comment.commented_at * 1000), "yyyy-MM-dd HH:mm")}
                           </span>
                         </div>
                         <div

@@ -15,6 +15,7 @@
   import SirenIcon from "@lucide/svelte/icons/siren";
   import { goto } from "$app/navigation";
   import { formatDistanceToNow } from "date-fns";
+  import { zhCN } from "date-fns/locale";
   import { formatDate } from "$lib/stores/datetime";
   import GC from "$lib/global-constants";
   import { resolve } from "$app/paths";
@@ -29,12 +30,17 @@
   const limit = 10;
 
   const stateOptions = [
-    { value: "ALL", label: "All States" },
-    { value: GC.INVESTIGATING, label: "Investigating" },
-    { value: GC.IDENTIFIED, label: "Identified" },
-    { value: GC.MONITORING, label: "Monitoring" },
-    { value: GC.RESOLVED, label: "Resolved" }
+    { value: "ALL", label: "所有状态" },
+    { value: GC.INVESTIGATING, label: "调查中" },
+    { value: GC.IDENTIFIED, label: "已定位" },
+    { value: GC.MONITORING, label: "监控中" },
+    { value: GC.RESOLVED, label: "已解决" }
   ];
+  const impactLabels: Record<string, string> = {
+    DOWN: "中断",
+    DEGRADED: "性能下降",
+    MAINTENANCE: "维护中"
+  };
 
   // Fetch incidents
   async function fetchData() {
@@ -58,7 +64,10 @@
           // Calculate duration
           let duration: string;
           if (!incident.end_date_time) {
-            duration = formatDistanceToNow(new Date(incident.start_date_time * 1000), { addSuffix: false });
+            duration = formatDistanceToNow(new Date(incident.start_date_time * 1000), {
+              addSuffix: false,
+              locale: zhCN
+            });
           } else {
             const durationMs = (incident.end_date_time - incident.start_date_time) * 1000;
             duration = formatDuration(durationMs);
@@ -82,10 +91,10 @@
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
 
-    if (days > 0) return `${days}d ${hours % 24}h`;
-    if (hours > 0) return `${hours}h ${minutes % 60}m`;
-    if (minutes > 0) return `${minutes}m`;
-    return `${seconds}s`;
+    if (days > 0) return `${days} 天 ${hours % 24} 小时`;
+    if (hours > 0) return `${hours} 小时 ${minutes % 60} 分钟`;
+    if (minutes > 0) return `${minutes} 分钟`;
+    return `${seconds} 秒`;
   }
 
   // Get state badge variant
@@ -140,7 +149,7 @@
     <div class="flex items-center gap-3">
       <Select.Root type="single" value={stateFilter} onValueChange={handleStateFilterChange}>
         <Select.Trigger class="w-44">
-          {stateOptions.find((o) => o.value === stateFilter)?.label || "All States"}
+          {stateOptions.find((o) => o.value === stateFilter)?.label || "所有状态"}
         </Select.Trigger>
         <Select.Content>
           {#each stateOptions as option}
@@ -155,7 +164,7 @@
     <div class="flex items-center gap-3">
       <Button onclick={createNewIncident}>
         <PlusIcon class="size-4" />
-        New Incident
+        新建事件
       </Button>
     </div>
   </div>
@@ -166,18 +175,18 @@
       <Table.Header>
         <Table.Row>
           <Table.Head class="w-16">ID</Table.Head>
-          <Table.Head>Title</Table.Head>
-          <Table.Head class="w-40">Started</Table.Head>
-          <Table.Head class="w-32">Duration</Table.Head>
-          <Table.Head class="w-36">State</Table.Head>
-          <Table.Head class="w-40">Affects</Table.Head>
-          <Table.Head class="w-24 text-right">Actions</Table.Head>
+          <Table.Head>标题</Table.Head>
+          <Table.Head class="w-40">开始时间</Table.Head>
+          <Table.Head class="w-32">持续时间</Table.Head>
+          <Table.Head class="w-36">状态</Table.Head>
+          <Table.Head class="w-40">影响范围</Table.Head>
+          <Table.Head class="w-24 text-right">操作</Table.Head>
         </Table.Row>
       </Table.Header>
       <Table.Body>
         {#if incidents.length === 0 && !loading}
           <Table.Row>
-            <Table.Cell colspan={7} class="text-muted-foreground py-8 text-center">No incidents found</Table.Cell>
+            <Table.Cell colspan={7} class="text-muted-foreground py-8 text-center">未找到事件</Table.Cell>
           </Table.Row>
         {:else}
           {#each incidents as incident}
@@ -205,14 +214,14 @@
                   </Tooltip.Trigger>
                   <Tooltip.Content>
                     <div class="text-sm">
-                      <span class="text-muted-foreground">From:</span>
+                      <span class="text-muted-foreground">从：</span>
                       {$formatDate(incident.start_date_time, "yyyy-MM-dd HH:mm")}
                       <br />
-                      <span class="text-muted-foreground">To:</span>
+                      <span class="text-muted-foreground">到：</span>
                       {#if incident.end_date_time}
                         {$formatDate(incident.end_date_time, "yyyy-MM-dd HH:mm")}
                       {:else}
-                        Ongoing
+                        进行中
                       {/if}
                     </div>
                   </Tooltip.Content>
@@ -222,7 +231,7 @@
                 <div class="flex items-center gap-2">
                   <Badge variant={getStateBadgeVariant(incident.state)} class="gap-1">
                     <SirenIcon class="size-3" />
-                    {incident.state}
+                    {stateOptions.find((o) => o.value === incident.state)?.label || incident.state}
                   </Badge>
                 </div>
               </Table.Cell>
@@ -230,7 +239,7 @@
                 {#if incident.monitors && incident.monitors.length > 0}
                   <Tooltip.Root>
                     <Tooltip.Trigger>
-                      <Badge variant="outline">{incident.monitors.length} monitor(s)</Badge>
+                      <Badge variant="outline">{incident.monitors.length} 个监控器</Badge>
                     </Tooltip.Trigger>
                     <Tooltip.Content>
                       <div class="space-y-1">
@@ -238,7 +247,9 @@
                           <div class="text-sm">
                             <span class="font-medium">{monitor.tag || monitor.monitor_tag}</span>
                             <span class="text-muted-foreground ml-1"
-                              >({monitor.impact_type || monitor.monitor_impact})</span
+                              >({impactLabels[monitor.impact_type || monitor.monitor_impact || ""] ||
+                                monitor.impact_type ||
+                                monitor.monitor_impact})</span
                             >
                           </div>
                         {/each}
@@ -246,7 +257,7 @@
                     </Tooltip.Content>
                   </Tooltip.Root>
                 {:else}
-                  <span class="text-muted-foreground text-sm">None</span>
+                  <span class="text-muted-foreground text-sm">无</span>
                 {/if}
               </Table.Cell>
               <Table.Cell class="text-right">
@@ -258,7 +269,7 @@
                     openIncident(incident.id);
                   }}
                 >
-                  <PencilIcon class="size-4" /> Edit
+                  <PencilIcon class="size-4" /> 编辑
                 </Button>
               </Table.Cell>
             </Table.Row>
@@ -272,7 +283,7 @@
   {#if totalPages > 0}
     <div class="flex items-center justify-between">
       <p class="text-muted-foreground text-sm">
-        Showing {(pageNo - 1) * limit + 1} - {Math.min(pageNo * limit, totalCount)} of {totalCount} incidents
+        显示第 {(pageNo - 1) * limit + 1} - {Math.min(pageNo * limit, totalCount)} 项，共 {totalCount} 个事件
       </p>
       {#if totalPages > 1}
         <div class="flex items-center gap-2">

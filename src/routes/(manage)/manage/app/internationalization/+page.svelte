@@ -18,6 +18,7 @@
   import { resolve } from "$app/paths";
   import clientResolver from "$lib/client/resolver.js";
   import { format } from "date-fns";
+  import { zhCN } from "date-fns/locale";
 
   interface Locale {
     code: string;
@@ -95,7 +96,7 @@
         }
       }
     } catch (e) {
-      toast.error("Failed to load settings");
+      toast.error("加载设置失败");
     } finally {
       loading = false;
     }
@@ -118,10 +119,10 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Language settings saved successfully");
+        toast.success("语言设置已保存");
       }
     } catch (e) {
-      toast.error("Failed to save language settings");
+      toast.error("保存语言设置失败");
     } finally {
       savingLanguages = false;
     }
@@ -144,10 +145,10 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Timezone settings saved successfully");
+        toast.success("时区设置已保存");
       }
     } catch (e) {
-      toast.error("Failed to save timezone settings");
+      toast.error("保存时区设置失败");
     } finally {
       savingTimezone = false;
     }
@@ -175,34 +176,34 @@
   const previewDate = new Date();
 
   const datePlusTimeSuggestions = [
-    { value: "PPp", label: "Locale (AM/PM)" },
-    { value: "PP HH:mm", label: "Locale date + 24h" },
-    { value: "yyyy-MM-dd HH:mm", label: "ISO-like 24h" },
-    { value: "dd MMM yyyy h:mm a", label: "Day month year AM/PM" },
-    { value: "MMM dd, yyyy HH:mm", label: "Month day year 24h" }
+    { value: "PPp", label: "本地格式（上午/下午）" },
+    { value: "PP HH:mm", label: "本地日期 + 24 小时制" },
+    { value: "yyyy-MM-dd HH:mm", label: "ISO 风格 24 小时制" },
+    { value: "dd MMM yyyy h:mm a", label: "日月年（上午/下午）" },
+    { value: "MMM dd, yyyy HH:mm", label: "月日年 24 小时制" }
   ];
 
   const dateOnlySuggestions = [
-    { value: "PP", label: "Locale" },
+    { value: "PP", label: "本地格式" },
     { value: "yyyy-MM-dd", label: "ISO" },
-    { value: "dd/MM/yyyy", label: "Day-first" },
-    { value: "MMM dd, yyyy", label: "Month day year" },
-    { value: "dd MMM yyyy", label: "Day month year" }
+    { value: "dd/MM/yyyy", label: "日优先" },
+    { value: "MMM dd, yyyy", label: "月日年" },
+    { value: "dd MMM yyyy", label: "日月年" }
   ];
 
   const timeOnlySuggestions = [
-    { value: "p", label: "Locale (AM/PM)" },
-    { value: "HH:mm", label: "24h" },
-    { value: "H:mm", label: "24h short" },
-    { value: "h:mm a", label: "12h AM/PM" },
-    { value: "hh:mm", label: "12h no period" }
+    { value: "p", label: "本地格式（上午/下午）" },
+    { value: "HH:mm", label: "24 小时制" },
+    { value: "H:mm", label: "简短 24 小时制" },
+    { value: "h:mm a", label: "12 小时制（上午/下午）" },
+    { value: "hh:mm", label: "12 小时制（无时段）" }
   ];
 
   function formatPreview(fmt: string): string {
     try {
-      return format(previewDate, fmt);
+      return format(previewDate, fmt, { locale: zhCN });
     } catch {
-      return "Invalid format";
+      return "格式无效";
     }
   }
 
@@ -223,10 +224,10 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Date & time format saved successfully");
+        toast.success("日期和时间格式已保存");
       }
     } catch (e) {
-      toast.error("Failed to save date & time format");
+      toast.error("保存日期和时间格式失败");
     } finally {
       savingDateTimeFormat = false;
     }
@@ -249,19 +250,16 @@
         <div class="flex items-center gap-2">
           <GlobeIcon class="h-5 w-5" />
           <div>
-            <Card.Title>Languages</Card.Title>
-            <Card.Description>Configure the available languages for your status page</Card.Description>
+            <Card.Title>语言</Card.Title>
+            <Card.Description>配置状态页可用的语言</Card.Description>
           </div>
         </div>
       </Card.Header>
       <Card.Content class="space-y-6">
         <!-- Available Languages -->
         <div class="space-y-3">
-          <Label class="text-sm font-medium">Available Languages</Label>
-          <p class="text-muted-foreground text-xs">
-            Select the languages you want to make available on your status page. Users will be able to switch between
-            these languages.
-          </p>
+          <Label class="text-sm font-medium">可用语言</Label>
+          <p class="text-muted-foreground text-xs">选择状态页可用的语言，访客可以在这些语言之间切换。</p>
           <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
             {#each i18n.locales as locale (locale.code)}
               <div class="flex items-center space-x-2">
@@ -277,7 +275,7 @@
                 >
                   {locale.name}
                   {#if i18n.defaultLocale === locale.code}
-                    <span class="text-muted-foreground text-xs">(default)</span>
+                    <span class="text-muted-foreground text-xs">（默认）</span>
                   {/if}
                 </Label>
               </div>
@@ -287,10 +285,8 @@
 
         <!-- Default Language -->
         <div class="space-y-3">
-          <Label class="text-sm font-medium">Default Language</Label>
-          <p class="text-muted-foreground text-xs">
-            The default language will be shown when users first visit your status page.
-          </p>
+          <Label class="text-sm font-medium">默认语言</Label>
+          <p class="text-muted-foreground text-xs">访客首次打开状态页时将显示此语言。</p>
           <Select.Root
             type="single"
             value={i18n.defaultLocale}
@@ -299,7 +295,7 @@
             }}
           >
             <Select.Trigger class="w-[200px]">
-              {i18n.locales.find((l) => l.code === i18n.defaultLocale)?.name || "Select language"}
+              {i18n.locales.find((l) => l.code === i18n.defaultLocale)?.name || "选择语言"}
             </Select.Trigger>
             <Select.Content>
               {#each availableDefaultLocales as locale (locale.code)}
@@ -316,7 +312,7 @@
           {:else}
             <SaveIcon class="h-4 w-4" />
           {/if}
-          Save Languages
+          保存语言设置
         </Button>
       </Card.Footer>
     </Card.Root>
@@ -327,15 +323,14 @@
         <div class="flex items-center gap-2">
           <ClockIcon class="h-5 w-5" />
           <div>
-            <Card.Title>Timezone Settings</Card.Title>
-            <Card.Description>Configure timezone switching for your status page</Card.Description>
+            <Card.Title>时区设置</Card.Title>
+            <Card.Description>配置状态页的时区切换功能</Card.Description>
           </div>
         </div>
       </Card.Header>
       <Card.Content class="space-y-4">
         <p class="text-muted-foreground text-sm">
-          Kener automatically detects the user's timezone and displays times accordingly. You can optionally allow users
-          to manually switch between different timezones.
+          Kener 会自动检测访客的时区并显示相应时间，也可以允许访客手动切换时区。
         </p>
         <div class="flex items-center space-x-3">
           <Switch
@@ -343,7 +338,7 @@
             checked={tzToggle === "YES"}
             onCheckedChange={(checked) => (tzToggle = checked ? "YES" : "NO")}
           />
-          <Label for="tz-toggle" class="font-normal">Allow users to switch timezones</Label>
+          <Label for="tz-toggle" class="font-normal">允许访客切换时区</Label>
         </div>
       </Card.Content>
       <Card.Footer class="flex justify-end">
@@ -353,7 +348,7 @@
           {:else}
             <SaveIcon class="h-4 w-4" />
           {/if}
-          Save Timezone
+          保存时区设置
         </Button>
       </Card.Footer>
     </Card.Root>
@@ -364,13 +359,13 @@
         <div class="flex items-center gap-2">
           <CalendarClockIcon class="h-5 w-5" />
           <div>
-            <Card.Title>Date & Time Format</Card.Title>
+            <Card.Title>日期和时间格式</Card.Title>
             <Card.Description>
-              Choose how dates and times are displayed across your status page. Uses
+              设置状态页中的日期和时间显示方式，使用
               <a
                 href="https://date-fns.org/docs/format"
                 target="_blank"
-                class="hover:text-foreground underline underline-offset-2">date-fns format tokens</a
+                class="hover:text-foreground underline underline-offset-2">date-fns 格式标记</a
               >.
             </Card.Description>
           </div>
@@ -379,10 +374,10 @@
       <Card.Content class="space-y-6">
         <!-- Date + Time -->
         <div class="space-y-2">
-          <Label class="text-sm font-medium">Date + Time</Label>
+          <Label class="text-sm font-medium">日期 + 时间</Label>
           <Input
             class="font-mono text-sm"
-            placeholder="e.g. PPpp"
+            placeholder="例如 PPpp"
             value={dateAndTimeFormat.datePlusTime}
             oninput={(e) => {
               dateAndTimeFormat.datePlusTime = e.currentTarget.value;
@@ -403,16 +398,16 @@
             {/each}
           </div>
           <p class="text-muted-foreground text-xs">
-            Preview: <code>{formatPreview(dateAndTimeFormat.datePlusTime)}</code>
+            预览：<code>{formatPreview(dateAndTimeFormat.datePlusTime)}</code>
           </p>
         </div>
 
         <!-- Date Only -->
         <div class="space-y-2">
-          <Label class="text-sm font-medium">Date Only</Label>
+          <Label class="text-sm font-medium">仅日期</Label>
           <Input
             class="font-mono text-sm"
-            placeholder="e.g. PP"
+            placeholder="例如 PP"
             value={dateAndTimeFormat.dateOnly}
             oninput={(e) => {
               dateAndTimeFormat.dateOnly = e.currentTarget.value;
@@ -432,15 +427,15 @@
               </Badge>
             {/each}
           </div>
-          <p class="text-muted-foreground text-xs">Preview: <code>{formatPreview(dateAndTimeFormat.dateOnly)}</code></p>
+          <p class="text-muted-foreground text-xs">预览：<code>{formatPreview(dateAndTimeFormat.dateOnly)}</code></p>
         </div>
 
         <!-- Time Only -->
         <div class="space-y-2">
-          <Label class="text-sm font-medium">Time Only</Label>
+          <Label class="text-sm font-medium">仅时间</Label>
           <Input
             class="font-mono text-sm"
-            placeholder="e.g. pp"
+            placeholder="例如 pp"
             value={dateAndTimeFormat.timeOnly}
             oninput={(e) => {
               dateAndTimeFormat.timeOnly = e.currentTarget.value;
@@ -460,7 +455,7 @@
               </Badge>
             {/each}
           </div>
-          <p class="text-muted-foreground text-xs">Preview: <code>{formatPreview(dateAndTimeFormat.timeOnly)}</code></p>
+          <p class="text-muted-foreground text-xs">预览：<code>{formatPreview(dateAndTimeFormat.timeOnly)}</code></p>
         </div>
       </Card.Content>
       <Card.Footer class="flex justify-end">
@@ -470,7 +465,7 @@
           {:else}
             <SaveIcon class="h-4 w-4" />
           {/if}
-          Save Format
+          保存格式
         </Button>
       </Card.Footer>
     </Card.Root>

@@ -31,11 +31,11 @@
     modifyDataError = null;
 
     if (!modifyDataForm.start) {
-      modifyDataError = "Start date is required";
+      modifyDataError = "开始日期不能为空";
       return;
     }
     if (!modifyDataForm.end) {
-      modifyDataError = "End date is required";
+      modifyDataError = "结束日期不能为空";
       return;
     }
 
@@ -43,16 +43,16 @@
     const endTimestamp = Math.floor(new Date(modifyDataForm.end).getTime() / 1000);
 
     if (startTimestamp >= endTimestamp) {
-      modifyDataError = "Start date must be before end date";
+      modifyDataError = "开始日期必须早于结束日期";
       return;
     }
 
     if (modifyDataForm.latency < 0) {
-      modifyDataError = "Latency must be non-negative";
+      modifyDataError = "延迟不能为负数";
       return;
     }
     if (modifyDataForm.deviation < 0) {
-      modifyDataError = "Deviation must be non-negative";
+      modifyDataError = "偏差不能为负数";
       return;
     }
 
@@ -78,11 +78,11 @@
       if (result.error) {
         modifyDataError = result.error;
       } else {
-        toast.success("Monitoring data updated successfully");
+        toast.success("监控数据已成功更新");
         modifyDataForm = { start: "", end: "", newStatus: "UP", latency: 0, deviation: 0 };
       }
     } catch (e) {
-      modifyDataError = "Failed to update monitoring data";
+      modifyDataError = "更新监控数据失败";
     } finally {
       modifyingData = false;
     }
@@ -93,25 +93,25 @@
   <Card.Header>
     <Card.Title class="flex items-center gap-2">
       <DatabaseIcon class="size-5" />
-      Modify Monitoring Data
+      修改监控数据
     </Card.Title>
-    <Card.Description>Change the status of monitoring data for a given time range</Card.Description>
+    <Card.Description>更改指定时间范围内监控数据的状态</Card.Description>
   </Card.Header>
   <Card.Content>
     <div class="grid gap-4">
       <div class="grid grid-cols-2 gap-4">
         <div class="space-y-2">
-          <Label for="start_date">Start Date & Time <span class="text-destructive">*</span></Label>
+          <Label for="start_date">开始日期和时间 <span class="text-destructive">*</span></Label>
           <Input id="start_date" type="datetime-local" bind:value={modifyDataForm.start} />
         </div>
         <div class="space-y-2">
-          <Label for="end_date">End Date & Time <span class="text-destructive">*</span></Label>
+          <Label for="end_date">结束日期和时间 <span class="text-destructive">*</span></Label>
           <Input id="end_date" type="datetime-local" bind:value={modifyDataForm.end} min={modifyDataForm.start} />
         </div>
       </div>
       <div class="grid grid-cols-3 gap-4">
         <div class="space-y-2">
-          <Label for="new_status">New Status</Label>
+          <Label for="new_status">新状态</Label>
           <Select.Root
             type="single"
             value={modifyDataForm.newStatus}
@@ -130,17 +130,16 @@
           </Select.Root>
         </div>
         <div class="space-y-2">
-          <Label for="latency">Latency (ms)</Label>
+          <Label for="latency">延迟（毫秒）</Label>
           <Input id="latency" type="number" min="0" bind:value={modifyDataForm.latency} placeholder="100" />
         </div>
         <div class="space-y-2">
-          <Label for="deviation">Deviation (ms)</Label>
+          <Label for="deviation">偏差（毫秒）</Label>
           <Input id="deviation" type="number" min="0" bind:value={modifyDataForm.deviation} placeholder="0" />
         </div>
       </div>
       <p class="text-muted-foreground text-xs">
-        Latency will be randomly generated as latency ± deviation for each data point. Set deviation to 0 for a fixed
-        latency value.
+        每个数据点的延迟将在“延迟 ± 偏差”范围内随机生成。将偏差设为 0 可使用固定延迟值。
       </p>
       {#if modifyDataError}
         <p class="text-destructive text-sm">{modifyDataError}</p>
@@ -151,10 +150,10 @@
     <Button onclick={modifyMonitoringData} disabled={modifyingData}>
       {#if modifyingData}
         <Loader class="size-4 animate-spin" />
-        Saving...
+        正在保存...
       {:else}
         <SaveIcon class="size-4" />
-        Save Changes
+        保存更改
       {/if}
     </Button>
   </Card.Footer>

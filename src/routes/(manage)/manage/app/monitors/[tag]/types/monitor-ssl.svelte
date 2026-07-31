@@ -16,11 +16,11 @@
 <div class="space-y-4">
   <div class="grid grid-cols-2 gap-4">
     <div class="flex flex-col gap-2">
-      <Label for="ssl-host">Host <span class="text-destructive">*</span></Label>
+      <Label for="ssl-host">主机 <span class="text-destructive">*</span></Label>
       <Input id="ssl-host" bind:value={data.host} placeholder="example.com" />
     </div>
     <div class="flex flex-col gap-2">
-      <Label for="ssl-port">Port</Label>
+      <Label for="ssl-port">端口</Label>
       <Input id="ssl-port" bind:value={data.port} placeholder="443" />
     </div>
   </div>
@@ -30,10 +30,7 @@
       <div>
         <InputGroup.Root>
           <InputGroup.Addon>
-            <InputGroup.Text>
-              <span class="text-degraded">Degraded</span>
-              when hours remaining expires in</InputGroup.Text
-            >
+            <InputGroup.Text>剩余有效期少于</InputGroup.Text>
           </InputGroup.Addon>
           <InputGroup.Input
             id="ssl-degraded"
@@ -43,19 +40,17 @@
             placeholder="168"
           />
           <InputGroup.Addon align="inline-end">
-            <InputGroup.Text>hours</InputGroup.Text>
+            <InputGroup.Text>小时则为 DEGRADED</InputGroup.Text>
           </InputGroup.Addon>
         </InputGroup.Root>
-        <p class="text-muted-foreground mt-1 text-xs">
-          Certificate expiring within this many hours will be marked as DEGRADED
-        </p>
+        <p class="text-muted-foreground mt-1 text-xs">证书将在指定小时数内过期时标记为 DEGRADED</p>
       </div>
     </div>
     <div class="flex flex-col gap-2">
       <div>
         <InputGroup.Root>
           <InputGroup.Addon>
-            <InputGroup.Text><span class="text-down">Down</span> when hours remaining expires In</InputGroup.Text>
+            <InputGroup.Text>剩余有效期少于</InputGroup.Text>
           </InputGroup.Addon>
           <InputGroup.Input
             id="ssl-down"
@@ -65,12 +60,10 @@
             placeholder="24"
           />
           <InputGroup.Addon align="inline-end">
-            <InputGroup.Text>hours</InputGroup.Text>
+            <InputGroup.Text>小时则为 DOWN</InputGroup.Text>
           </InputGroup.Addon>
         </InputGroup.Root>
-        <p class="text-muted-foreground mt-1 text-xs">
-          Certificate expiring within this many hours will be marked as DOWN
-        </p>
+        <p class="text-muted-foreground mt-1 text-xs">证书将在指定小时数内过期时标记为 DOWN</p>
       </div>
     </div>
   </div>

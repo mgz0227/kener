@@ -145,7 +145,7 @@ export async function POST({ request, cookies }) {
 
   let userDB = await GetLoggedInSession(cookies);
   if (!userDB) {
-    return json({ error: "User not logged in" }, { status: 401 });
+    return json({ error: "用户未登录" }, { status: 401 });
   }
 
   // Fetch user permissions once for the entire request
@@ -154,13 +154,13 @@ export async function POST({ request, cookies }) {
   // Check permission for the action
   const requiredPermission = ACTION_PERMISSION_MAP[action];
   if (requiredPermission === undefined) {
-    return json({ error: "Unknown action" }, { status: 400 });
+    return json({ error: "未知操作" }, { status: 400 });
   }
   if (requiredPermission !== null) {
     try {
       RequirePermission(userPermissions, requiredPermission);
     } catch {
-      return json({ error: "You do not have permission to perform this action" }, { status: 403 });
+      return json({ error: "你没有执行此操作的权限" }, { status: 403 });
     }
   }
 
@@ -185,12 +185,12 @@ export async function POST({ request, cookies }) {
     } else if (action == "sendVerificationEmail") {
       const toId = parseInt(String(data.toId));
       if (!toId) {
-        throw new Error("User ID is required");
+        throw new Error("用户 ID 不能为空");
       }
       // Non-self verification requires users.write permission
       if (toId !== userDB.id) {
         if (!userPermissions.has("users.write")) {
-          return json({ error: "You do not have permission to perform this action" }, { status: 403 });
+          return json({ error: "你没有执行此操作的权限" }, { status: 403 });
         }
       }
       await SendVerificationEmail(toId, userDB.id);
@@ -265,7 +265,7 @@ export async function POST({ request, cookies }) {
     } else if (action == "deleteApiKey") {
       const deleted = await DeleteApiKey(data);
       if (!deleted) {
-        throw new Error("API key not found");
+        throw new Error("未找到 API 密钥");
       }
       resp = { success: true };
     } else if (action == "getIncidents") {
@@ -273,7 +273,7 @@ export async function POST({ request, cookies }) {
     } else if (action == "getIncident") {
       resp = await GetIncidentByIDDashboard(data);
       if (!!!resp) {
-        throw new Error("Incident not found");
+        throw new Error("未找到故障事件");
       }
     } else if (action == "createIncident") {
       resp = await CreateIncident(data);
@@ -297,7 +297,7 @@ export async function POST({ request, cookies }) {
       const trigger = await GetTriggerByID(data.trigger_id);
       const siteData = await GetAllSiteData();
       if (!trigger || !siteData) {
-        throw new Error("Trigger not found");
+        throw new Error("未找到触发器");
       }
       //fetch the last monitor tag from monitoring data and use that for testing instead of "test-monitor"
       const lastMonitoringData = await GetMonitoringDataPaginated(1, 1);
@@ -313,7 +313,7 @@ export async function POST({ request, cookies }) {
         alert_value: "DOWN",
         failure_threshold: 1,
         success_threshold: 1,
-        alert_description: "This is a test alert",
+        alert_description: "这是一条测试告警",
         create_incident: "NO",
         is_active: "YES",
         severity: "WARNING",
@@ -365,14 +365,14 @@ export async function POST({ request, cookies }) {
           triggerMetaParsed.url,
         );
       } else {
-        throw new Error("Unsupported trigger type for testing");
+        throw new Error("此触发器类型不支持测试");
       }
     } else if (action == "testMonitor") {
       let monitorID = data.monitor_id;
       let monitors = await GetMonitorsParsed({ id: monitorID });
       let monitor = monitors[0];
       if (monitor.monitor_type === "NONE") {
-        throw new Error("Tests can't be run on monitor type NONE");
+        throw new Error("NONE 类型的监控项无法运行测试");
       }
       const monitorReducedType: MonitorWithType = {
         tag: monitor.tag,
@@ -420,7 +420,7 @@ export async function POST({ request, cookies }) {
     } else if (action == "getMaintenance") {
       resp = await GetMaintenanceWithEvents(data.id);
       if (!resp) {
-        throw new Error("Maintenance not found");
+        throw new Error("未找到维护计划");
       }
     } else if (action == "createMaintenance") {
       resp = await CreateMaintenance(data);
@@ -436,7 +436,7 @@ export async function POST({ request, cookies }) {
     } else if (action == "getMaintenanceEvent") {
       resp = await GetMaintenanceEventById(data.id);
       if (!resp) {
-        throw new Error("Maintenance event not found");
+        throw new Error("未找到维护事件");
       }
     } else if (action == "createMaintenanceEvent") {
       resp = await CreateMaintenanceEvent(data);
@@ -469,7 +469,7 @@ export async function POST({ request, cookies }) {
     } else if (action == "getMonitorAlertConfig" || action == "getMonitorAlertConfigById") {
       resp = await GetMonitorAlertConfigById(data.id);
       if (!resp) {
-        throw new Error("Monitor alert config not found");
+        throw new Error("未找到监控告警配置");
       }
     } else if (action == "getMonitorAlertConfigsByMonitorTag") {
       resp = await GetMonitorAlertConfigsByMonitorTag(data.monitor_tag);
@@ -502,14 +502,14 @@ export async function POST({ request, cookies }) {
     else if (action == "getSubscribersByMethod") {
       const { method, page = 1, limit = 25 } = data;
       if (!method) {
-        throw new Error("Method is required");
+        throw new Error("订阅方式不能为空");
       }
       resp = await GetSubscribersByMethod(method, page, limit);
     } else if (action == "getSubscriberWithSubscriptions") {
       // V2: subscriberId is actually the method_id from subscriber_methods table
       const { subscriberId, method } = data;
       if (!subscriberId || !method) {
-        throw new Error("subscriberId and method are required");
+        throw new Error("订阅者 ID 和订阅方式不能为空");
       }
       // Use V2 function which expects method_id
       const result = await GetSubscriberWithSubscriptionsV2(subscriberId);
@@ -543,34 +543,33 @@ export async function POST({ request, cookies }) {
     } else if (action == "deleteUserSubscription") {
       const { subscriptionId } = data;
       if (!subscriptionId) {
-        throw new Error("subscriptionId is required");
+        throw new Error("订阅 ID 不能为空");
       }
       resp = await DeleteUserSubscription(subscriptionId);
     } else if (action == "updateUserSubscriptionStatus") {
       const { subscriptionId, status } = data;
       if (!subscriptionId || !status) {
-        throw new Error("subscriptionId and status are required");
+        throw new Error("订阅 ID 和状态不能为空");
       }
       resp = await UpdateUserSubscriptionStatus(subscriptionId, status);
     }
     // ============ Email Template Config ============
-
     // ============ General Email Templates ============
     else if (action == "getGeneralEmailTemplates") {
       resp = await GetAllGeneralEmailTemplates();
     } else if (action == "getGeneralEmailTemplateById") {
       const { templateId } = data;
       if (!templateId) {
-        throw new Error("Template ID is required");
+        throw new Error("模板 ID 不能为空");
       }
       resp = await GetGeneralEmailTemplateById(templateId);
       if (!resp) {
-        throw new Error("Template not found");
+        throw new Error("未找到模板");
       }
     } else if (action == "updateGeneralEmailTemplate") {
       const { templateId, template_subject, template_html_body, template_text_body } = data;
       if (!templateId) {
-        throw new Error("Template ID is required");
+        throw new Error("模板 ID 不能为空");
       }
       resp = await UpdateGeneralEmailTemplate(templateId, {
         template_subject,
@@ -589,7 +588,7 @@ export async function POST({ request, cookies }) {
     } else if (action == "adminUpdateSubscriptionStatus") {
       const { methodId, eventType, enabled } = data;
       if (!methodId || !eventType) {
-        throw new Error("Method ID and event type are required");
+        throw new Error("订阅方式 ID 和事件类型不能为空");
       }
       resp = await AdminUpdateSubscriptionStatus(methodId, eventType, enabled);
       if (!resp.success) {
@@ -598,7 +597,7 @@ export async function POST({ request, cookies }) {
     } else if (action == "adminDeleteSubscriber") {
       const { methodId } = data;
       if (!methodId) {
-        throw new Error("Method ID is required");
+        throw new Error("订阅方式 ID 不能为空");
       }
       resp = await AdminDeleteSubscriber(methodId);
       if (!resp.success) {
@@ -607,7 +606,7 @@ export async function POST({ request, cookies }) {
     } else if (action == "adminAddSubscriber") {
       const { email, incidents, maintenances } = data;
       if (!email) {
-        throw new Error("Email is required");
+        throw new Error("邮箱不能为空");
       }
       resp = await AdminAddSubscriber(email, incidents ?? false, maintenances ?? false);
       if (!resp.success) {
@@ -630,11 +629,11 @@ export async function POST({ request, cookies }) {
     } else if (action == "getSiteDataByKey") {
       const { key } = data;
       if (!key) {
-        throw new Error("Key is required");
+        throw new Error("配置键不能为空");
       }
       let siteData = await GetSiteDataByKey(key);
       if (!!!siteData) {
-        throw new Error("Site data not found for the given key");
+        throw new Error("未找到该配置键对应的站点数据");
       }
       resp = siteData;
     } else if (action == "updateSubscriptionsConfig") {
@@ -703,22 +702,22 @@ async function uploadImage(data: ImageUploadData): Promise<{ id: string; url: st
   } = data;
 
   if (!base64) {
-    throw new Error("Image data is required");
+    throw new Error("图片数据不能为空");
   }
 
   const allowedMimeTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/heic", "image/heif"];
   if (!allowedMimeTypes.includes(mimeType)) {
-    throw new Error(`Invalid image type. Allowed types: ${allowedMimeTypes.join(", ")}`);
+    throw new Error(`图片类型无效，允许的类型：${allowedMimeTypes.join(", ")}`);
   }
 
   // Decode base64 to buffer
   const imageBuffer = Buffer.from(base64, "base64");
   if (!imageBuffer.length) {
-    throw new Error("Invalid image data");
+    throw new Error("图片数据无效");
   }
 
   if (imageBuffer.length > GC.MAX_UPLOAD_BYTES) {
-    throw new Error("Image is too large. Maximum upload size is 5MB");
+    throw new Error("图片过大，最大上传大小为 5MB");
   }
 
   const normalizedRequestedMime = mimeType === "image/jpg" ? "image/jpeg" : mimeType;
@@ -726,7 +725,7 @@ async function uploadImage(data: ImageUploadData): Promise<{ id: string; url: st
   const looksLikeSvg = /<svg[\s>]/i.test(maybeTextHeader) || /<\?xml/i.test(maybeTextHeader);
 
   if (normalizedRequestedMime === "image/svg+xml" || looksLikeSvg) {
-    throw new Error("SVG uploads are not allowed");
+    throw new Error("不允许上传 SVG 图片");
   }
 
   let processedBuffer: Buffer;
@@ -762,27 +761,25 @@ async function uploadImage(data: ImageUploadData): Promise<{ id: string; url: st
 
   const detectedMimeType = metadata.format ? formatToMime[metadata.format] : undefined;
   if (!detectedMimeType) {
-    throw new Error("Could not detect a valid image format");
+    throw new Error("无法识别有效的图片格式");
   }
 
   if (detectedMimeType === "image/svg+xml") {
-    throw new Error("SVG uploads are not allowed");
+    throw new Error("不允许上传 SVG 图片");
   }
 
   // HEIC/HEIF files often have .jpg extension (e.g. iPhone photos); allow the mismatch
   const isHeicDetected = detectedMimeType === "image/heic" || detectedMimeType === "image/heif";
   const isHeicRequested = normalizedRequestedMime === "image/heic" || normalizedRequestedMime === "image/heif";
   if (normalizedRequestedMime !== detectedMimeType && !isHeicDetected && !isHeicRequested) {
-    throw new Error("Image MIME type does not match file content");
+    throw new Error("图片 MIME 类型与文件内容不一致");
   }
 
   const sourceWidth = metadata.width || maxWidth;
   const sourceHeight = metadata.height || maxHeight;
 
   if (sourceWidth > GC.MAX_IMAGE_DIMENSION || sourceHeight > GC.MAX_IMAGE_DIMENSION) {
-    throw new Error(
-      `Image dimensions exceed maximum allowed size of ${GC.MAX_IMAGE_DIMENSION}x${GC.MAX_IMAGE_DIMENSION}`,
-    );
+    throw new Error(`图片尺寸超过允许的最大值 ${GC.MAX_IMAGE_DIMENSION}x${GC.MAX_IMAGE_DIMENSION}`);
   }
 
   const boundedMaxWidth = Math.min(maxWidth, GC.MAX_IMAGE_DIMENSION);

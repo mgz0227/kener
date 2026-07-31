@@ -26,6 +26,7 @@
   import * as Tooltip from "$lib/components/ui/tooltip/index.js";
   import { toast } from "svelte-sonner";
   import { format } from "date-fns";
+  import { zhCN } from "date-fns/locale";
   import { onMount } from "svelte";
   import type { UserRecordDashboard, UserRecordPublic, RoleRecord } from "$lib/server/types/db.js";
   import { resolve } from "$app/paths";
@@ -63,6 +64,16 @@
 
   function hasPermission(perm: string): boolean {
     return userPermissions.includes(perm);
+  }
+
+  const roleDisplayNames: Record<string, string> = {
+    Administrator: "管理员",
+    Editor: "编辑者",
+    Member: "成员"
+  };
+
+  function getRoleDisplayName(name: string): string {
+    return roleDisplayNames[name] ?? name;
   }
 
   // State
@@ -121,8 +132,8 @@
         totalPages = Math.ceil(total / limit);
       }
     } catch (error) {
-      console.error("Error fetching users:", error);
-      toast.error("Failed to load users");
+      console.error("获取用户失败：", error);
+      toast.error("加载用户失败");
     } finally {
       loading = false;
     }
@@ -136,27 +147,27 @@
     const normalizedEmail = normalizeEmail(newUser.email);
 
     if (!normalizedName) {
-      creatingUserError = "Name cannot be empty";
+      creatingUserError = "姓名不能为空";
       return;
     }
     if (normalizedName.length < 2) {
-      creatingUserError = "Name must be at least 2 characters";
+      creatingUserError = "姓名至少需要 2 个字符";
       return;
     }
     if (normalizedName.length > 100) {
-      creatingUserError = "Name must be less than 100 characters";
+      creatingUserError = "姓名不能超过 100 个字符";
       return;
     }
     if (!normalizedEmail) {
-      creatingUserError = "Email cannot be empty";
+      creatingUserError = "邮箱不能为空";
       return;
     }
     if (!EMAIL_REGEX.test(normalizedEmail)) {
-      creatingUserError = "Please enter a valid email address";
+      creatingUserError = "请输入有效的邮箱地址";
       return;
     }
     if (newUser.role_ids.length === 0) {
-      creatingUserError = "At least one role must be selected";
+      creatingUserError = "至少选择一个角色";
       return;
     }
 
@@ -183,10 +194,10 @@
         users = [...users, result];
         showAddUserDialog = false;
         resetNewUser();
-        toast.success("User invited successfully");
+        toast.success("用户邀请已发送");
       }
     } catch (error) {
-      creatingUserError = "Error while creating user";
+      creatingUserError = "创建用户时出错";
     } finally {
       creatingUser = false;
     }
@@ -228,9 +239,9 @@
           data: { email }
         })
       });
-      toast.success("Invitation email resent");
+      toast.success("邀请邮件已重新发送");
     } catch (error) {
-      toast.error("Failed to resend invitation email");
+      toast.error("重新发送邀请邮件失败");
     }
   }
 
@@ -248,11 +259,11 @@
       });
       const result = await res.json();
       if (!res.ok || result.error) {
-        throw new Error(result.error || "Failed to send verification email");
+        throw new Error(result.error || "发送验证邮件失败");
       }
-      toast.success("Verification email sent");
+      toast.success("验证邮件已发送");
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to send verification email";
+      const message = error instanceof Error ? error.message : "发送验证邮件失败";
       toast.error(message);
     } finally {
       sendingSelfVerification = false;
@@ -281,7 +292,7 @@
         manualUpdateError = result.error;
       } else {
         users = users.map((user) => (user.id === toEditUser!.id ? result : user));
-        manualSuccess = `User ${updateType} updated successfully`;
+        manualSuccess = updateType === "role" ? "用户角色已更新" : "用户状态已更新";
 
         // Update toEditUser with the result
         toEditUser = {
@@ -291,7 +302,7 @@
         };
       }
     } catch (error) {
-      manualUpdateError = "Error while updating user";
+      manualUpdateError = "更新用户时出错";
     }
   }
 
@@ -304,10 +315,10 @@
   // Format date
   function formatDate(dateStr: string | Date): string {
     if (dateStr instanceof Date) {
-      return format(dateStr, "MMM dd, yyyy HH:mm");
+      return format(dateStr, "yyyy年M月d日 HH:mm", { locale: zhCN });
     }
     try {
-      return format(new Date(dateStr), "MMM dd, yyyy HH:mm");
+      return format(new Date(dateStr), "yyyy年M月d日 HH:mm", { locale: zhCN });
     } catch {
       return dateStr;
     }
@@ -335,7 +346,7 @@
         roles = result;
       }
     } catch {
-      toast.error("Failed to load roles");
+      toast.error("加载角色失败");
     }
   }
 
@@ -367,7 +378,7 @@
           fetchUsers();
         }}
       >
-        Active
+        已启用
       </Button>
       <Button
         variant={statusFilter === "INACTIVE" ? "default" : "outline"}
@@ -378,7 +389,7 @@
           fetchUsers();
         }}
       >
-        Inactive
+        已停用
       </Button>
     </div>
     <div class="flex items-center gap-2">
@@ -388,16 +399,14 @@
       {#if hasPermission("users.write")}
         {#if !canSendEmail}
           <p class="text-muted-foreground max-w-xs text-xs">
-            Email service not configured. Cannot invite new users. Please go to
-            <a href={`${GC.DOCS_URL}/setup/email-setup`} target="_blank" class="text-blue-500 underline">
-              setup email
-            </a>
-            for more info.
+            邮件服务尚未配置，无法邀请新用户。请前往
+            <a href={`${GC.DOCS_URL}/setup/email-setup`} target="_blank" class="text-blue-500 underline"> 配置邮件 </a>
+            查看详情。
           </p>
         {/if}
         <Button onclick={() => (showAddUserDialog = true)} disabled={!canSendEmail}>
           <PlusIcon class="h-4 w-4" />
-          Add User
+          添加用户
         </Button>
       {/if}
     </div>
@@ -408,12 +417,12 @@
     <Table.Root>
       <Table.Header>
         <Table.Row>
-          <Table.Head>Name</Table.Head>
-          <Table.Head>Email</Table.Head>
-          <Table.Head class="text-center">Verified</Table.Head>
-          <Table.Head>Role</Table.Head>
-          <Table.Head>Status</Table.Head>
-          <Table.Head class="w-20 text-center">Actions</Table.Head>
+          <Table.Head>姓名</Table.Head>
+          <Table.Head>邮箱</Table.Head>
+          <Table.Head class="text-center">已验证</Table.Head>
+          <Table.Head>角色</Table.Head>
+          <Table.Head>状态</Table.Head>
+          <Table.Head class="w-20 text-center">操作</Table.Head>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -422,20 +431,20 @@
             <Table.Cell colspan={6} class="py-8 text-center">
               <div class="flex items-center justify-center gap-2">
                 <Spinner class="size-4" />
-                <span class="text-muted-foreground text-sm">Loading users...</span>
+                <span class="text-muted-foreground text-sm">正在加载用户...</span>
               </div>
             </Table.Cell>
           </Table.Row>
         {:else if users.length === 0}
           <Table.Row>
-            <Table.Cell colspan={6} class="text-muted-foreground py-8 text-center">No users found.</Table.Cell>
+            <Table.Cell colspan={6} class="text-muted-foreground py-8 text-center">暂无用户。</Table.Cell>
           </Table.Row>
         {:else}
           {#each users as user (user.id)}
             <Table.Row class={currentUser.id === user.id ? "bg-muted/50" : ""}>
               <Table.Cell class="font-medium"
                 >{user.name}{#if currentUser.id === user.id}
-                  <Badge variant="outline" class="ml-1 text-[10px]">You</Badge>{/if}</Table.Cell
+                  <Badge variant="outline" class="ml-1 text-[10px]">你</Badge>{/if}</Table.Cell
               >
               <Table.Cell>{user.email}</Table.Cell>
               <Table.Cell class="text-center">
@@ -452,9 +461,9 @@
               </Table.Cell>
               <Table.Cell>
                 {#if user.is_active}
-                  <span class="text-sm font-semibold text-green-500">ACTIVE</span>
+                  <span class="text-sm font-semibold text-green-500">已启用</span>
                 {:else}
-                  <span class="text-sm font-semibold text-pink-500">INACTIVE</span>
+                  <span class="text-sm font-semibold text-pink-500">已停用</span>
                 {/if}
               </Table.Cell>
               <Table.Cell class="text-center">
@@ -472,7 +481,7 @@
                     {#if sendingSelfVerification}
                       <Spinner class="size-4" />
                     {/if}
-                    Verify Email
+                    验证邮箱
                   </Button>
                 {/if}
               </Table.Cell>
@@ -488,7 +497,7 @@
     {@const startItem = (page - 1) * limit + 1}
     {@const endItem = Math.min(page * limit, total)}
     <div class="flex items-center justify-between">
-      <span class="text-muted-foreground text-sm">Showing {startItem}-{endItem} of {total}</span>
+      <span class="text-muted-foreground text-sm">显示第 {startItem}-{endItem} 条，共 {total} 条</span>
       {#if totalPages > 1}
         <div class="flex items-center gap-2">
           <Button variant="outline" size="icon" disabled={page === 1} onclick={() => goToPage(page - 1)}>
@@ -518,8 +527,8 @@
 <Dialog.Root bind:open={showAddUserDialog}>
   <Dialog.Content class="sm:max-w-md">
     <Dialog.Header>
-      <Dialog.Title>Add New User</Dialog.Title>
-      <Dialog.Description>Add a new user to your project</Dialog.Description>
+      <Dialog.Title>添加新用户</Dialog.Title>
+      <Dialog.Description>为项目添加新用户</Dialog.Description>
     </Dialog.Header>
     <form
       onsubmit={(e) => {
@@ -529,16 +538,16 @@
     >
       <div class="space-y-4 py-4">
         <div class="space-y-2">
-          <Label for="name">Name</Label>
-          <Input id="name" type="text" placeholder="John Doe" bind:value={newUser.name} required />
+          <Label for="name">姓名</Label>
+          <Input id="name" type="text" placeholder="张三" bind:value={newUser.name} required />
         </div>
         <div class="space-y-2">
-          <Label for="email">Email</Label>
+          <Label for="email">邮箱</Label>
           <Input id="email" type="email" placeholder="email@example.com" bind:value={newUser.email} required />
         </div>
 
         <div class="space-y-2">
-          <Label>Roles</Label>
+          <Label>角色</Label>
           <div class="space-y-2">
             {#each activeRoles as role (role.id)}
               <label class="flex items-center gap-2">
@@ -548,11 +557,11 @@
                     newUser.role_ids = toggleRole(role.id, newUser.role_ids);
                   }}
                 />
-                <span class="text-sm uppercase">{role.role_name}</span>
+                <span class="text-sm uppercase">{getRoleDisplayName(role.role_name)}</span>
               </label>
             {/each}
             {#if activeRoles.length === 0}
-              <p class="text-muted-foreground text-sm">No roles available</p>
+              <p class="text-muted-foreground text-sm">暂无可用角色</p>
             {/if}
           </div>
         </div>
@@ -561,12 +570,12 @@
         {/if}
       </div>
       <Dialog.Footer>
-        <Button type="button" variant="outline" onclick={() => (showAddUserDialog = false)}>Cancel</Button>
+        <Button type="button" variant="outline" onclick={() => (showAddUserDialog = false)}>取消</Button>
         <Button type="submit" disabled={creatingUser}>
           {#if creatingUser}
             <Spinner class="size-4" />
           {/if}
-          Add User
+          添加用户
         </Button>
       </Dialog.Footer>
     </form>
@@ -577,8 +586,8 @@
 <Sheet.Root bind:open={showSettingsSheet}>
   <Sheet.Content side="right" class="w-full overflow-y-auto sm:max-w-xl">
     <Sheet.Header>
-      <Sheet.Title>Settings - {toEditUser?.name}</Sheet.Title>
-      <Sheet.Description>Manage user settings and permissions</Sheet.Description>
+      <Sheet.Title>设置 - {toEditUser?.name}</Sheet.Title>
+      <Sheet.Description>管理用户设置和权限</Sheet.Description>
     </Sheet.Header>
     <div class="px-4">
       {#if toEditUser}
@@ -586,15 +595,15 @@
           <!-- User Info -->
           <div class="space-y-2 text-sm">
             <p>
-              <strong>Created At:</strong>
+              <strong>创建时间：</strong>
               {formatDate(toEditUser.created_at)}
             </p>
             <p>
-              <strong>Updated At:</strong>
+              <strong>更新时间：</strong>
               {formatDate(toEditUser.updated_at)}
             </p>
             <p>
-              <strong>Name:</strong>
+              <strong>姓名：</strong>
               {toEditUser.name}
             </p>
           </div>
@@ -603,11 +612,11 @@
             <Card.Root>
               <Card.Content class="">
                 <p class="mb-3 text-sm">
-                  This user hasn't set their password yet. Resend the invitation email to {toEditUser.email}.
+                  此用户尚未设置密码，可向 {toEditUser.email} 重新发送邀请邮件。
                 </p>
                 {#if !canSendEmail}
                   <Alert.Root variant="destructive" class="mb-4">
-                    <Alert.Description>Email service not configured. Cannot resend invitation email.</Alert.Description>
+                    <Alert.Description>邮件服务尚未配置，无法重新发送邀请邮件。</Alert.Description>
                   </Alert.Root>
                 {/if}
                 <Button
@@ -618,13 +627,13 @@
                     manualSuccess = "";
                     await resendInvitationEmail(toEditUser!.email);
                     toEditUser!.actions.resendingInvitation = false;
-                    manualSuccess = "Invitation email resent successfully";
+                    manualSuccess = "邀请邮件已重新发送";
                   }}
                 >
                   {#if toEditUser.actions.resendingInvitation}
                     <Spinner class="size-4" />
                   {/if}
-                  Resend Invitation
+                  重新发送邀请
                 </Button>
               </Card.Content>
             </Card.Root>
@@ -633,9 +642,7 @@
           <!-- Update Role -->
           <Card.Root>
             <Card.Content class="p-4">
-              <p class="mb-3 text-sm">
-                Change the roles of the user. The user will have different permissions based on assigned roles.
-              </p>
+              <p class="mb-3 text-sm">修改用户角色，用户将根据分配的角色获得相应权限。</p>
               <div class="space-y-2">
                 {#each activeRoles as role (role.id)}
                   <label class="flex items-center gap-2">
@@ -646,11 +653,11 @@
                         toEditUser!.role_ids = toggleRole(role.id, toEditUser!.role_ids);
                       }}
                     />
-                    <span class="text-sm uppercase">{role.role_name}</span>
+                    <span class="text-sm uppercase">{getRoleDisplayName(role.role_name)}</span>
                   </label>
                 {/each}
                 {#if activeRoles.length === 0}
-                  <p class="text-muted-foreground text-sm">No roles available</p>
+                  <p class="text-muted-foreground text-sm">暂无可用角色</p>
                 {/if}
               </div>
               <Button
@@ -667,7 +674,7 @@
                 {#if toEditUser.actions.updatingRole}
                   <Spinner class="size-4" />
                 {/if}
-                Update Roles
+                更新角色
               </Button>
             </Card.Content>
           </Card.Root>
@@ -676,9 +683,7 @@
           {#if toEditUser.is_active}
             <Card.Root class="border-destructive">
               <Card.Content class="p-4">
-                <p class="mb-3 text-sm">
-                  Deactivate User. The user will not be able to login. Existing session will get invalidated.
-                </p>
+                <p class="mb-3 text-sm">停用用户后，该用户将无法登录，现有会话也会失效。</p>
                 <Button
                   variant="destructive"
                   disabled={toEditUser.actions.deactivatingUser}
@@ -693,14 +698,14 @@
                   {#if toEditUser.actions.deactivatingUser}
                     <Spinner class="size-4" />
                   {/if}
-                  Deactivate User
+                  停用用户
                 </Button>
               </Card.Content>
             </Card.Root>
           {:else}
             <Card.Root>
               <Card.Content class="p-4">
-                <p class="mb-3 text-sm">Activate User. The user will be able to login.</p>
+                <p class="mb-3 text-sm">启用用户后，该用户可以正常登录。</p>
                 <Button
                   variant="secondary"
                   disabled={toEditUser.actions.activatingUser}
@@ -715,7 +720,7 @@
                   {#if toEditUser.actions.activatingUser}
                     <Spinner class="size-4" />
                   {/if}
-                  Activate User
+                  启用用户
                 </Button>
               </Card.Content>
             </Card.Root>

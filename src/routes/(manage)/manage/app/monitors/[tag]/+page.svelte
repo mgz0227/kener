@@ -149,10 +149,10 @@
           }
         }
       } else {
-        error = "Monitor not found";
+        error = "未找到监控项";
       }
     } catch (e) {
-      error = e instanceof Error ? e.message : "Failed to fetch monitor";
+      error = e instanceof Error ? e.message : "获取监控项失败";
     } finally {
       loading = false;
     }
@@ -224,7 +224,7 @@
 
   function openCloneDialog() {
     cloneTag = "";
-    cloneName = monitor.name ? `${monitor.name} Copy` : "Copy";
+    cloneName = monitor.name ? `${monitor.name} 副本` : "副本";
     cloneDialogOpen = true;
   }
 
@@ -233,7 +233,7 @@
     const newName = cloneName.trim();
 
     if (!newTag || !newName) {
-      toast.error("Tag and name are required");
+      toast.error("标签和名称不能为空");
       return;
     }
 
@@ -258,11 +258,11 @@
         return;
       }
 
-      toast.success("Monitor cloned successfully");
+      toast.success("监控项已成功克隆");
       cloneDialogOpen = false;
       goto(clientResolver(resolve, `/manage/app/monitors/${newTag}`));
     } catch (e) {
-      const message = e instanceof Error ? e.message : "Failed to clone monitor";
+      const message = e instanceof Error ? e.message : "克隆监控项失败";
       toast.error(message);
     } finally {
       cloning = false;
@@ -275,32 +275,32 @@
     <Breadcrumb.Root>
       <Breadcrumb.List>
         <Breadcrumb.Item>
-          <Breadcrumb.Link href={clientResolver(resolve, "/manage/app/monitors")}>Monitors</Breadcrumb.Link>
+          <Breadcrumb.Link href={clientResolver(resolve, "/manage/app/monitors")}>监控项</Breadcrumb.Link>
         </Breadcrumb.Item>
         <Breadcrumb.Separator />
         <Breadcrumb.Item>
-          <Breadcrumb.Page>{isNew ? "New Monitor" : monitor.name || params.tag}</Breadcrumb.Page>
+          <Breadcrumb.Page>{isNew ? "新建监控项" : monitor.name || params.tag}</Breadcrumb.Page>
         </Breadcrumb.Item>
       </Breadcrumb.List>
     </Breadcrumb.Root>
     <div class="flex gap-2">
       {#if !isNew}
-        <Button size="sm" variant="outline" onclick={openCloneDialog}>Clone</Button>
+        <Button size="sm" variant="outline" onclick={openCloneDialog}>克隆</Button>
       {/if}
       <HoverCard.Root>
         <HoverCard.Trigger>
           <Button size="sm" target="_blank" href={clientResolver(resolve, `/monitors/${params.tag}`)} variant="outline">
-            View
+            查看
           </Button>
         </HoverCard.Trigger>
         <HoverCard.Content class="w-80">
           <div class="flex justify-between space-x-4 text-xs">
             {#if monitor.is_hidden === "YES"}
-              <p class="text-destructive">This monitor is hidden and won't appear on status pages.</p>
+              <p class="text-destructive">此监控项已隐藏，不会显示在状态页上。</p>
             {:else if monitor.status !== "ACTIVE"}
-              <p class="text-destructive">This monitor is not active and won't appear on status pages.</p>
+              <p class="text-destructive">此监控项未启用，不会显示在状态页上。</p>
             {:else}
-              <p class="text-success">This monitor is visible on status pages.</p>
+              <p class="text-success">此监控项会显示在状态页上。</p>
             {/if}
             <p class="text-xs"></p>
           </div>
@@ -324,11 +324,8 @@
     {#if !isNew && monitorPages.length === 0}
       <Alert.Root variant="destructive">
         <AlertTriangleIcon class="size-4" />
-        <Alert.Title>Monitor Not Visible</Alert.Title>
-        <Alert.Description>
-          This monitor is not added to any page. It won't be visible on your status page until you add it to at least
-          one page.
-        </Alert.Description>
+        <Alert.Title>监控项不可见</Alert.Title>
+        <Alert.Description>此监控项尚未添加到任何页面。至少添加到一个页面后，才会显示在状态页上。</Alert.Description>
       </Alert.Root>
     {/if}
 
@@ -339,7 +336,7 @@
       onValueChange={(value) => (activeAccordionItem = value)}
     >
       <Accordion.Item value="general">
-        <Accordion.Trigger>General Settings</Accordion.Trigger>
+        <Accordion.Trigger>常规设置</Accordion.Trigger>
         <Accordion.Content class="flex flex-col gap-4 text-balance">
           <!-- General Settings Card -->
           <GeneralSettingsCard bind:monitor {typeData} {isNew} />
@@ -347,7 +344,7 @@
       </Accordion.Item>
       {#if !isNew}
         <Accordion.Item value="configuration">
-          <Accordion.Trigger>Configuration</Accordion.Trigger>
+          <Accordion.Trigger>配置</Accordion.Trigger>
           <Accordion.Content class="flex flex-col gap-4 text-balance">
             <!-- Monitor Type Configuration Card -->
             <MonitorTypeCard bind:monitor bind:typeData {availableMonitors} />
@@ -356,7 +353,7 @@
       {/if}
       {#if !isNew}
         <Accordion.Item value="calculation">
-          <Accordion.Trigger>Uptime Calculation</Accordion.Trigger>
+          <Accordion.Trigger>可用率计算</Accordion.Trigger>
           <Accordion.Content class="flex flex-col gap-4 text-balance">
             <!-- Uptime Calculation Card -->
             <UptimeSettingsCard {monitor} {typeData} bind:uptimeSettings />
@@ -365,7 +362,7 @@
       {/if}
       {#if !isNew}
         <Accordion.Item value="status-history">
-          <Accordion.Trigger>Status History</Accordion.Trigger>
+          <Accordion.Trigger>状态历史</Accordion.Trigger>
           <Accordion.Content class="flex flex-col gap-4 text-balance">
             <!-- Status History Days Card -->
 
@@ -375,7 +372,7 @@
       {/if}
       {#if !isNew}
         <Accordion.Item value="logs-recent">
-          <Accordion.Trigger>Recent Logs</Accordion.Trigger>
+          <Accordion.Trigger>最近日志</Accordion.Trigger>
           <Accordion.Content class="flex flex-col gap-4 text-balance">
             <!-- Recent Logs Card -->
 
@@ -385,7 +382,7 @@
       {/if}
       {#if !isNew}
         <Accordion.Item value="pages-visibility">
-          <Accordion.Trigger>Page Visibility</Accordion.Trigger>
+          <Accordion.Trigger>页面可见性</Accordion.Trigger>
           <Accordion.Content class="flex flex-col gap-4 text-balance">
             <!-- Page Visibility Card -->
 
@@ -395,7 +392,7 @@
       {/if}
       {#if !isNew}
         <Accordion.Item value="sharing-options">
-          <Accordion.Trigger>Sharing Options</Accordion.Trigger>
+          <Accordion.Trigger>共享选项</Accordion.Trigger>
           <Accordion.Content class="flex flex-col gap-4 text-balance">
             <!-- Monitor Sharing Options Card -->
 
@@ -405,7 +402,7 @@
       {/if}
       {#if !isNew}
         <Accordion.Item value="modify-data">
-          <Accordion.Trigger>Modify Data</Accordion.Trigger>
+          <Accordion.Trigger>修改数据</Accordion.Trigger>
           <Accordion.Content class="flex flex-col gap-4 text-balance">
             <!-- Modify Data Card -->
 
@@ -415,7 +412,7 @@
       {/if}
       {#if !isNew}
         <Accordion.Item value="danger-zone">
-          <Accordion.Trigger>Danger Zone</Accordion.Trigger>
+          <Accordion.Trigger>危险操作</Accordion.Trigger>
           <Accordion.Content class="flex flex-col gap-4 text-balance">
             <!-- Danger Zone Card -->
 
@@ -430,29 +427,29 @@
 <Dialog.Root bind:open={cloneDialogOpen}>
   <Dialog.Content class="sm:max-w-md">
     <Dialog.Header>
-      <Dialog.Title>Clone Monitor</Dialog.Title>
-      <Dialog.Description>Enter a new tag and name for the cloned monitor.</Dialog.Description>
+      <Dialog.Title>克隆监控项</Dialog.Title>
+      <Dialog.Description>请输入克隆监控项的新标签和名称。</Dialog.Description>
     </Dialog.Header>
 
     <div class="space-y-4 py-2">
       <div class="space-y-2">
-        <Label for="clone-tag">Tag</Label>
+        <Label for="clone-tag">标签</Label>
         <Input id="clone-tag" bind:value={cloneTag} placeholder="my-monitor-copy" />
       </div>
       <div class="space-y-2">
-        <Label for="clone-name">Name</Label>
-        <Input id="clone-name" bind:value={cloneName} placeholder="Monitor Name Copy" />
+        <Label for="clone-name">名称</Label>
+        <Input id="clone-name" bind:value={cloneName} placeholder="监控项名称副本" />
       </div>
     </div>
 
     <Dialog.Footer>
-      <Button variant="outline" onclick={() => (cloneDialogOpen = false)} disabled={cloning}>Cancel</Button>
+      <Button variant="outline" onclick={() => (cloneDialogOpen = false)} disabled={cloning}>取消</Button>
       <Button onclick={cloneMonitor} disabled={cloning || !cloneTag.trim() || !cloneName.trim()}>
         {#if cloning}
           <Spinner class="size-4" />
-          Cloning...
+          正在克隆...
         {:else}
-          Clone
+          克隆
         {/if}
       </Button>
     </Dialog.Footer>

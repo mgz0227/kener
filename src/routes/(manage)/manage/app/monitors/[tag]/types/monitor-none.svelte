@@ -12,19 +12,16 @@
 
 <div class="space-y-4">
   <div class="bg-muted/50 rounded-lg p-6 text-center">
-    <p class="text-muted-foreground text-sm">
-      This monitor type does not have any automatic checks. Status updates must be made manually via the API or through
-      incidents.
-    </p>
+    <p class="text-muted-foreground text-sm">此监控类型不会执行任何自动检查。状态必须通过 API 或事件手动更新。</p>
   </div>
 
   <div class="flex items-start gap-3 rounded-lg border p-4">
     <Checkbox id="none-override-last-known-status" bind:checked={data.overrideWithLastKnownStatus} />
     <div class="grid gap-1.5 leading-none">
-      <Label for="none-override-last-known-status" class="cursor-pointer">Override with last known status</Label>
+      <Label for="none-override-last-known-status" class="cursor-pointer">使用最后已知状态覆盖</Label>
       <p class="text-muted-foreground text-sm">
-        On each scheduled run, reuse the last manual status (created using the API) so this monitor keeps that state in
-        status history, uptime, and alert evaluation until you change it.
+        每次计划运行时复用最后一次通过 API
+        创建的手动状态，使此监控项在状态历史、可用率和告警评估中保持该状态，直到您再次更改。
       </p>
     </div>
   </div>

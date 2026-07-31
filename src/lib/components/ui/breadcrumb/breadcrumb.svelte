@@ -10,6 +10,6 @@
   }: WithElementRef<HTMLAttributes<HTMLElement>> = $props();
 </script>
 
-<nav bind:this={ref} data-slot="breadcrumb" class={className} aria-label="breadcrumb" {...restProps}>
+<nav bind:this={ref} data-slot="breadcrumb" class={className} aria-label="面包屑导航" {...restProps}>
   {@render children?.()}
 </nav>

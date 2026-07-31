@@ -29,6 +29,15 @@
   let pageNo = $state(1);
   let monitorFilter = $state("");
   const limit = 20;
+  const alertTypeLabels: Record<string, string> = {
+    STATUS: "状态",
+    LATENCY: "延迟",
+    UPTIME: "可用率"
+  };
+  const severityLabels: Record<string, string> = {
+    CRITICAL: "严重",
+    WARNING: "警告"
+  };
 
   // Fetch alert configs
   async function fetchConfigs() {
@@ -95,11 +104,11 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success(result.is_active === "YES" ? "Alert activated" : "Alert deactivated");
+        toast.success(result.is_active === "YES" ? "告警已启用" : "告警已停用");
         await fetchConfigs();
       }
     } catch (error) {
-      toast.error("Failed to toggle alert status");
+      toast.error("切换告警状态失败");
     }
   }
 
@@ -140,10 +149,10 @@
     <div class="flex items-center gap-3">
       <Select.Root type="single" value={monitorFilter} onValueChange={handleMonitorChange}>
         <Select.Trigger class="w-48">
-          {monitorFilter ? monitors.find((m) => m.tag === monitorFilter)?.name || monitorFilter : "All Monitors"}
+          {monitorFilter ? monitors.find((m) => m.tag === monitorFilter)?.name || monitorFilter : "所有监控器"}
         </Select.Trigger>
         <Select.Content>
-          <Select.Item value="">All Monitors</Select.Item>
+          <Select.Item value="">所有监控器</Select.Item>
           {#each monitors as monitor}
             <Select.Item value={monitor.tag}>{monitor.name}</Select.Item>
           {/each}
@@ -155,7 +164,7 @@
     </div>
     <Button onclick={() => goto(clientResolver(resolve, "/manage/app/alerts/new"))}>
       <PlusIcon class="size-4" />
-      Create Alert
+      创建告警
     </Button>
   </div>
 
@@ -164,13 +173,13 @@
     <Table.Root>
       <Table.Header>
         <Table.Row>
-          <Table.Head>Monitors</Table.Head>
-          <Table.Head>Alert Type</Table.Head>
-          <Table.Head>Severity</Table.Head>
-          <Table.Head>Description</Table.Head>
-          <Table.Head class="w-24">Triggers</Table.Head>
-          <Table.Head class="w-20 text-center">Active</Table.Head>
-          <Table.Head class="w-32 text-right">Actions</Table.Head>
+          <Table.Head>监控器</Table.Head>
+          <Table.Head>告警类型</Table.Head>
+          <Table.Head>严重程度</Table.Head>
+          <Table.Head>描述</Table.Head>
+          <Table.Head class="w-24">触发器</Table.Head>
+          <Table.Head class="w-20 text-center">启用</Table.Head>
+          <Table.Head class="w-32 text-right">操作</Table.Head>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -180,16 +189,14 @@
               <div class="flex flex-col items-center gap-4">
                 <BellOffIcon class="text-muted-foreground size-16" />
                 <div class="space-y-2">
-                  <h3 class="text-lg font-semibold">No alert configurations</h3>
+                  <h3 class="text-lg font-semibold">暂无告警配置</h3>
                   <p class="text-muted-foreground text-sm">
-                    {monitorFilter
-                      ? "No alerts found for this monitor."
-                      : "Create an alert to get notified when your monitors have issues."}
+                    {monitorFilter ? "未找到此监控器的告警。" : "创建告警后，监控器出现问题时会收到通知。"}
                   </p>
                 </div>
                 <Button onclick={() => goto(clientResolver(resolve, "/manage/app/alerts/new"))}>
                   <PlusIcon class="size-4" />
-                  Create Alert
+                  创建告警
                 </Button>
               </div>
             </Table.Cell>
@@ -217,11 +224,11 @@
                 {/if}
               </Table.Cell>
               <Table.Cell>
-                <Badge variant="outline">{config.alert_for}</Badge>
+                <Badge variant="outline">{alertTypeLabels[config.alert_for] || config.alert_for}</Badge>
               </Table.Cell>
               <Table.Cell>
                 <Badge variant={getSeverityBadgeVariant(config.severity)}>
-                  {config.severity}
+                  {severityLabels[config.severity] || config.severity}
                 </Badge>
               </Table.Cell>
               <Table.Cell>
@@ -259,7 +266,7 @@
                   <Tooltip.Root>
                     <Tooltip.Trigger>
                       <Badge variant="secondary" class="cursor-pointer text-xs">
-                        {config.triggers.length} trigger{config.triggers.length > 1 ? "s" : ""}
+                        {config.triggers.length} 个触发器
                       </Badge>
                     </Tooltip.Trigger>
                     <Tooltip.Content>
@@ -285,7 +292,7 @@
                     onclick={() => goto(clientResolver(resolve, `/manage/app/alerts/${config.id}`))}
                   >
                     <EditIcon class="size-3" />
-                    Edit
+                    编辑
                   </Button>
                   <Button
                     variant="outline"
@@ -293,7 +300,7 @@
                     onclick={() => goto(clientResolver(resolve, `/manage/app/alerts/logs/${config.id}`))}
                   >
                     <ListIcon class="size-3" />
-                    Logs
+                    日志
                   </Button>
                 </div>
               </Table.Cell>
@@ -309,7 +316,7 @@
     {@const startItem = (pageNo - 1) * limit + 1}
     {@const endItem = Math.min(pageNo * limit, totalCount)}
     <div class="flex items-center justify-between">
-      <span class="text-muted-foreground text-sm">Showing {startItem}-{endItem} of {totalCount}</span>
+      <span class="text-muted-foreground text-sm">显示第 {startItem}-{endItem} 项，共 {totalCount} 项</span>
       {#if totalPages > 1}
         <div class="flex items-center gap-2">
           <Button variant="outline" size="icon" disabled={pageNo === 1} onclick={() => goToPage(pageNo - 1)}>

@@ -41,10 +41,10 @@
 
   // Days presets
   const daysPresets = [
-    { label: "7 Days", value: 7 },
-    { label: "30 Days", value: 30 },
-    { label: "60 Days", value: 60 },
-    { label: "90 Days", value: 90 }
+    { label: "7 天", value: 7 },
+    { label: "30 天", value: 30 },
+    { label: "60 天", value: 60 },
+    { label: "90 天", value: 90 }
   ];
 
   // Height presets
@@ -190,10 +190,8 @@
     <div class="flex flex-col gap-6">
       <Card.Root>
         <Card.Header>
-          <Card.Title>Embed Generator</Card.Title>
-          <Card.Description>
-            Create customizable embeds to display the status or latency of your monitors on external websites
-          </Card.Description>
+          <Card.Title>嵌入代码生成器</Card.Title>
+          <Card.Description>创建可自定义的嵌入组件，在外部网站显示监控状态、延迟或实时事件</Card.Description>
         </Card.Header>
         <Card.Content>
           <div class="grid grid-cols-2 gap-4">
@@ -201,7 +199,7 @@
             <div class="flex flex-col gap-4 border-r pr-4">
               <!-- Embed Type -->
               <div class="flex flex-col gap-2">
-                <Label for="embed-type">Embed Type</Label>
+                <Label for="embed-type">嵌入类型</Label>
                 <Select.Root
                   type="single"
                   value={embedConfig.embedType}
@@ -211,24 +209,24 @@
                 >
                   <Select.Trigger id="embed-type" class="w-full capitalize">
                     {embedConfig.embedType === "status"
-                      ? "Status Bar"
+                      ? "状态栏"
                       : embedConfig.embedType === "latency"
-                        ? "Latency Chart"
-                        : "Live Events"}
+                        ? "延迟图表"
+                        : "实时事件"}
                   </Select.Trigger>
                   <Select.Content>
-                    <Select.Item value="status">Status Bar</Select.Item>
-                    <Select.Item value="latency">Latency Chart</Select.Item>
-                    <Select.Item value="events">Live Events</Select.Item>
+                    <Select.Item value="status">状态栏</Select.Item>
+                    <Select.Item value="latency">延迟图表</Select.Item>
+                    <Select.Item value="events">实时事件</Select.Item>
                   </Select.Content>
                 </Select.Root>
                 <p class="text-muted-foreground text-xs">
                   {#if embedConfig.embedType === "status"}
-                    Shows a status bar with uptime percentage and daily status indicators
+                    显示包含可用率百分比和每日状态的状态栏
                   {:else if embedConfig.embedType === "latency"}
-                    Shows a latency trend chart over time
+                    显示一段时间内的延迟趋势图
                   {:else}
-                    Shows ongoing incidents and maintenance events in real time
+                    实时显示正在进行的故障和维护事件
                   {/if}
                 </p>
               </div>
@@ -236,7 +234,7 @@
               <!-- Monitor Selection (status & latency only) -->
               {#if embedConfig.embedType !== "events"}
                 <div class="flex flex-col gap-2">
-                  <Label for="monitor-select">Monitor</Label>
+                  <Label for="monitor-select">监控项</Label>
                   <Select.Root
                     type="single"
                     value={embedConfig.tag}
@@ -245,7 +243,7 @@
                     }}
                   >
                     <Select.Trigger id="monitor-select" class="w-full">
-                      {monitors.find((m) => m.tag === embedConfig.tag)?.name || "Select a monitor"}
+                      {monitors.find((m) => m.tag === embedConfig.tag)?.name || "选择监控项"}
                     </Select.Trigger>
                     <Select.Content>
                       {#each monitors as monitor (monitor.tag)}
@@ -258,21 +256,21 @@
 
               <!-- Theme -->
               <div class="flex flex-col gap-2">
-                <Label>Theme</Label>
+                <Label>主题</Label>
                 <div class="flex gap-2">
                   <Button
                     variant={embedConfig.theme === "light" ? "default" : "outline"}
                     size="sm"
                     onclick={() => (embedConfig.theme = "light")}
                   >
-                    Light
+                    浅色
                   </Button>
                   <Button
                     variant={embedConfig.theme === "dark" ? "default" : "outline"}
                     size="sm"
                     onclick={() => (embedConfig.theme = "dark")}
                   >
-                    Dark
+                    深色
                   </Button>
                 </div>
               </div>
@@ -280,7 +278,7 @@
               <!-- Events-specific options -->
               {#if embedConfig.embedType === "events"}
                 <div class="flex flex-col gap-2">
-                  <Label>Show</Label>
+                  <Label>显示内容</Label>
                   <div class="flex flex-col gap-2">
                     <label class="flex items-center gap-2">
                       <Checkbox
@@ -289,7 +287,7 @@
                           embedConfig.showIncidents = !!v;
                         }}
                       />
-                      <span class="text-sm">Incidents</span>
+                      <span class="text-sm">故障事件</span>
                     </label>
                     <label class="flex items-center gap-2">
                       <Checkbox
@@ -298,17 +296,15 @@
                           embedConfig.showMaintenance = !!v;
                         }}
                       />
-                      <span class="text-sm">Maintenance</span>
+                      <span class="text-sm">维护事件</span>
                     </label>
                   </div>
                 </div>
 
                 <!-- Monitor Tags Filter (optional) -->
                 <div class="flex flex-col gap-2">
-                  <Label>Filter by Monitors</Label>
-                  <p class="text-muted-foreground text-xs">
-                    Select monitors to filter events. Leave empty to show all global events.
-                  </p>
+                  <Label>按监控项筛选</Label>
+                  <p class="text-muted-foreground text-xs">选择用于筛选事件的监控项，留空则显示所有全局事件。</p>
                   <div class="flex max-h-40 flex-col gap-1.5 overflow-y-auto rounded-md border p-2">
                     {#each monitors as monitor (monitor.tag)}
                       <label class="flex items-center gap-2">
@@ -331,7 +327,7 @@
                       class="text-muted-foreground self-start text-xs underline hover:no-underline"
                       onclick={() => (embedConfig.selectedTags = [])}
                     >
-                      Clear selection
+                      清除选择
                     </button>
                   {/if}
                 </div>
@@ -340,7 +336,7 @@
               <!-- Days (status & latency only) -->
               {#if embedConfig.embedType !== "events"}
                 <div class="flex flex-col gap-2">
-                  <Label for="days-select">Time Period</Label>
+                  <Label for="days-select">时间范围</Label>
                   <Select.Root
                     type="single"
                     value={embedConfig.days.toString()}
@@ -349,7 +345,7 @@
                     }}
                   >
                     <Select.Trigger id="days-select" class="w-full">
-                      {daysPresets.find((d) => d.value === embedConfig.days)?.label || `${embedConfig.days} Days`}
+                      {daysPresets.find((d) => d.value === embedConfig.days)?.label || `${embedConfig.days} 天`}
                     </Select.Trigger>
                     <Select.Content>
                       {#each daysPresets as preset (preset.value)}
@@ -363,7 +359,7 @@
               <!-- Height (only for latency) -->
               {#if embedConfig.embedType === "latency"}
                 <div class="flex flex-col gap-2">
-                  <Label for="height-select">Chart Height</Label>
+                  <Label for="height-select">图表高度</Label>
                   <Select.Root
                     type="single"
                     value={embedConfig.height.toString()}
@@ -384,7 +380,7 @@
 
                 <!-- Latency Metric -->
                 <div class="flex flex-col gap-2">
-                  <Label for="metric-select">Latency Metric</Label>
+                  <Label for="metric-select">延迟指标</Label>
                   <Select.Root
                     type="single"
                     value={embedConfig.metric}
@@ -394,24 +390,24 @@
                   >
                     <Select.Trigger id="metric-select" class="w-full capitalize">
                       {embedConfig.metric === "average"
-                        ? "Average"
+                        ? "平均值"
                         : embedConfig.metric === "maximum"
-                          ? "Maximum"
-                          : "Minimum"}
+                          ? "最大值"
+                          : "最小值"}
                     </Select.Trigger>
                     <Select.Content>
-                      <Select.Item value="average">Average</Select.Item>
-                      <Select.Item value="maximum">Maximum</Select.Item>
-                      <Select.Item value="minimum">Minimum</Select.Item>
+                      <Select.Item value="average">平均值</Select.Item>
+                      <Select.Item value="maximum">最大值</Select.Item>
+                      <Select.Item value="minimum">最小值</Select.Item>
                     </Select.Content>
                   </Select.Root>
-                  <p class="text-muted-foreground text-xs">Select which latency metric to display in the chart</p>
+                  <p class="text-muted-foreground text-xs">选择图表中显示的延迟指标</p>
                 </div>
               {/if}
 
               <!-- Format -->
               <div class="flex flex-col gap-2">
-                <Label>Embed Format</Label>
+                <Label>嵌入格式</Label>
                 <div class="flex gap-2">
                   <Button
                     variant={embedConfig.format === "iframe" ? "default" : "outline"}
@@ -425,14 +421,14 @@
                     size="sm"
                     onclick={() => (embedConfig.format = "script")}
                   >
-                    Script
+                    脚本
                   </Button>
                 </div>
                 <p class="text-muted-foreground text-xs">
                   {#if embedConfig.format === "iframe"}
-                    Use an iframe to embed the widget. Works on most websites.
+                    使用 iframe 嵌入组件，适用于大多数网站。
                   {:else}
-                    Use a script tag for dynamic embedding. May require CSP configuration.
+                    使用 script 标签动态嵌入，可能需要配置 CSP。
                   {/if}
                 </p>
               </div>
@@ -443,12 +439,12 @@
               {#if embedConfig.tag || embedConfig.embedType === "events"}
                 <div>
                   <p class="flex items-center justify-between">
-                    <span class="text-sm font-semibold">Preview</span>
+                    <span class="text-sm font-semibold">预览</span>
                     <Button variant="ghost" size="icon-sm" onclick={refreshPreview}>
                       <RefreshCwIcon class="h-4 w-4" />
                     </Button>
                   </p>
-                  <p class="text-muted-foreground text-sm">See how your embed will look</p>
+                  <p class="text-muted-foreground text-sm">查看嵌入组件的显示效果</p>
                 </div>
 
                 <!-- Embed Preview -->
@@ -459,7 +455,7 @@
                   {#key previewKey}
                     {#key embedConfig}
                       <iframe
-                        title="Embed preview"
+                        title="嵌入预览"
                         src={previewUrl}
                         width="100%"
                         height={embedConfig.embedType === "status"
@@ -476,7 +472,7 @@
 
                 <!-- Embed URL -->
                 <div class="space-y-2">
-                  <Label>Embed URL</Label>
+                  <Label>嵌入 URL</Label>
                   <div class="flex gap-2">
                     <Input readonly value={previewUrl} class="font-mono text-xs" />
                     <CopyButton variant="outline" size="icon" text={previewUrl}>
@@ -487,7 +483,7 @@
 
                 <!-- Embed Code -->
                 <div class="space-y-2">
-                  <Label>Embed Code</Label>
+                  <Label>嵌入代码</Label>
                   <div class="flex gap-2">
                     <Input readonly value={htmlSnippet} class="font-mono text-xs" />
                     <CopyButton variant="outline" size="icon" text={htmlSnippet}>
@@ -497,7 +493,7 @@
                 </div>
               {:else}
                 <div class="text-muted-foreground flex items-center justify-center py-12 text-center">
-                  Select a monitor to preview the embed
+                  选择监控项以预览嵌入组件
                 </div>
               {/if}
             </div>

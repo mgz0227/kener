@@ -51,7 +51,7 @@
 <div class="space-y-4">
   <div class="grid grid-cols-2 gap-4">
     <div class="flex flex-col gap-2">
-      <Label for="sql-dbtype">Database Type</Label>
+      <Label for="sql-dbtype">数据库类型</Label>
       <Select.Root
         type="single"
         value={data.dbType}
@@ -70,7 +70,7 @@
       </Select.Root>
     </div>
     <div class="flex flex-col gap-2">
-      <Label for="sql-timeout">Timeout (ms)</Label>
+      <Label for="sql-timeout">超时时间（毫秒）</Label>
       <Input id="sql-timeout" type="number" bind:value={data.timeout} placeholder="5000" />
     </div>
   </div>
@@ -78,7 +78,7 @@
   <div>
     <InputGroup.Root>
       <InputGroup.Addon>
-        <InputGroup.Text class="border-r-2 pr-2">Connection String for {selectedDbType}</InputGroup.Text>
+        <InputGroup.Text class="border-r-2 pr-2">{selectedDbType} 连接字符串</InputGroup.Text>
       </InputGroup.Addon>
       <InputGroup.Input
         id="sql-connection"
@@ -89,8 +89,8 @@
       <InputGroup.Addon align="inline-end">
         <InputGroup.Button
           type="button"
-          aria-label={showConnectionString ? "Hide connection string" : "Show connection string"}
-          title={showConnectionString ? "Hide connection string" : "Show connection string"}
+          aria-label={showConnectionString ? "隐藏连接字符串" : "显示连接字符串"}
+          title={showConnectionString ? "隐藏连接字符串" : "显示连接字符串"}
           size="icon-xs"
           onclick={() => (showConnectionString = !showConnectionString)}
         >
@@ -102,11 +102,11 @@
         </InputGroup.Button>
       </InputGroup.Addon>
     </InputGroup.Root>
-    <p class="text-muted-foreground mt-1 text-xs">Connection string will be stored securely</p>
+    <p class="text-muted-foreground mt-1 text-xs">连接字符串将被安全存储</p>
   </div>
 
   <div class="flex flex-col gap-2">
-    <Label for="sql-query">Query <span class="text-destructive">*</span></Label>
+    <Label for="sql-query">查询语句 <span class="text-destructive">*</span></Label>
     <div class="rounded-md border">
       <CodeMirror
         bind:value={data.query}
@@ -120,6 +120,6 @@
         }}
       />
     </div>
-    <p class="text-muted-foreground mt-1 text-xs">Query to execute. If successful, monitor is UP.</p>
+    <p class="text-muted-foreground mt-1 text-xs">要执行的查询。执行成功时，监控状态为 UP。</p>
   </div>
 </div>

@@ -16,6 +16,7 @@
   import Trash2 from "@lucide/svelte/icons/trash-2";
   import { toast } from "svelte-sonner";
   import { format } from "date-fns";
+  import { zhCN } from "date-fns/locale";
   import { onMount } from "svelte";
   import { resolve } from "$app/paths";
   import clientResolver from "$lib/client/resolver.js";
@@ -55,7 +56,7 @@
         apiKeys = result;
       }
     } catch (e) {
-      toast.error("Failed to load API keys");
+      toast.error("加载 API 密钥失败");
     } finally {
       loading = false;
     }
@@ -63,7 +64,7 @@
 
   async function createNewAPIKey() {
     if (!newAPIKeyName.trim()) {
-      toast.error("Please enter a name for the API key");
+      toast.error("请输入 API 密钥名称");
       return;
     }
 
@@ -82,13 +83,13 @@
         toast.error(result.error);
       } else {
         newKeyResp = result;
-        toast.success("API key created successfully");
+        toast.success("API 密钥创建成功");
         loadAPIKeys();
         showCreateDialog = false;
         newAPIKeyName = "";
       }
     } catch (e) {
-      toast.error("Failed to create API key");
+      toast.error("创建 API 密钥失败");
     } finally {
       creating = false;
     }
@@ -111,10 +112,10 @@
       } else {
         apiKey.status = newStatus;
         apiKeys = [...apiKeys];
-        toast.success(`API key ${newStatus === "ACTIVE" ? "activated" : "deactivated"}`);
+        toast.success(`API 密钥已${newStatus === "ACTIVE" ? "启用" : "停用"}`);
       }
     } catch (e) {
-      toast.error("Failed to update API key status");
+      toast.error("更新 API 密钥状态失败");
     }
   }
 
@@ -140,11 +141,11 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("API key deleted successfully");
+        toast.success("API 密钥已删除");
         await loadAPIKeys();
       }
     } catch (e) {
-      toast.error("Failed to delete API key");
+      toast.error("删除 API 密钥失败");
     } finally {
       deleting = false;
       deleteDialogOpen = false;
@@ -156,7 +157,7 @@
     if (newKeyResp.apiKey) {
       navigator.clipboard.writeText(newKeyResp.apiKey);
       copied = true;
-      toast.success("API key copied to clipboard");
+      toast.success("API 密钥已复制到剪贴板");
       setTimeout(() => {
         copied = false;
       }, 2000);
@@ -165,7 +166,7 @@
 
   function formatDate(dateStr: string): string {
     try {
-      return format(new Date(dateStr), "MMM d, yyyy HH:mm");
+      return format(new Date(dateStr), "yyyy年M月d日 HH:mm", { locale: zhCN });
     } catch {
       return dateStr;
     }
@@ -187,7 +188,7 @@
   <div class="flex items-center justify-end">
     <Button onclick={() => (showCreateDialog = true)}>
       <Plus class="h-4 w-4" />
-      Create New API Key
+      新建 API 密钥
     </Button>
   </div>
 
@@ -197,7 +198,7 @@
       <Card.Content class="">
         <div class="flex items-start gap-3">
           <div class="flex-1">
-            <p class="font-medium text-green-800 dark:text-green-200">🎉 API Key Created Successfully</p>
+            <p class="font-medium text-green-800 dark:text-green-200">API 密钥创建成功</p>
             <div class="relative mt-2">
               <code class="bg-background block rounded-md border px-4 py-2 pr-12 font-mono text-sm">
                 {newKeyResp.apiKey}
@@ -216,11 +217,10 @@
               </Button>
             </div>
             <p class="text-muted-foreground mt-2 text-xs">
-              Your new API key has been created. It will <strong class="uppercase underline">not be shown again</strong
-              >, so make sure to save it.
+              新 API 密钥已创建，之后将<strong class="underline">不再显示</strong>，请立即妥善保存。
             </p>
           </div>
-          <Button size="sm" variant="ghost" onclick={dismissNewKey}>Dismiss</Button>
+          <Button size="sm" variant="ghost" onclick={dismissNewKey}>关闭</Button>
         </div>
       </Card.Content>
     </Card.Root>
@@ -236,18 +236,18 @@
       {:else if apiKeys.length === 0}
         <div class="text-muted-foreground py-12 text-center">
           <KeyIcon class="mx-auto mb-4 h-12 w-12 opacity-50" />
-          <p>No API keys found</p>
-          <p class="text-sm">Create your first API key to get started</p>
+          <p>暂无 API 密钥</p>
+          <p class="text-sm">创建第一个 API 密钥以开始使用</p>
         </div>
       {:else}
         <Table.Root class="p-4">
           <Table.Header>
             <Table.Row>
-              <Table.Head class="pl-4">Name</Table.Head>
-              <Table.Head>Key</Table.Head>
-              <Table.Head>Created At</Table.Head>
-              <Table.Head class="pr-4 text-right">Status</Table.Head>
-              <Table.Head class="pr-4 text-right">Actions</Table.Head>
+              <Table.Head class="pl-4">名称</Table.Head>
+              <Table.Head>密钥</Table.Head>
+              <Table.Head>创建时间</Table.Head>
+              <Table.Head class="pr-4 text-right">状态</Table.Head>
+              <Table.Head class="pr-4 text-right">操作</Table.Head>
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -265,7 +265,7 @@
                 <Table.Cell class="pr-4 text-right">
                   <div class="flex items-center justify-end gap-2">
                     <span class="text-muted-foreground text-xs">
-                      {apiKey.status === "ACTIVE" ? "Active" : "Inactive"}
+                      {apiKey.status === "ACTIVE" ? "已启用" : "已停用"}
                     </span>
                     <Switch checked={apiKey.status === "ACTIVE"} onCheckedChange={() => updateStatus(apiKey)} />
                   </div>
@@ -278,7 +278,7 @@
                     onclick={() => openDeleteDialog(apiKey)}
                   >
                     <Trash2 class="h-4 w-4" />
-                    Delete
+                    删除
                   </Button>
                 </Table.Cell>
               </Table.Row>
@@ -292,11 +292,8 @@
 <Dialog.Root bind:open={showCreateDialog}>
   <Dialog.Content class="sm:max-w-md">
     <Dialog.Header>
-      <Dialog.Title>Create a new API Key</Dialog.Title>
-      <Dialog.Description>
-        API keys are used to authenticate your requests to the API. They are unique to your account and should be kept
-        secret.
-      </Dialog.Description>
+      <Dialog.Title>新建 API 密钥</Dialog.Title>
+      <Dialog.Description>API 密钥用于验证 API 请求。每个密钥均为账户专用，请妥善保密。</Dialog.Description>
     </Dialog.Header>
     <form
       onsubmit={(e) => {
@@ -306,17 +303,17 @@
     >
       <div class="grid gap-4 py-4">
         <div class="grid gap-2">
-          <Label for="newAPIKeyName">Name</Label>
-          <Input id="newAPIKeyName" bind:value={newAPIKeyName} placeholder="eg. My API Key" required />
+          <Label for="newAPIKeyName">名称</Label>
+          <Input id="newAPIKeyName" bind:value={newAPIKeyName} placeholder="例如：我的 API 密钥" required />
         </div>
       </div>
       <Dialog.Footer>
-        <Button type="button" variant="outline" onclick={() => (showCreateDialog = false)}>Cancel</Button>
+        <Button type="button" variant="outline" onclick={() => (showCreateDialog = false)}>取消</Button>
         <Button type="submit" disabled={creating}>
           {#if creating}
             <Loader class="h-4 w-4 animate-spin" />
           {/if}
-          Create
+          创建
         </Button>
       </Dialog.Footer>
     </form>
@@ -326,18 +323,18 @@
 <AlertDialog.Root bind:open={deleteDialogOpen}>
   <AlertDialog.Content>
     <AlertDialog.Header>
-      <AlertDialog.Title>Delete API Key</AlertDialog.Title>
+      <AlertDialog.Title>删除 API 密钥</AlertDialog.Title>
       <AlertDialog.Description>
-        Are you sure you want to delete API key "{keyToDelete?.name}"? This action cannot be undone.
+        确定要删除 API 密钥“{keyToDelete?.name}”吗？此操作无法撤销。
       </AlertDialog.Description>
     </AlertDialog.Header>
     <AlertDialog.Footer>
-      <AlertDialog.Cancel disabled={deleting}>Cancel</AlertDialog.Cancel>
+      <AlertDialog.Cancel disabled={deleting}>取消</AlertDialog.Cancel>
       <AlertDialog.Action onclick={deleteApiKey} disabled={deleting}>
         {#if deleting}
           <Spinner class="h-4 w-4" />
         {/if}
-        Delete
+        删除
       </AlertDialog.Action>
     </AlertDialog.Footer>
   </AlertDialog.Content>

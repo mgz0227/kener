@@ -14,8 +14,6 @@
   import Info from "@lucide/svelte/icons/info";
   import { toast } from "svelte-sonner";
   import { mode } from "mode-watcher";
-  import constants from "$lib/global-constants";
-
   import CodeMirror from "svelte-codemirror-editor";
   import { html } from "@codemirror/lang-html";
   import { css } from "@codemirror/lang-css";
@@ -94,6 +92,7 @@
     ctaURL: "",
     ctaText: ""
   });
+  const announcementTypeLabels = { INFO: "信息", WARNING: "警告", ERROR: "错误" };
 
   // Page ordering
   interface PageItem {
@@ -198,16 +197,16 @@
       defaultFooterHTML = `<div class="container relative mt-4 max-w-[655px]">
   <div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
     <p class="text-center text-sm leading-loose text-muted-foreground">
-      Made using 
+      使用
       <a href="https://github.com/rajnandan1/kener" target="_blank" class="font-medium underline underline-offset-4">
         Kener
       </a>
-      an open source status page system built with Svelte and TailwindCSS.
+      构建，这是一个基于 Svelte 和 TailwindCSS 的开源状态页系统。
     </p>
   </div>
 </div>`;
     } catch (e) {
-      toast.error("Failed to load settings");
+      toast.error("加载设置失败");
     } finally {
       loading = false;
     }
@@ -229,10 +228,10 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Footer saved successfully");
+        toast.success("页脚已保存");
       }
     } catch (e) {
-      toast.error("Failed to save footer");
+      toast.error("保存页脚失败");
     } finally {
       savingFooter = false;
     }
@@ -253,10 +252,10 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Status colors saved successfully");
+        toast.success("状态颜色已保存");
       }
     } catch (e) {
-      toast.error("Failed to save colors");
+      toast.error("保存颜色失败");
     } finally {
       savingColors = false;
     }
@@ -277,10 +276,10 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Font settings saved successfully");
+        toast.success("字体设置已保存");
       }
     } catch (e) {
-      toast.error("Failed to save font settings");
+      toast.error("保存字体设置失败");
     } finally {
       savingFont = false;
     }
@@ -301,10 +300,10 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Custom CSS saved successfully");
+        toast.success("自定义 CSS 已保存");
       }
     } catch (e) {
-      toast.error("Failed to save custom CSS");
+      toast.error("保存自定义 CSS 失败");
     } finally {
       savingCSS = false;
     }
@@ -325,10 +324,10 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Theme settings saved successfully");
+        toast.success("主题设置已保存");
       }
     } catch (e) {
-      toast.error("Failed to save theme settings");
+      toast.error("保存主题设置失败");
     } finally {
       savingTheme = false;
     }
@@ -365,10 +364,10 @@
         toast.error(result.error);
       } else {
         announcement.reshowAfterInHours = reshowAfterInHours == null ? "" : String(reshowAfterInHours);
-        toast.success("Announcement settings saved successfully");
+        toast.success("公告设置已保存");
       }
     } catch (e) {
-      toast.error("Failed to save announcement settings");
+      toast.error("保存公告设置失败");
     } finally {
       savingAnnouncement = false;
     }
@@ -418,10 +417,10 @@
         toast.error(result.error);
       } else {
         orderedPageIds = displayPages.map((p) => p.id);
-        toast.success("Page ordering saved successfully");
+        toast.success("页面顺序已保存");
       }
     } catch (e) {
-      toast.error("Failed to save page ordering");
+      toast.error("保存页面顺序失败");
     } finally {
       savingPageOrdering = false;
     }
@@ -464,10 +463,8 @@
     <!-- Footer HTML Section -->
     <Card.Root>
       <Card.Header class="border-b">
-        <Card.Title>Site Footer</Card.Title>
-        <Card.Description>
-          Customize the footer HTML of your status page. Use HTML to add links, text, and other content.
-        </Card.Description>
+        <Card.Title>站点页脚</Card.Title>
+        <Card.Description>自定义状态页的页脚 HTML，可添加链接、文字和其他内容。</Card.Description>
       </Card.Header>
       <Card.Content class="pt-6">
         <div class="w-full">
@@ -488,12 +485,12 @@
         </div>
       </Card.Content>
       <Card.Footer class="flex justify-between border-t pt-6">
-        <Button variant="outline" onclick={resetFooter}>Reset to Default</Button>
+        <Button variant="outline" onclick={resetFooter}>恢复默认</Button>
         <Button onclick={saveFooter} disabled={savingFooter}>
           {#if savingFooter}
             <Loader class="h-4 w-4 animate-spin" />
           {/if}
-          Save Footer
+          保存页脚
         </Button>
       </Card.Footer>
     </Card.Root>
@@ -501,25 +498,22 @@
     <!-- Status Colors Section -->
     <Card.Root>
       <Card.Header class="border-b">
-        <Card.Title>Status Colors</Card.Title>
-        <Card.Description
-          >Customize the colors used to represent different monitor statuses. Set separate colors for light and dark
-          themes.</Card.Description
-        >
+        <Card.Title>状态颜色</Card.Title>
+        <Card.Description>自定义不同监控状态的颜色，并分别设置浅色和深色主题。</Card.Description>
       </Card.Header>
       <Card.Content class="pt-6">
         <div class="ktable rounded-lg border">
           <Table.Root>
             <Table.Header>
               <Table.Row>
-                <Table.Head>Name</Table.Head>
-                <Table.Head>Light</Table.Head>
-                <Table.Head>Dark</Table.Head>
+                <Table.Head>名称</Table.Head>
+                <Table.Head>浅色主题</Table.Head>
+                <Table.Head>深色主题</Table.Head>
               </Table.Row>
             </Table.Header>
             <Table.Body>
               <Table.Row>
-                <Table.Cell class="font-medium">{constants.UP}</Table.Cell>
+                <Table.Cell class="font-medium">正常</Table.Cell>
                 <Table.Cell>
                   <ColorPicker
                     bind:hex={colors.UP}
@@ -544,7 +538,7 @@
                 </Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.Cell class="font-medium">{constants.DEGRADED}</Table.Cell>
+                <Table.Cell class="font-medium">性能下降</Table.Cell>
                 <Table.Cell>
                   <ColorPicker
                     bind:hex={colors.DEGRADED}
@@ -569,7 +563,7 @@
                 </Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.Cell class="font-medium">{constants.DOWN}</Table.Cell>
+                <Table.Cell class="font-medium">故障</Table.Cell>
                 <Table.Cell>
                   <ColorPicker
                     bind:hex={colors.DOWN}
@@ -594,7 +588,7 @@
                 </Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.Cell class="font-medium">{constants.MAINTENANCE}</Table.Cell>
+                <Table.Cell class="font-medium">维护中</Table.Cell>
                 <Table.Cell>
                   <ColorPicker
                     bind:hex={colors.MAINTENANCE}
@@ -619,7 +613,7 @@
                 </Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.Cell class="font-medium">Accent</Table.Cell>
+                <Table.Cell class="font-medium">强调色</Table.Cell>
                 <Table.Cell>
                   <ColorPicker
                     bind:hex={colors.ACCENT}
@@ -644,7 +638,7 @@
                 </Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.Cell class="font-medium">Accent Foreground</Table.Cell>
+                <Table.Cell class="font-medium">强调色前景</Table.Cell>
                 <Table.Cell>
                   <ColorPicker
                     bind:hex={colors.ACCENT_FOREGROUND}
@@ -677,7 +671,7 @@
           {#if savingColors}
             <Loader class="h-4 w-4 animate-spin" />
           {/if}
-          Save Colors
+          保存颜色
         </Button>
       </Card.Footer>
     </Card.Root>
@@ -686,25 +680,22 @@
     <Card.Root>
       <Card.Header class="border-b">
         <Card.Title class="flex items-center gap-2">
-          Font
+          字体
           <Tooltip.Root>
             <Tooltip.Trigger>
               <Info class="text-muted-foreground h-4 w-4" />
             </Tooltip.Trigger>
             <Tooltip.Content class="max-w-xs">
-              <p>
-                You can use any web font by providing the CSS URL and font family name. Popular sources include Google
-                Fonts and Bunny Fonts.
-              </p>
+              <p>提供 CSS URL 和字体系列名称即可使用任意网页字体，常用来源包括 Google Fonts 和 Bunny Fonts。</p>
             </Tooltip.Content>
           </Tooltip.Root>
         </Card.Title>
-        <Card.Description>Customize the font used throughout your status page.</Card.Description>
+        <Card.Description>自定义状态页使用的字体。</Card.Description>
       </Card.Header>
       <Card.Content class="pt-6">
         <div class="grid gap-4 md:grid-cols-2">
           <div>
-            <Label for="font-url">Font CSS URL</Label>
+            <Label for="font-url">字体 CSS URL</Label>
             <Input
               bind:value={font.cssSrc}
               type="text"
@@ -712,23 +703,23 @@
               placeholder="https://fonts.bunny.net/css?family=lato:400,700&display=swap"
               class="mt-1"
             />
-            <p class="text-muted-foreground mt-1 text-xs">The URL to the CSS file that loads the font</p>
+            <p class="text-muted-foreground mt-1 text-xs">用于加载字体的 CSS 文件 URL</p>
           </div>
           <div>
-            <Label for="font-family">Font Family Name</Label>
+            <Label for="font-family">字体系列名称</Label>
             <Input bind:value={font.family} type="text" id="font-family" placeholder="Lato" class="mt-1" />
-            <p class="text-muted-foreground mt-1 text-xs">The name of the font family as defined in the CSS</p>
+            <p class="text-muted-foreground mt-1 text-xs">CSS 中定义的字体系列名称</p>
           </div>
         </div>
 
         <p class="text-muted-foreground mt-4 text-sm">
-          Want to upload and use custom fonts? Read more about it in the
+          想上传并使用自定义字体？请查看
           <a
             href="https://kener.ing/docs/v4/guides/custom-fonts"
             target="_blank"
             class="text-foreground underline underline-offset-4"
           >
-            documentation
+            使用文档
           </a>.
         </p>
       </Card.Content>
@@ -737,7 +728,7 @@
           {#if savingFont}
             <Loader class="h-4 w-4 animate-spin" />
           {/if}
-          Save Font
+          保存字体
         </Button>
       </Card.Footer>
     </Card.Root>
@@ -745,29 +736,27 @@
     <!-- Theme Configuration Section -->
     <Card.Root>
       <Card.Header class="border-b">
-        <Card.Title>Theme</Card.Title>
-        <Card.Description>Configure the default theme and user preferences for your status page.</Card.Description>
+        <Card.Title>主题</Card.Title>
+        <Card.Description>配置状态页的默认主题和访客偏好。</Card.Description>
       </Card.Header>
       <Card.Content class="space-y-6 pt-6">
         <div class="space-y-3">
-          <Label>Default Theme</Label>
+          <Label>默认主题</Label>
           <RadioGroup.Root bind:value={theme} class="flex flex-col gap-3">
             <div class="flex items-center space-x-2">
               <RadioGroup.Item value="light" id="theme-light" />
-              <Label for="theme-light" class="cursor-pointer font-normal">Light</Label>
+              <Label for="theme-light" class="cursor-pointer font-normal">浅色</Label>
             </div>
             <div class="flex items-center space-x-2">
               <RadioGroup.Item value="dark" id="theme-dark" />
-              <Label for="theme-dark" class="cursor-pointer font-normal">Dark</Label>
+              <Label for="theme-dark" class="cursor-pointer font-normal">深色</Label>
             </div>
             <div class="flex items-center space-x-2">
               <RadioGroup.Item value="system" id="theme-system" />
-              <Label for="theme-system" class="cursor-pointer font-normal">System</Label>
+              <Label for="theme-system" class="cursor-pointer font-normal">跟随系统</Label>
             </div>
           </RadioGroup.Root>
-          <p class="text-muted-foreground text-xs">
-            The theme that will be used by default when users visit your status page.
-          </p>
+          <p class="text-muted-foreground text-xs">访客打开状态页时默认使用的主题。</p>
         </div>
 
         <div class="flex items-start space-x-3 rounded-lg border p-4">
@@ -777,10 +766,8 @@
             onCheckedChange={(checked) => (themeToggle = checked ? "YES" : "NO")}
           />
           <div class="space-y-1">
-            <Label for="theme-toggle" class="cursor-pointer">Allow users to toggle theme</Label>
-            <p class="text-muted-foreground text-sm">
-              When enabled, users can switch between light and dark themes using a toggle button.
-            </p>
+            <Label for="theme-toggle" class="cursor-pointer">允许访客切换主题</Label>
+            <p class="text-muted-foreground text-sm">启用后，访客可以通过切换按钮选择浅色或深色主题。</p>
           </div>
         </div>
       </Card.Content>
@@ -789,7 +776,7 @@
           {#if savingTheme}
             <Loader class="h-4 w-4 animate-spin" />
           {/if}
-          Save Theme
+          保存主题
         </Button>
       </Card.Footer>
     </Card.Root>
@@ -797,56 +784,58 @@
     <!-- Announcement Section -->
     <Card.Root>
       <Card.Header class="border-b">
-        <Card.Title>Announcement</Card.Title>
-        <Card.Description>Configure a site-wide announcement message shown to visitors.</Card.Description>
+        <Card.Title>站点公告</Card.Title>
+        <Card.Description>配置向所有访客显示的站点公告。</Card.Description>
       </Card.Header>
       <Card.Content class="space-y-4 pt-6">
         <div class="grid gap-4 md:grid-cols-2">
           <div class="space-y-2">
-            <Label for="announcement-title">Title</Label>
-            <Input id="announcement-title" bind:value={announcement.title} placeholder="Scheduled Maintenance" />
+            <Label for="announcement-title">标题</Label>
+            <Input id="announcement-title" bind:value={announcement.title} placeholder="计划维护" />
           </div>
           <div class="space-y-2">
-            <Label for="announcement-type">Type</Label>
+            <Label for="announcement-type">类型</Label>
             <Select.Root
               type="single"
               value={announcement.type}
               onValueChange={(v: string | undefined) => v && (announcement.type = v as "INFO" | "WARNING" | "ERROR")}
             >
-              <Select.Trigger id="announcement-type" class="w-full">{announcement.type}</Select.Trigger>
+              <Select.Trigger id="announcement-type" class="w-full"
+                >{announcementTypeLabels[announcement.type]}</Select.Trigger
+              >
               <Select.Content>
-                <Select.Item value="INFO">INFO</Select.Item>
-                <Select.Item value="WARNING">WARNING</Select.Item>
-                <Select.Item value="ERROR">ERROR</Select.Item>
+                <Select.Item value="INFO">信息</Select.Item>
+                <Select.Item value="WARNING">警告</Select.Item>
+                <Select.Item value="ERROR">错误</Select.Item>
               </Select.Content>
             </Select.Root>
           </div>
         </div>
 
         <div class="space-y-2">
-          <Label for="announcement-message">Message</Label>
+          <Label for="announcement-message">内容</Label>
           <Textarea
             id="announcement-message"
             bind:value={announcement.message}
-            placeholder="We are currently performing infrastructure upgrades."
+            placeholder="我们正在进行基础设施升级。"
             rows={4}
           />
         </div>
 
         <div class="grid gap-4 md:grid-cols-3">
           <div class="space-y-2">
-            <Label for="announcement-reshow">Reshow After (hours)</Label>
+            <Label for="announcement-reshow">再次显示间隔（小时）</Label>
             <Input
               id="announcement-reshow"
               type="number"
               min="0"
               bind:value={announcement.reshowAfterInHours}
-              placeholder="Leave empty to never reshow automatically"
+              placeholder="留空则不自动再次显示"
             />
-            <p class="text-muted-foreground text-xs">Leave empty for null.</p>
+            <p class="text-muted-foreground text-xs">留空表示不设置。</p>
           </div>
           <div class="space-y-2">
-            <Label for="announcement-cta">CTA URL (optional)</Label>
+            <Label for="announcement-cta">操作按钮 URL（可选）</Label>
             <Input
               id="announcement-cta-url"
               bind:value={announcement.ctaURL}
@@ -854,8 +843,8 @@
             />
           </div>
           <div class="space-y-2">
-            <Label for="announcement-cta-text">CTA Text (optional)</Label>
-            <Input id="announcement-cta-text" bind:value={announcement.ctaText} placeholder="Learn more" />
+            <Label for="announcement-cta-text">操作按钮文字（可选）</Label>
+            <Input id="announcement-cta-text" bind:value={announcement.ctaText} placeholder="了解更多" />
           </div>
         </div>
 
@@ -866,8 +855,8 @@
             onCheckedChange={(checked) => (announcement.cancellable = checked === true)}
           />
           <div class="space-y-1">
-            <Label for="announcement-cancellable" class="cursor-pointer">Cancellable</Label>
-            <p class="text-muted-foreground text-sm">Allow users to dismiss the announcement.</p>
+            <Label for="announcement-cancellable" class="cursor-pointer">允许关闭</Label>
+            <p class="text-muted-foreground text-sm">允许访客关闭此公告。</p>
           </div>
         </div>
       </Card.Content>
@@ -876,7 +865,7 @@
           {#if savingAnnouncement}
             <Loader class="h-4 w-4 animate-spin" />
           {/if}
-          Save Announcement
+          保存公告
         </Button>
       </Card.Footer>
     </Card.Root>
@@ -884,10 +873,8 @@
     <!-- Page Ordering Section -->
     <Card.Root>
       <Card.Header class="border-b">
-        <Card.Title>Page Ordering</Card.Title>
-        <Card.Description>
-          Control the display order of pages in the page switcher. New pages will appear at the end of the list.
-        </Card.Description>
+        <Card.Title>页面排序</Card.Title>
+        <Card.Description>控制页面切换器中的显示顺序，新页面会出现在列表末尾。</Card.Description>
       </Card.Header>
       <Card.Content class="space-y-4 pt-6">
         <div class="flex items-start space-x-3 rounded-lg border p-4">
@@ -897,10 +884,8 @@
             onCheckedChange={(checked) => (pageOrderingEnabled = checked === true)}
           />
           <div class="space-y-1">
-            <Label for="page-ordering-enabled" class="cursor-pointer">Enable custom page ordering</Label>
-            <p class="text-muted-foreground text-sm">
-              When enabled, pages will be displayed in the order below instead of the default creation order.
-            </p>
+            <Label for="page-ordering-enabled" class="cursor-pointer">启用自定义页面顺序</Label>
+            <p class="text-muted-foreground text-sm">启用后，页面将按下方顺序显示，而不是默认创建顺序。</p>
           </div>
         </div>
 
@@ -909,7 +894,7 @@
             <Spinner class="h-5 w-5" />
           </div>
         {:else if allPages.length === 0}
-          <p class="text-muted-foreground py-4 text-center text-sm">No pages found.</p>
+          <p class="text-muted-foreground py-4 text-center text-sm">暂无页面。</p>
         {:else}
           <div class="rounded-lg border">
             {#each displayPages as page, index (page.id)}
@@ -955,7 +940,7 @@
           {#if savingPageOrdering}
             <Loader class="h-4 w-4 animate-spin" />
           {/if}
-          Save Page Ordering
+          保存页面顺序
         </Button>
       </Card.Footer>
     </Card.Root>
@@ -963,16 +948,15 @@
     <!-- Custom CSS Section -->
     <Card.Root>
       <Card.Header class="border-b">
-        <Card.Title>Custom CSS</Card.Title>
+        <Card.Title>自定义 CSS</Card.Title>
         <Card.Description>
-          Add custom CSS to further customize the appearance of your status page. Do not include &lt;style&gt; tags.
-          Learn more in the
+          添加自定义 CSS 以进一步调整状态页外观，请勿包含 &lt;style&gt; 标签。更多信息请查看
           <a
             href="https://kener.ing/docs/v4/guides/custom-js-css-guide"
             target="_blank"
             class="text-foreground underline underline-offset-4"
           >
-            documentation
+            使用文档
           </a>.
         </Card.Description>
       </Card.Header>
@@ -999,7 +983,7 @@
           {#if savingCSS}
             <Loader class="h-4 w-4 animate-spin" />
           {/if}
-          Save Custom CSS
+          保存自定义 CSS
         </Button>
       </Card.Footer>
     </Card.Root>

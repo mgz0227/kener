@@ -25,7 +25,7 @@
   let heartbeatUrl = $derived(
     tag
       ? window.location.origin + clientResolve(resolve, `/ext/heartbeat/${tag}/${data.secretString}`)
-      : "Save the monitor first to get the heartbeat URL"
+      : "请先保存监控项以获取心跳 URL"
   );
 
   //refresh secret string and thus heartbeat URL
@@ -39,10 +39,7 @@
     <div class="flex flex-col">
       <InputGroup.Root>
         <InputGroup.Addon>
-          <InputGroup.Text>
-            <span class="text-degraded">DEGRADED</span>
-            if no heartbeat received for
-          </InputGroup.Text>
+          <InputGroup.Text><span class="text-degraded">DEGRADED</span> 阈值</InputGroup.Text>
         </InputGroup.Addon>
         <InputGroup.Input
           class="text-right"
@@ -51,29 +48,27 @@
           placeholder="5"
         />
         <InputGroup.Addon align="inline-end">
-          <InputGroup.Text>minutes</InputGroup.Text>
+          <InputGroup.Text>分钟</InputGroup.Text>
         </InputGroup.Addon>
       </InputGroup.Root>
-      <p class="text-muted-foreground mt-1 text-xs">Mark as DEGRADED if no heartbeat received for this many minutes</p>
+      <p class="text-muted-foreground mt-1 text-xs">若在指定分钟数内未收到心跳，则标记为 DEGRADED</p>
     </div>
     <div class="flex flex-col">
       <InputGroup.Root>
         <InputGroup.Addon>
-          <InputGroup.Text>
-            <span class="text-down">DOWN</span> if no heartbeat received for
-          </InputGroup.Text>
+          <InputGroup.Text><span class="text-down">DOWN</span> 阈值</InputGroup.Text>
         </InputGroup.Addon>
         <InputGroup.Input class="text-right" id="hb-down" bind:value={data.downRemainingMinutes} placeholder="10" />
         <InputGroup.Addon align="inline-end">
-          <InputGroup.Text>minutes</InputGroup.Text>
+          <InputGroup.Text>分钟</InputGroup.Text>
         </InputGroup.Addon>
       </InputGroup.Root>
-      <p class="text-muted-foreground mt-1 text-xs">Mark as DOWN if no heartbeat received for this many minutes</p>
+      <p class="text-muted-foreground mt-1 text-xs">若在指定分钟数内未收到心跳，则标记为 DOWN</p>
     </div>
   </div>
 
   <div class="flex flex-col gap-2">
-    <Label>Heartbeat URL</Label>
+    <Label>心跳 URL</Label>
     <div>
       <div class="flex items-center gap-2">
         <InputGroup.Root>
@@ -84,7 +79,7 @@
           </InputGroup.Addon>
           <InputGroup.Input class="text-muted-foreground" id="hb-secret" bind:value={heartbeatUrl} readonly />
           <InputGroup.Addon align="inline-end">
-            <InputGroup.Button variant="secondary" onclick={refreshSecret}>New URL</InputGroup.Button>
+            <InputGroup.Button variant="secondary" onclick={refreshSecret}>生成新 URL</InputGroup.Button>
 
             <CopyButton variant="ghost" size="icon-sm" text={heartbeatUrl}>
               <Copy class="size-4" />
@@ -92,7 +87,7 @@
           </InputGroup.Addon>
         </InputGroup.Root>
       </div>
-      <p class="text-muted-foreground mt-1 text-xs">Send a GET or POST request to this URL to record a heartbeat</p>
+      <p class="text-muted-foreground mt-1 text-xs">向此 URL 发送 GET 或 POST 请求以记录心跳</p>
     </div>
   </div>
 </div>

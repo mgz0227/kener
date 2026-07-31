@@ -14,7 +14,7 @@
     selectedTags = [],
     onToggle,
     onAddMany,
-    placeholder = "Search monitors to add..."
+    placeholder = "搜索要添加的监控项……"
   }: {
     monitors: MonitorRecord[];
     selectedTags: string[];
@@ -26,7 +26,7 @@
   let open = $state(false);
   let search = $state("");
 
-  // Own filtering (shouldFilter={false}) so "Add all matching" counts stay
+  // Own filtering (shouldFilter={false}) so "add all matching" counts stay
   // consistent with what the list shows. Case-insensitive over name + tag.
   const filteredMonitors = $derived.by(() => {
     const query = search.trim().toLowerCase();
@@ -61,7 +61,7 @@
     <Command.Root shouldFilter={false}>
       <Command.Input {placeholder} bind:value={search} />
       <Command.List class="max-h-64">
-        <Command.Empty>No monitors found.</Command.Empty>
+        <Command.Empty>没有找到监控项。</Command.Empty>
         <Command.Group>
           {#each filteredMonitors as monitor (monitor.tag)}
             {@const selected = selectedTags.includes(monitor.tag)}
@@ -88,7 +88,7 @@
           <Command.Group>
             <Command.Item value="__add-all-matching__" onSelect={addAllMatching}>
               <ListPlusIcon class="size-4" />
-              Add all {unselectedMatches.length} matching
+              添加全部匹配项（{unselectedMatches.length} 个）
             </Command.Item>
           </Command.Group>
         {/if}

@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
   if (view !== "confirm_token" || !token) {
     return {
       valid: false,
-      error: "Invalid or missing invitation link.",
+      error: "邀请链接无效或缺失。",
       token: "",
     };
   }
@@ -24,7 +24,7 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
   if (!tokenData) {
     return {
       valid: false,
-      error: "Invalid or expired invitation link.",
+      error: "邀请链接无效或已过期。",
       token: "",
     };
   }
@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
   if (!email) {
     return {
       valid: false,
-      error: "Invalid invitation link.",
+      error: "邀请链接无效。",
       token: "",
     };
   }
@@ -43,7 +43,7 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
   if (!validTill || Date.now() > validTill) {
     return {
       valid: false,
-      error: "This invitation link has expired. Please ask your administrator to send a new one.",
+      error: "此邀请链接已过期，请联系管理员重新发送。",
       token: "",
     };
   }
@@ -53,7 +53,7 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
   if (!user) {
     return {
       valid: false,
-      error: "No invitation found for this email address.",
+      error: "未找到此邮箱对应的邀请。",
       token: "",
     };
   }
@@ -62,7 +62,7 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
   if (passwordData && passwordData.password_hash !== "") {
     return {
       valid: false,
-      error: "This invitation has already been accepted. Please sign in instead.",
+      error: "此邀请已接受，请直接登录。",
       token: "",
     };
   }

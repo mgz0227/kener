@@ -84,7 +84,7 @@
       }
     } catch (error) {
       console.error("Error fetching templates:", error);
-      toast.error("Failed to load templates");
+      toast.error("加载模板失败");
     } finally {
       loading = false;
     }
@@ -92,7 +92,7 @@
 
   async function updateTemplate() {
     if (!selectedTemplateId) {
-      toast.error("Please select a template");
+      toast.error("请选择模板");
       return;
     }
 
@@ -115,7 +115,7 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Template updated successfully");
+        toast.success("模板更新成功");
         // Update local state
         const index = templates.findIndex((t) => t.template_id === selectedTemplateId);
         if (index !== -1) {
@@ -129,7 +129,7 @@
       }
     } catch (error) {
       console.error("Error updating template:", error);
-      toast.error("Failed to update template");
+      toast.error("更新模板失败");
     } finally {
       saving = false;
     }
@@ -150,8 +150,8 @@
     <Card.Root>
       <Card.Content class="flex flex-col items-center justify-center py-12">
         <MailIcon class="text-muted-foreground mb-4 size-12" />
-        <h3 class="mb-2 text-lg font-semibold">No Templates Found</h3>
-        <p class="text-muted-foreground text-center">There are no email templates configured yet.</p>
+        <h3 class="mb-2 text-lg font-semibold">未找到模板</h3>
+        <p class="text-muted-foreground text-center">尚未配置电子邮件模板。</p>
       </Card.Content>
     </Card.Root>
   {:else}
@@ -159,14 +159,14 @@
       <Card.Header>
         <Card.Title class="flex items-center gap-2">
           <FileTextIcon class="size-5" />
-          Edit Template
+          编辑模板
         </Card.Title>
-        <Card.Description>Select a template from the dropdown to view and edit its content</Card.Description>
+        <Card.Description>从下拉菜单中选择模板以查看和编辑其内容</Card.Description>
       </Card.Header>
       <Card.Content class="space-y-6">
         <!-- Template Selector -->
         <div class="space-y-2">
-          <Label for="template-select">Select Template</Label>
+          <Label for="template-select">选择模板</Label>
           <Select.Root
             type="single"
             value={selectedTemplateId}
@@ -178,7 +178,7 @@
               {#if selectedTemplateId}
                 {formatTemplateId(selectedTemplateId)}
               {:else}
-                Select a template...
+                选择模板...
               {/if}
             </Select.Trigger>
             <Select.Content>
@@ -194,21 +194,17 @@
         {#if selectedTemplateId}
           <!-- Subject -->
           <div class="space-y-2">
-            <Label for="template-subject">Subject</Label>
-            <Input id="template-subject" bind:value={templateSubject} placeholder="Email subject line" />
+            <Label for="template-subject">主题</Label>
+            <Input id="template-subject" bind:value={templateSubject} placeholder="电子邮件主题" />
             <p class="text-muted-foreground text-xs">
-              The subject line for the email. You can use Mustache variables like <code class="bg-muted rounded px-1"
-                >{"{{variable}}"}</code
-              >
+              电子邮件主题行。可以使用 Mustache 变量，例如 <code class="bg-muted rounded px-1">{"{{variable}}"}</code>
             </p>
           </div>
 
           <!-- HTML Body -->
           <div class="space-y-2">
-            <Label>HTML Body</Label>
-            <p class="text-muted-foreground text-xs">
-              The HTML content of the email. Use Mustache variables for dynamic content.
-            </p>
+            <Label>HTML 正文</Label>
+            <p class="text-muted-foreground text-xs">电子邮件的 HTML 内容。使用 Mustache 变量插入动态内容。</p>
             <div class="overflow-hidden rounded-md border">
               <CodeMirror
                 bind:value={templateHtmlBody}
@@ -221,16 +217,9 @@
 
           <!-- Text Body -->
           <div class="space-y-2">
-            <Label for="template-text-body">Text Body</Label>
-            <p class="text-muted-foreground text-xs">
-              Plain text version of the email for clients that don't support HTML
-            </p>
-            <Textarea
-              id="template-text-body"
-              bind:value={templateTextBody}
-              placeholder="Plain text email content"
-              rows={8}
-            />
+            <Label for="template-text-body">文本正文</Label>
+            <p class="text-muted-foreground text-xs">不支持 HTML 的客户端使用的纯文本版本</p>
+            <Textarea id="template-text-body" bind:value={templateTextBody} placeholder="纯文本电子邮件内容" rows={8} />
           </div>
         {/if}
       </Card.Content>
@@ -242,7 +231,7 @@
             {:else}
               <SaveIcon class="size-4" />
             {/if}
-            Update Template
+            更新模板
           </Button>
         </Card.Footer>
       {/if}

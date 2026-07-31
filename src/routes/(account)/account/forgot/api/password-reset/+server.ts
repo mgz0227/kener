@@ -17,36 +17,36 @@ export const POST: RequestHandler = async ({ request }) => {
   const { receivedToken, newPassword } = body;
 
   if (!receivedToken) {
-    return json({ error: "Token is required" }, { status: 400 });
+    return json({ error: "令牌不能为空" }, { status: 400 });
   }
   let data = await VerifyToken(receivedToken);
   if (!data) {
-    return json({ error: "Invalid or expired token" }, { status: 400 });
+    return json({ error: "令牌无效或已过期" }, { status: 400 });
   }
   let email = data.email;
   if (!email) {
-    return json({ error: "Invalid token data" }, { status: 400 });
+    return json({ error: "令牌数据无效" }, { status: 400 });
   }
   let generatedAt = data.generatedAt;
   if (!generatedAt) {
-    return json({ error: "Invalid token data" }, { status: 400 });
+    return json({ error: "令牌数据无效" }, { status: 400 });
   }
   let currentTime = Date.now();
   // Check if token is expired (1 hour = 3600000 milliseconds)
   if (currentTime - generatedAt > 3600000) {
-    return json({ error: "Token has expired" }, { status: 400 });
+    return json({ error: "令牌已过期" }, { status: 400 });
   }
 
   let userDB = await db.getUserByEmail(email);
   if (!!!userDB) {
-    let errorMessage = "User does not exist";
+    let errorMessage = "用户不存在";
     return json({ error: errorMessage }, { status: 401 });
   }
   // Validate password strength
   if (!ValidatePassword(newPassword)) {
     return json(
       {
-        error: "Password must contain at least 8 characters, one uppercase letter, one lowercase letter and one number",
+        error: "密码至少需要 8 个字符，并包含一个大写字母、一个小写字母和一个数字",
       },
       { status: 400 },
     );

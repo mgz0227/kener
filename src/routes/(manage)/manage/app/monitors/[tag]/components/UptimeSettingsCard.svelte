@@ -73,7 +73,7 @@
 
   async function saveUptimeSettings() {
     if (!isUptimeSettingsValid) {
-      toast.error("Invalid uptime formula. Use: up, down, degraded, maintenance with +, -, *, /");
+      toast.error("可用率公式无效。请使用变量 up、down、degraded、maintenance 和运算符 +、-、*、/");
       return;
     }
 
@@ -95,10 +95,10 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Uptime settings saved successfully");
+        toast.success("可用率设置已成功保存");
       }
     } catch (e) {
-      const message = e instanceof Error ? e.message : "Failed to save uptime settings";
+      const message = e instanceof Error ? e.message : "保存可用率设置失败";
       toast.error(message);
     } finally {
       savingUptimeSettings = false;
@@ -108,8 +108,8 @@
 
 <Card.Root>
   <Card.Header>
-    <Card.Title>Uptime Calculation</Card.Title>
-    <Card.Description>Customize how uptime percentage is calculated for this monitor</Card.Description>
+    <Card.Title>可用率计算</Card.Title>
+    <Card.Description>自定义此监控项的可用率计算方式</Card.Description>
   </Card.Header>
   <Card.Content class="space-y-4">
     <div class="flex gap-2">
@@ -131,15 +131,15 @@
       </InputGroup.Root>
     </div>
     <div class="text-muted-foreground text-sm">
-      <p><strong>Uptime % = (a / b) × 100</strong></p>
+      <p><strong>可用率 % = (a / b) × 100</strong></p>
       <p class="mt-2 text-xs">
-        Valid variables: <code class="bg-muted rounded px-1">up</code>,
+        可用变量：<code class="bg-muted rounded px-1">up</code>,
         <code class="bg-muted rounded px-1">down</code>,
         <code class="bg-muted rounded px-1">degraded</code>,
         <code class="bg-muted rounded px-1">maintenance</code>
       </p>
       <p class="text-xs">
-        Valid operators: <code class="bg-muted rounded px-1">+</code>,
+        可用运算符：<code class="bg-muted rounded px-1">+</code>,
         <code class="bg-muted rounded px-1">-</code>,
         <code class="bg-muted rounded px-1">*</code>,
         <code class="bg-muted rounded px-1">/</code>
@@ -153,7 +153,7 @@
       {:else}
         <SaveIcon class="size-4" />
       {/if}
-      Save Uptime Settings
+      保存可用率设置
     </Button>
   </Card.Footer>
 </Card.Root>

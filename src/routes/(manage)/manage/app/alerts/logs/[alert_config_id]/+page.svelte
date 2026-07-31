@@ -32,6 +32,11 @@
   let pageNo = $state(1);
   let statusFilter = $state("ALL");
   const limit = 20;
+  const statusLabels: Record<string, string> = {
+    ALL: "所有状态",
+    TRIGGERED: "已触发",
+    RESOLVED: "已解除"
+  };
 
   // Delete dialog state
   let deleteDialogOpen = $state(false);
@@ -103,11 +108,11 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success(`Status updated to ${newStatus}`);
+        toast.success(`状态已更新为 ${statusLabels[newStatus] || newStatus}`);
         await fetchAlerts();
       }
     } catch (error) {
-      toast.error("Failed to update status");
+      toast.error("更新状态失败");
     }
   }
 
@@ -139,11 +144,11 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Alert deleted successfully");
+        toast.success("告警删除成功");
         await fetchAlerts();
       }
     } catch (error) {
-      toast.error("Failed to delete alert");
+      toast.error("删除告警失败");
     } finally {
       deleteDialogOpen = false;
       alertToDelete = null;
@@ -185,11 +190,11 @@
   <Breadcrumb.Root>
     <Breadcrumb.List>
       <Breadcrumb.Item>
-        <Breadcrumb.Link href={clientResolver(resolve, "/manage/app/alerts")}>Alerts</Breadcrumb.Link>
+        <Breadcrumb.Link href={clientResolver(resolve, "/manage/app/alerts")}>告警</Breadcrumb.Link>
       </Breadcrumb.Item>
       <Breadcrumb.Separator />
       <Breadcrumb.Item>
-        <Breadcrumb.Page>Alert Logs</Breadcrumb.Page>
+        <Breadcrumb.Page>告警日志</Breadcrumb.Page>
       </Breadcrumb.Item>
     </Breadcrumb.List>
   </Breadcrumb.Root>
@@ -200,12 +205,12 @@
   <div class="flex items-center gap-3">
     <Select.Root type="single" value={statusFilter} onValueChange={handleStatusChange}>
       <Select.Trigger class="w-36">
-        {statusFilter === "ALL" ? "All Status" : statusFilter}
+        {statusLabels[statusFilter] || statusFilter}
       </Select.Trigger>
       <Select.Content>
-        <Select.Item value="ALL">All Status</Select.Item>
-        <Select.Item value="TRIGGERED">Triggered</Select.Item>
-        <Select.Item value="RESOLVED">Resolved</Select.Item>
+        <Select.Item value="ALL">所有状态</Select.Item>
+        <Select.Item value="TRIGGERED">已触发</Select.Item>
+        <Select.Item value="RESOLVED">已解除</Select.Item>
       </Select.Content>
     </Select.Root>
     {#if loading}
@@ -218,11 +223,9 @@
     <div class="flex flex-col items-center gap-4 py-16 text-center">
       <BellOffIcon class="text-muted-foreground size-16" />
       <div class="space-y-2">
-        <h3 class="text-lg font-semibold">No alert logs</h3>
+        <h3 class="text-lg font-semibold">暂无告警日志</h3>
         <p class="text-muted-foreground text-sm">
-          {statusFilter !== "ALL"
-            ? `No ${statusFilter.toLowerCase()} alerts found.`
-            : "This alert has not been triggered yet."}
+          {statusFilter !== "ALL" ? `未找到状态为 ${statusFilter} 的告警。` : "此告警尚未触发。"}
         </p>
       </div>
     </div>
@@ -233,12 +236,12 @@
         <Table.Header>
           <Table.Row>
             <Table.Head class="w-16">ID</Table.Head>
-            <Table.Head class="w-40">Monitor</Table.Head>
-            <Table.Head class="w-40">Status</Table.Head>
-            <Table.Head class="w-32">Incident</Table.Head>
-            <Table.Head class="w-44">Created At</Table.Head>
-            <Table.Head class="w-44">Updated At</Table.Head>
-            <Table.Head class="w-20 text-right">Actions</Table.Head>
+            <Table.Head class="w-40">监控器</Table.Head>
+            <Table.Head class="w-40">状态</Table.Head>
+            <Table.Head class="w-32">事件</Table.Head>
+            <Table.Head class="w-44">创建时间</Table.Head>
+            <Table.Head class="w-44">更新时间</Table.Head>
+            <Table.Head class="w-20 text-right">操作</Table.Head>
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -258,10 +261,12 @@
                   value={alert.alert_status}
                   onValueChange={(v) => v && updateAlertStatus(alert.id, v as "TRIGGERED" | "RESOLVED")}
                 >
-                  <Select.Trigger class="h-8 w-32">{alert.alert_status}</Select.Trigger>
+                  <Select.Trigger class="h-8 w-32"
+                    >{statusLabels[alert.alert_status] || alert.alert_status}</Select.Trigger
+                  >
                   <Select.Content>
-                    <Select.Item value="TRIGGERED">TRIGGERED</Select.Item>
-                    <Select.Item value="RESOLVED">RESOLVED</Select.Item>
+                    <Select.Item value="TRIGGERED">已触发</Select.Item>
+                    <Select.Item value="RESOLVED">已解除</Select.Item>
                   </Select.Content>
                 </Select.Root>
               </Table.Cell>
@@ -282,7 +287,7 @@
               <Table.Cell class="text-muted-foreground text-sm">{formatDate(alert.updated_at)}</Table.Cell>
               <Table.Cell class="text-right">
                 <Button variant="destructive" size="sm" class="text-xs" onclick={() => openDeleteDialog(alert)}>
-                  <TrashIcon class="size-3" /> Delete
+                  <TrashIcon class="size-3" /> 删除
                 </Button>
               </Table.Cell>
             </Table.Row>
@@ -297,7 +302,7 @@
     {@const startItem = (pageNo - 1) * limit + 1}
     {@const endItem = Math.min(pageNo * limit, totalCount)}
     <div class="flex items-center justify-between">
-      <span class="text-muted-foreground text-sm">Showing {startItem}-{endItem} of {totalCount}</span>
+      <span class="text-muted-foreground text-sm">显示第 {startItem}-{endItem} 项，共 {totalCount} 项</span>
       {#if totalPages > 1}
         <div class="flex items-center gap-2">
           <Button variant="outline" size="icon" disabled={pageNo === 1} onclick={() => goToPage(pageNo - 1)}>
@@ -327,24 +332,22 @@
 <AlertDialog.Root bind:open={deleteDialogOpen}>
   <AlertDialog.Content>
     <AlertDialog.Header>
-      <AlertDialog.Title>Delete Alert</AlertDialog.Title>
-      <AlertDialog.Description>
-        Are you sure you want to delete this alert? This action cannot be undone.
-      </AlertDialog.Description>
+      <AlertDialog.Title>删除告警</AlertDialog.Title>
+      <AlertDialog.Description>确定要删除此告警吗？此操作无法撤销。</AlertDialog.Description>
     </AlertDialog.Header>
 
     {#if alertToDelete?.incident_id}
       <div class="flex items-center gap-3 py-2">
         <Checkbox id="delete-incident" bind:checked={deleteIncident} />
         <label for="delete-incident" class="text-sm">
-          Also delete associated incident <span class="text-primary font-medium">#{alertToDelete.incident_id}</span>
+          同时删除关联事件 <span class="text-primary font-medium">#{alertToDelete.incident_id}</span>
         </label>
       </div>
     {/if}
 
     <AlertDialog.Footer>
-      <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-      <AlertDialog.Action onclick={confirmDelete}>Delete</AlertDialog.Action>
+      <AlertDialog.Cancel>取消</AlertDialog.Cancel>
+      <AlertDialog.Action onclick={confirmDelete}>删除</AlertDialog.Action>
     </AlertDialog.Footer>
   </AlertDialog.Content>
 </AlertDialog.Root>

@@ -11,12 +11,12 @@ export const POST: RequestHandler = async ({ request }) => {
   const { email } = body;
 
   if (!email) {
-    return json({ error: "Email is required" }, { status: 400 });
+    return json({ error: "邮箱不能为空" }, { status: 400 });
   }
 
   let userDB = await db.getUserByEmail(email);
   if (!!!userDB) {
-    let errorMessage = "User does not exist";
+    let errorMessage = "用户不存在";
     return json({ error: errorMessage }, { status: 401 });
   }
 
@@ -33,7 +33,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
   const template = await GetGeneralEmailTemplateById("forgot_password");
   if (!template) {
-    return json({ error: "Email template not found" }, { status: 404 });
+    return json({ error: "未找到邮件模板" }, { status: 404 });
   }
 
   // Prepare variables
@@ -46,7 +46,7 @@ export const POST: RequestHandler = async ({ request }) => {
   try {
     await sendEmail(
       template.template_html_body || "",
-      template.template_subject || "Your Password Reset Request",
+      template.template_subject || "密码重置请求",
       emailVars,
       [email],
       undefined,
@@ -55,6 +55,6 @@ export const POST: RequestHandler = async ({ request }) => {
     return json({ success: true });
   } catch (error) {
     console.error("Failed to send password reset email:", error);
-    return json({ success: false, error: "Failed to send password reset email" }, { status: 500 });
+    return json({ success: false, error: "发送密码重置邮件失败" }, { status: 500 });
   }
 };

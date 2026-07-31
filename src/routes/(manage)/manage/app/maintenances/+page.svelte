@@ -18,6 +18,7 @@
   import UsersIcon from "@lucide/svelte/icons/users";
   import { goto } from "$app/navigation";
   import { format, formatDistanceToNow, isPast, isFuture, isWithinInterval } from "date-fns";
+  import { zhCN } from "date-fns/locale";
   import { resolve } from "$app/paths";
   import clientResolver from "$lib/client/resolver.js";
 
@@ -88,13 +89,13 @@
 
   // Format duration in seconds
   function formatDuration(seconds: number): string {
-    if (seconds < 60) return `${seconds}s`;
+    if (seconds < 60) return `${seconds} 秒`;
     const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m`;
+    if (minutes < 60) return `${minutes} 分钟`;
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
-    if (mins === 0) return `${hours}h`;
-    return `${hours}h ${mins}m`;
+    if (mins === 0) return `${hours} 小时`;
+    return `${hours} 小时 ${mins} 分钟`;
   }
 
   // Get status badge variant
@@ -123,16 +124,16 @@
     // Check if currently ongoing
     if (isWithinInterval(now, { start: startDate, end: endDate })) {
       return {
-        label: "Ongoing",
+        label: "进行中",
         variant: "default"
       };
     }
 
     // Check if in the future (upcoming)
     if (isFuture(startDate)) {
-      const distance = formatDistanceToNow(startDate, { addSuffix: false });
+      const distance = formatDistanceToNow(startDate, { addSuffix: false, locale: zhCN });
       return {
-        label: `In ${distance}`,
+        label: `${distance}后开始`,
         variant: "outline"
       };
     }
@@ -140,14 +141,14 @@
     // If in the past (completed)
     if (isPast(endDate)) {
       return {
-        label: "Completed",
+        label: "已完成",
         variant: "secondary"
       };
     }
 
     // Fallback
     return {
-      label: "Scheduled",
+      label: "已计划",
       variant: "outline"
     };
   }
@@ -191,12 +192,12 @@
       <div class="flex items-center gap-3">
         <Select.Root type="single" value={status} onValueChange={handleStatusChange}>
           <Select.Trigger class="w-40">
-            {status === "ALL" ? "All" : status === "ACTIVE" ? "Active" : "Inactive"}
+            {status === "ALL" ? "全部" : status === "ACTIVE" ? "启用" : "停用"}
           </Select.Trigger>
           <Select.Content>
-            <Select.Item value="ALL">All</Select.Item>
-            <Select.Item value="ACTIVE">Active</Select.Item>
-            <Select.Item value="INACTIVE">Inactive</Select.Item>
+            <Select.Item value="ALL">全部</Select.Item>
+            <Select.Item value="ACTIVE">启用</Select.Item>
+            <Select.Item value="INACTIVE">停用</Select.Item>
           </Select.Content>
         </Select.Root>
       </div>
@@ -207,7 +208,7 @@
     <div class="flex items-center gap-3">
       <Button onclick={createNewMaintenance}>
         <PlusIcon class="size-4" />
-        New Maintenance
+        新建维护
       </Button>
     </div>
   </div>
@@ -220,19 +221,19 @@
       <Table.Header>
         <Table.Row>
           <Table.Head class="w-16">ID</Table.Head>
-          <Table.Head>Title</Table.Head>
-          <Table.Head class="w-32">Type</Table.Head>
-          <Table.Head class="w-40">Duration</Table.Head>
-          <Table.Head class="w-24">Monitors</Table.Head>
-          <Table.Head class="w-40">Next Event</Table.Head>
-          <Table.Head class="w-24">Status</Table.Head>
-          <Table.Head class="w-24 text-right">Actions</Table.Head>
+          <Table.Head>标题</Table.Head>
+          <Table.Head class="w-32">类型</Table.Head>
+          <Table.Head class="w-40">持续时间</Table.Head>
+          <Table.Head class="w-24">监控器</Table.Head>
+          <Table.Head class="w-40">下次事件</Table.Head>
+          <Table.Head class="w-24">状态</Table.Head>
+          <Table.Head class="w-24 text-right">操作</Table.Head>
         </Table.Row>
       </Table.Header>
       <Table.Body>
         {#if maintenances.length === 0 && !loading}
           <Table.Row>
-            <Table.Cell colspan={8} class="text-muted-foreground py-8 text-center">No maintenances found</Table.Cell>
+            <Table.Cell colspan={8} class="text-muted-foreground py-8 text-center">未找到维护计划</Table.Cell>
           </Table.Row>
         {:else}
           {#each maintenances as maintenance}
@@ -255,10 +256,10 @@
                 <Badge variant="outline" class="gap-1">
                   {#if isOneTime(maintenance.rrule)}
                     <CalendarIcon class="size-3" />
-                    One-Time
+                    单次
                   {:else}
                     <RepeatIcon class="size-3" />
-                    Recurring
+                    重复
                   {/if}
                 </Badge>
               </Table.Cell>
@@ -273,11 +274,11 @@
                   <Tooltip.Content>
                     <div class="text-sm">
                       <div>
-                        <span class="text-muted-foreground">Start:</span>
+                        <span class="text-muted-foreground">开始：</span>
                         {format(new Date(maintenance.start_date_time * 1000), "yyyy-MM-dd HH:mm")}
                       </div>
                       <div>
-                        <span class="text-muted-foreground">Duration:</span>
+                        <span class="text-muted-foreground">持续时间：</span>
                         {formatDuration(maintenance.duration_seconds)}
                       </div>
                       <div>
@@ -306,7 +307,7 @@
                     </Tooltip.Content>
                   </Tooltip.Root>
                 {:else}
-                  <span class="text-muted-foreground text-sm">None</span>
+                  <span class="text-muted-foreground text-sm">无</span>
                 {/if}
               </Table.Cell>
               <Table.Cell>
@@ -321,23 +322,23 @@
                     <Tooltip.Content>
                       <div class="text-sm">
                         <div>
-                          <span class="text-muted-foreground">Start:</span>
-                          {format(new Date(maintenance.upcoming_event.start_date_time * 1000), "MMM d, yyyy HH:mm")}
+                          <span class="text-muted-foreground">开始：</span>
+                          {format(new Date(maintenance.upcoming_event.start_date_time * 1000), "yyyy-MM-dd HH:mm")}
                         </div>
                         <div>
-                          <span class="text-muted-foreground">End:</span>
-                          {format(new Date(maintenance.upcoming_event.end_date_time * 1000), "MMM d, yyyy HH:mm")}
+                          <span class="text-muted-foreground">结束：</span>
+                          {format(new Date(maintenance.upcoming_event.end_date_time * 1000), "yyyy-MM-dd HH:mm")}
                         </div>
                       </div>
                     </Tooltip.Content>
                   </Tooltip.Root>
                 {:else}
-                  <span class="text-muted-foreground text-sm">No events</span>
+                  <span class="text-muted-foreground text-sm">暂无事件</span>
                 {/if}
               </Table.Cell>
               <Table.Cell>
                 <Badge variant={getStatusBadgeVariant(maintenance.status)}>
-                  {maintenance.status}
+                  {maintenance.status === "ACTIVE" ? "启用" : "停用"}
                 </Badge>
               </Table.Cell>
               <Table.Cell class="text-right">
@@ -349,7 +350,7 @@
                     openMaintenance(maintenance.id);
                   }}
                 >
-                  <PencilIcon class="size-4" /> Edit
+                  <PencilIcon class="size-4" /> 编辑
                 </Button>
               </Table.Cell>
             </Table.Row>
@@ -364,7 +365,7 @@
     {@const startItem = (pageNo - 1) * limit + 1}
     {@const endItem = Math.min(pageNo * limit, totalCount)}
     <div class="flex items-center justify-between">
-      <span class="text-muted-foreground text-sm">Showing {startItem}-{endItem} of {totalCount}</span>
+      <span class="text-muted-foreground text-sm">显示第 {startItem}-{endItem} 项，共 {totalCount} 项</span>
       {#if totalPages > 1}
         <div class="flex items-center gap-2">
           <Button variant="outline" size="icon" disabled={pageNo === 1} onclick={() => goToPage(pageNo - 1)}>

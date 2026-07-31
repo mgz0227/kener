@@ -38,7 +38,7 @@
 
 <div class="space-y-4">
   <div class="flex flex-col gap-2">
-    <Label for="gamedig-game">Game <span class="text-destructive">*</span></Label>
+    <Label for="gamedig-game">游戏 <span class="text-destructive">*</span></Label>
     <Select.Root
       type="single"
       value={data.gameId}
@@ -51,13 +51,13 @@
       </Select.Trigger>
       <Select.Content class="max-h-75">
         <div class="p-2">
-          <Input bind:value={searchQuery} placeholder="Search games..." class="mb-2" />
+          <Input bind:value={searchQuery} placeholder="搜索游戏..." class="mb-2" />
         </div>
         {#each filteredGames as game}
           <Select.Item value={game.id}>{game.name}</Select.Item>
         {/each}
         {#if filteredGames.length === 0}
-          <p class="text-muted-foreground p-2 text-sm">No games found</p>
+          <p class="text-muted-foreground p-2 text-sm">未找到游戏</p>
         {/if}
       </Select.Content>
     </Select.Root>
@@ -65,15 +65,15 @@
 
   <div class="grid grid-cols-3 gap-4">
     <div class="flex flex-col gap-2">
-      <Label for="gamedig-host">Host <span class="text-destructive">*</span></Label>
+      <Label for="gamedig-host">主机 <span class="text-destructive">*</span></Label>
       <Input id="gamedig-host" bind:value={data.host} placeholder="game.example.com" />
     </div>
     <div class="flex flex-col gap-2">
-      <Label for="gamedig-port">Port</Label>
+      <Label for="gamedig-port">端口</Label>
       <Input id="gamedig-port" type="number" bind:value={data.port} placeholder="27015" />
     </div>
     <div class="flex flex-col gap-2">
-      <Label for="gamedig-timeout">Timeout (ms)</Label>
+      <Label for="gamedig-timeout">超时时间（毫秒）</Label>
       <Input id="gamedig-timeout" type="number" bind:value={data.timeout} placeholder="10000" />
     </div>
   </div>
@@ -83,13 +83,10 @@
       <Tooltip.Root>
         <Tooltip.Trigger class="flex items-center space-x-2">
           <Switch id="gamedig-guessport" bind:checked={data.guessPort} />
-          <Label for="gamedig-guessport">Guess Port</Label>
+          <Label for="gamedig-guessport">自动推测端口</Label>
         </Tooltip.Trigger>
         <Tooltip.Content class="max-w-xs">
-          <p class="text-wrap">
-            Used port can be different from client port, depending on queried game. Try this if you have unsuccessful
-            responses
-          </p>
+          <p class="text-wrap">使用的端口可能因游戏而异，并与客户端端口不同。如果查询失败，请尝试启用此选项。</p>
         </Tooltip.Content>
       </Tooltip.Root>
     </div>
@@ -97,12 +94,11 @@
       <Tooltip.Root>
         <Tooltip.Trigger class="flex items-center space-x-2">
           <Switch id="gamedig-rules" bind:checked={data.requestRules} />
-          <Label for="gamedig-rules">Request Rules</Label>
+          <Label for="gamedig-rules">请求规则数据</Label>
         </Tooltip.Trigger>
         <Tooltip.Content class="max-w-xs">
           <p class="text-wrap">
-            Valve games can provide additional 'rules' to Gamedig monitors. If checked, they will be available in
-            `reponseRaw.raw`, beware that it may increase query time.
+            Valve 游戏可向 Gamedig 监控提供额外的“rules”数据。启用后可在 `reponseRaw.raw` 中使用，但可能增加查询时间。
           </p>
         </Tooltip.Content>
       </Tooltip.Root>
@@ -110,7 +106,7 @@
   </div>
 
   <div class="flex flex-col gap-2">
-    <Label for="gamedig-eval">Custom Eval Function</Label>
+    <Label for="gamedig-eval">自定义评估函数</Label>
     <div class="rounded-md border">
       <CodeMirror
         bind:value={data.eval}
@@ -125,7 +121,7 @@
       />
     </div>
     <p class="text-muted-foreground mt-1 text-xs">
-      Function receives (responseTime, responseRaw) and should return {`{ status, latency }`}
+      函数接收 (responseTime, responseRaw)，并应返回 {`{ status, latency }`}
     </p>
   </div>
 </div>

@@ -24,7 +24,7 @@
               {...props}
               class="justify-start-safe flex items-center gap-2"
             >
-              <img src={clientResolver(resolve, "/logo96.png")} class="size-5!" alt="Kener Logo" />
+              <img src={clientResolver(resolve, "/logo96.png")} class="size-5!" alt="Kener 徽标" />
               <span class="text-base font-semibold"> Kener </span>
               <span class="text-muted-foreground pt-0.5 text-xs font-medium"> v{appVersion} </span>
             </a>

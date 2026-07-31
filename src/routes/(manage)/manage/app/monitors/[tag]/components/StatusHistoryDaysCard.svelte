@@ -38,9 +38,7 @@
 
   async function save() {
     if (!isValid) {
-      toast.error(
-        `Days must be a whole number between ${GC.STATUS_HISTORY_DAYS_MIN} and ${GC.STATUS_HISTORY_DAYS_MAX}`
-      );
+      toast.error(`天数必须是 ${GC.STATUS_HISTORY_DAYS_MIN} 到 ${GC.STATUS_HISTORY_DAYS_MAX} 之间的整数`);
       return;
     }
 
@@ -82,10 +80,10 @@
       } else {
         // Update the monitor's settings_json so subsequent saves from other cards stay in sync
         monitor.monitor_settings_json = JSON.stringify(mergedSettings);
-        toast.success("Status history settings saved successfully");
+        toast.success("状态历史设置已成功保存");
       }
     } catch (e) {
-      const message = e instanceof Error ? e.message : "Failed to save status history settings";
+      const message = e instanceof Error ? e.message : "保存状态历史设置失败";
       toast.error(message);
     } finally {
       saving = false;
@@ -95,15 +93,13 @@
 
 <Card.Root>
   <Card.Header>
-    <Card.Title>Status History Days</Card.Title>
-    <Card.Description>
-      Configure how many days of status history to display by default when this monitor loads on a status page
-    </Card.Description>
+    <Card.Title>状态历史天数</Card.Title>
+    <Card.Description>配置此监控项在状态页加载时默认显示多少天的状态历史</Card.Description>
   </Card.Header>
   <Card.Content class="space-y-4">
     <div class="grid grid-cols-2 gap-4">
       <div class="space-y-2">
-        <Label for="monitor-history-desktop">Desktop (days)</Label>
+        <Label for="monitor-history-desktop">桌面端（天）</Label>
         <Input
           id="monitor-history-desktop"
           type="number"
@@ -113,10 +109,10 @@
           bind:value={statusHistoryDays.desktop}
           class={isDesktopValid ? "" : "border-destructive"}
         />
-        <p class="text-muted-foreground text-xs">Number of days shown on desktop screens</p>
+        <p class="text-muted-foreground text-xs">桌面端显示的天数</p>
       </div>
       <div class="space-y-2">
-        <Label for="monitor-history-mobile">Mobile (days)</Label>
+        <Label for="monitor-history-mobile">移动端（天）</Label>
         <Input
           id="monitor-history-mobile"
           type="number"
@@ -126,12 +122,12 @@
           bind:value={statusHistoryDays.mobile}
           class={isMobileValid ? "" : "border-destructive"}
         />
-        <p class="text-muted-foreground text-xs">Number of days shown on mobile screens</p>
+        <p class="text-muted-foreground text-xs">移动端显示的天数</p>
       </div>
     </div>
     <p class="text-muted-foreground text-xs">
-      This overrides the page-level default for this monitor. Values must be whole numbers between {GC.STATUS_HISTORY_DAYS_MIN}
-      and {GC.STATUS_HISTORY_DAYS_MAX}.
+      此设置会覆盖该监控项的页面级默认值。数值必须是 {GC.STATUS_HISTORY_DAYS_MIN} 到 {GC.STATUS_HISTORY_DAYS_MAX}
+      之间的整数。
     </p>
   </Card.Content>
   <Card.Footer class="flex justify-end">
@@ -141,7 +137,7 @@
       {:else}
         <SaveIcon class="size-4" />
       {/if}
-      Save Status History Settings
+      保存状态历史设置
     </Button>
   </Card.Footer>
 </Card.Root>

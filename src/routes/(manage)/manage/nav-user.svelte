@@ -31,6 +31,12 @@
       .slice(0, 2)
       .toUpperCase()
   );
+  const roleDisplayNames: Record<string, string> = {
+    admin: "管理员",
+    editor: "编辑者",
+    member: "成员"
+  };
+  let roleNames = $derived(user.role_ids.map((role) => roleDisplayNames[role] ?? role).join(", "));
 
   const sidebar = Sidebar.useSidebar();
 
@@ -92,7 +98,7 @@
         setTimeout(() => (nameSuccess = false), 2000);
       }
     } catch {
-      nameError = "Error while saving name";
+      nameError = "保存姓名时出错";
     } finally {
       savingName = false;
     }
@@ -121,7 +127,7 @@
         setTimeout(() => (passwordSuccess = false), 2000);
       }
     } catch {
-      passwordError = "Error while updating password";
+      passwordError = "更新密码时出错";
     } finally {
       resettingPass = false;
     }
@@ -187,13 +193,13 @@
         <DropdownMenu.Group>
           <DropdownMenu.Item onclick={openAccountDialog}>
             <UserCircleIcon />
-            Account
+            账户
           </DropdownMenu.Item>
           <DropdownMenu.Item class="relative" onclick={toggleMode}>
             <Sun class="absolute left-2  scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
             <Moon class="absolute left-2  scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
             <span class="pl-6">
-              {mode.current === "light" ? "Light" : "Dark"}
+              {mode.current === "light" ? "浅色模式" : "深色模式"}
             </span>
           </DropdownMenu.Item>
         </DropdownMenu.Group>
@@ -203,7 +209,7 @@
             <form method="POST" action={clientResolver(resolve, "/account/logout")} class="w-full">
               <Button {...props} type="submit" variant="ghost" class="w-full justify-start">
                 <LogoutIcon />
-                Log out
+                退出登录
               </Button>
             </form>
           {/snippet}
@@ -217,16 +223,16 @@
   <Dialog.Content class="max-w-md">
     <Dialog.Header>
       <Dialog.Title class="flex flex-col  justify-between">
-        <span>Account Settings</span>
+        <span>账户设置</span>
       </Dialog.Title>
       <Dialog.Description class="flex flex-col gap-2">
-        <span> Manage your profile information. </span>
+        <span> 管理你的个人资料。 </span>
         <div class="flex items-center justify-between">
           <span class="text-foreground rounded-sm font-medium">
             {user.email}
           </span>
           <span class="text-foreground rounded-sm font-medium uppercase">
-            {user.role_ids.join(", ")}
+            {roleNames}
           </span>
         </div>
       </Dialog.Description>
@@ -242,16 +248,16 @@
           saveName();
         }}
       >
-        <Label for="account-name">Name</Label>
+        <Label for="account-name">姓名</Label>
         <div class="flex gap-2">
-          <Input id="account-name" bind:value={myName} placeholder="Your name" disabled={savingName} class="flex-1" />
+          <Input id="account-name" bind:value={myName} placeholder="你的姓名" disabled={savingName} class="flex-1" />
           <Button type="submit" disabled={savingName || !myName.trim()}>
             {#if savingName}
               <LoaderIcon class="size-4 animate-spin" />
             {:else if nameSuccess}
               <CheckIcon class="size-4" />
             {:else}
-              Save
+              保存
             {/if}
           </Button>
         </div>
@@ -270,39 +276,39 @@
           updatePassword();
         }}
       >
-        <Label for="new-password">Change Password</Label>
+        <Label for="new-password">修改密码</Label>
         <Input
           id="new-password"
           type="password"
           bind:value={myPassword}
-          placeholder="New Password"
+          placeholder="新密码"
           disabled={resettingPass}
         />
         <Input
           id="confirm-password"
           type="password"
           bind:value={plainPassword}
-          placeholder="Confirm Password"
+          placeholder="确认密码"
           disabled={resettingPass}
         />
 
         <div class="text-muted-foreground text-xs">
-          <p class="mb-1 font-medium">Password requirements:</p>
+          <p class="mb-1 font-medium">密码要求：</p>
           <ul class="grid grid-cols-2 gap-1">
             <li class:text-green-500={hasDigit}>
-              {#if hasDigit}<CheckIcon class="inline size-3" />{/if} One digit
+              {#if hasDigit}<CheckIcon class="inline size-3" />{/if} 至少一个数字
             </li>
             <li class:text-green-500={hasLowercase}>
-              {#if hasLowercase}<CheckIcon class="inline size-3" />{/if} One lowercase
+              {#if hasLowercase}<CheckIcon class="inline size-3" />{/if} 至少一个小写字母
             </li>
             <li class:text-green-500={hasUppercase}>
-              {#if hasUppercase}<CheckIcon class="inline size-3" />{/if} One uppercase
+              {#if hasUppercase}<CheckIcon class="inline size-3" />{/if} 至少一个大写字母
             </li>
             <li class:text-green-500={hasMinLength}>
-              {#if hasMinLength}<CheckIcon class="inline size-3" />{/if} 8+ characters
+              {#if hasMinLength}<CheckIcon class="inline size-3" />{/if} 至少 8 个字符
             </li>
             <li class:text-green-500={passwordsMatch}>
-              {#if passwordsMatch}<CheckIcon class="inline size-3" />{/if} Passwords match
+              {#if passwordsMatch}<CheckIcon class="inline size-3" />{/if} 两次密码一致
             </li>
           </ul>
         </div>
@@ -310,12 +316,12 @@
         <Button type="submit" disabled={resettingPass || !isPasswordValid}>
           {#if resettingPass}
             <LoaderIcon class="size-4 animate-spin" />
-            Updating...
+            正在更新……
           {:else if passwordSuccess}
             <CheckIcon class="size-4" />
-            Updated!
+            已更新
           {:else}
-            Update Password
+            更新密码
           {/if}
         </Button>
         {#if passwordError}

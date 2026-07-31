@@ -35,6 +35,23 @@
   let saving = $state(false);
   let selectedAnalytics = $state<AnalyticsProvider | null>(null);
 
+  const requirementLabels: Record<string, string> = {
+    "Measurement ID": "衡量 ID",
+    "Transport URL": "数据传输 URL",
+    "Script Host": "脚本主机",
+    Domain: "域名",
+    API: "API 地址",
+    "Script Source": "脚本地址",
+    "Project Token": "项目令牌",
+    "API Host": "API 主机",
+    "Amplitude API Key": "Amplitude API 密钥",
+    "Server URL": "服务器 URL",
+    "Project ID": "项目 ID",
+    "Website ID": "网站 ID",
+    "Script URL": "脚本 URL",
+    "API Key": "API 密钥"
+  };
+
   // Analytics providers configuration
   let analyticsProviders = $state<AnalyticsProvider[]>([
     {
@@ -107,7 +124,7 @@
         {
           label: "Project Token",
           type: "text",
-          placeholder: "YOUR_PROJECT_TOKEN",
+          placeholder: "你的项目令牌",
           required: true,
           value: ""
         },
@@ -130,7 +147,7 @@
         {
           label: "Amplitude API Key",
           type: "text",
-          placeholder: "API key for your Amplitude project",
+          placeholder: "Amplitude 项目的 API 密钥",
           required: true,
           value: ""
         },
@@ -153,7 +170,7 @@
         {
           label: "Project ID",
           type: "text",
-          placeholder: "Project ID for your Microsoft Clarity project",
+          placeholder: "Microsoft Clarity 项目 ID",
           required: true,
           value: ""
         }
@@ -169,7 +186,7 @@
         {
           label: "Website ID",
           type: "text",
-          placeholder: "Website ID for your umami script and domain",
+          placeholder: "Umami 脚本和域名对应的网站 ID",
           required: true,
           value: ""
         },
@@ -238,7 +255,7 @@
       // Select the first provider by default
       selectedAnalytics = analyticsProviders[0];
     } catch (e) {
-      toast.error("Failed to load analytics settings");
+      toast.error("加载统计服务设置失败");
     } finally {
       loading = false;
     }
@@ -275,7 +292,7 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success(`${selectedAnalytics.label} settings saved successfully`);
+        toast.success(`${selectedAnalytics.label} 设置已保存`);
         // Update activeInSite status
         selectedAnalytics.activeInSite = selectedAnalytics.isEnabled;
         // Update in the providers list
@@ -285,7 +302,7 @@
         }
       }
     } catch (e) {
-      toast.error("Failed to save analytics settings");
+      toast.error("保存统计服务设置失败");
     } finally {
       saving = false;
     }
@@ -302,12 +319,12 @@
 
 <div class="flex w-full flex-col gap-4 px-4">
   <div>
-    Add your analytics ID/Key here. You can add multiple analytics providers.
+    在此添加统计服务的 ID 或密钥，可以同时启用多个统计服务。
     <a
       href="https://kener.ing/docs/v4/analytics"
       target="_blank"
       rel="noopener noreferrer"
-      class="text-primary ml-1 underline underline-offset-2">Learn more</a
+      class="text-primary ml-1 underline underline-offset-2">了解更多</a
     >.
   </div>
   {#if loading}
@@ -352,13 +369,13 @@
         {#if selectedAnalytics}
           <div>
             <div class="text-muted-foreground mb-4 text-sm font-medium">
-              Add details for your {selectedAnalytics.label} account
+              填写 {selectedAnalytics.label} 账户信息
             </div>
 
             <div class="grid grid-cols-2 gap-4">
               {#each selectedAnalytics.requirements as req (req.label)}
                 <div class="flex flex-col gap-y-2">
-                  <Label for={req.label}>{req.label}</Label>
+                  <Label for={req.label}>{requirementLabels[req.label] ?? req.label}</Label>
                   <Input
                     bind:value={req.value}
                     type={req.type}
@@ -369,7 +386,7 @@
                 </div>
               {/each}
               <div class="flex flex-col gap-2">
-                <Label>Status</Label>
+                <Label>状态</Label>
                 <Select.Root
                   type="single"
                   value={selectedAnalytics.isEnabled ? "enabled" : "disabled"}
@@ -379,11 +396,11 @@
                   }}
                 >
                   <Select.Trigger class="w-32">
-                    {selectedAnalytics.isEnabled ? "Enable" : "Disable"}
+                    {selectedAnalytics.isEnabled ? "启用" : "停用"}
                   </Select.Trigger>
                   <Select.Content>
-                    <Select.Item value="enabled">Enable</Select.Item>
-                    <Select.Item value="disabled">Disable</Select.Item>
+                    <Select.Item value="enabled">启用</Select.Item>
+                    <Select.Item value="disabled">停用</Select.Item>
                   </Select.Content>
                 </Select.Root>
               </div>
@@ -391,7 +408,7 @@
 
             <div class="mt-4 flex flex-row items-center justify-between">
               <Button type="submit" disabled={saving}>
-                Save Changes for {selectedAnalytics.label}
+                保存 {selectedAnalytics.label} 设置
                 {#if saving}
                   <Loader class="ml-2 inline size-4 animate-spin" />
                 {/if}

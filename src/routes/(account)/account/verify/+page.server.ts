@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ url }) => {
   if (view !== "confirm_token" || !token) {
     return {
       valid: false,
-      error: "Invalid or missing verification link.",
+      error: "验证链接无效或缺失。",
     };
   }
 
@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ url }) => {
   if (!tokenData) {
     return {
       valid: false,
-      error: "Invalid or expired verification link.",
+      error: "验证链接无效或已过期。",
     };
   }
 
@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ url }) => {
   if (!email) {
     return {
       valid: false,
-      error: "Invalid verification link.",
+      error: "验证链接无效。",
     };
   }
 
@@ -35,7 +35,7 @@ export const load: PageServerLoad = async ({ url }) => {
   if (!validTill || Date.now() > validTill) {
     return {
       valid: false,
-      error: "This verification link has expired. Please request a new one.",
+      error: "此验证链接已过期，请重新申请。",
     };
   }
 
@@ -43,7 +43,7 @@ export const load: PageServerLoad = async ({ url }) => {
   if (!user) {
     return {
       valid: false,
-      error: "No user found for this verification link.",
+      error: "未找到此验证链接对应的用户。",
     };
   }
 

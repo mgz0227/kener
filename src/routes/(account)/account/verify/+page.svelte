@@ -7,11 +7,11 @@
   import clientResolver from "$lib/client/resolver.js";
 
   const { data } = $props();
-  const error: string = $derived(data.error || "Invalid verification link.");
+  const error: string = $derived(data.error || "验证链接无效。");
 </script>
 
 <svelte:head>
-  <title>Email Verification</title>
+  <title>邮箱验证</title>
 </svelte:head>
 
 <div class="flex min-h-screen items-center justify-center p-4">
@@ -20,13 +20,13 @@
       <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
         <AlertCircleIcon class="h-8 w-8 text-red-600" />
       </div>
-      <Card.Title>Email Verification Failed</Card.Title>
+      <Card.Title>邮箱验证失败</Card.Title>
       <Card.Description>{error}</Card.Description>
     </Card.Header>
     <Card.Content>
       <Button href={clientResolver(resolve, "/account/signin")} class="w-full">
         <ArrowLeftIcon class="mr-2 h-4 w-4" />
-        Go to Sign In
+        前往登录
       </Button>
     </Card.Content>
   </Card.Root>

@@ -10,6 +10,14 @@ import { VerifyPassword, GenerateToken, CookieConfig } from "$lib/server/control
 import constants from "$lib/global-constants";
 import serverResolve from "$lib/server/resolver.js";
 
+const signupErrorMessages: Record<string, string> = {
+  "Please enter a valid email address": "请输入有效的邮箱地址",
+  "Name must be at least 2 characters": "姓名至少需要 2 个字符",
+  "Name must be less than 100 characters": "姓名不能超过 100 个字符",
+  "Password must contain at least one digit, one lowercase letter, one uppercase letter, and have a minimum length of 8 characters":
+    "密码至少需要 8 个字符，并包含一个大写字母、一个小写字母和一个数字",
+};
+
 export const load: PageServerLoad = async ({ parent }) => {
   const parentData = await parent();
 
@@ -29,7 +37,7 @@ export const actions: Actions = {
     const password = String(formData.get("password") ?? "");
 
     if (!email || !password) {
-      return fail(400, { error: "Email and password are required", values: { email } });
+      return fail(400, { error: "邮箱和密码不能为空", values: { email } });
     }
 
     const userCount = await GetUsersCount();
@@ -39,29 +47,29 @@ export const actions: Actions = {
 
     const userDB = await GetUserByEmail(email);
     if (!userDB) {
-      return fail(401, { error: "User does not exist", values: { email } });
+      return fail(401, { error: "用户不存在", values: { email } });
     }
 
     const passwordStored = await GetUserPasswordHashById(userDB.id);
     if (!passwordStored) {
-      return fail(401, { error: "Invalid password or Email", values: { email } });
+      return fail(401, { error: "邮箱或密码错误", values: { email } });
     }
 
     const isMatch = await VerifyPassword(password, passwordStored.password_hash);
     if (!isMatch) {
-      return fail(401, { error: "Invalid password or Email", values: { email } });
+      return fail(401, { error: "邮箱或密码错误", values: { email } });
     }
 
     if (!userDB.is_active) {
       return fail(403, {
-        error: "Your account has been deactivated. Please contact an administrator.",
+        error: "你的账户已被停用，请联系管理员。",
         values: { email },
       });
     }
 
     if (!userDB.role_ids || userDB.role_ids.length === 0) {
       return fail(403, {
-        error: "Your account has no active roles assigned. Please contact an administrator.",
+        error: "你的账户没有分配有效角色，请联系管理员。",
         values: { email },
       });
     }
@@ -85,13 +93,13 @@ export const actions: Actions = {
     const password = String(formData.get("password") ?? "");
 
     if (!name || !email || !password) {
-      return fail(400, { error: "Email, password, and name are required", values: { name, email } });
+      return fail(400, { error: "姓名、邮箱和密码不能为空", values: { name, email } });
     }
 
     const userCount = await GetUsersCount();
     if (userCount && Number(userCount.count) !== 0) {
       return fail(400, {
-        error: "Set up already done. Please login with the email and password you have set up.",
+        error: "初始化已完成，请使用已设置的邮箱和密码登录。",
         values: { name, email },
       });
     }
@@ -101,7 +109,7 @@ export const actions: Actions = {
       const userDB = await GetUserByEmail(email);
 
       if (!userDB) {
-        return fail(500, { error: "Failed to create user", values: { name, email } });
+        return fail(500, { error: "创建用户失败", values: { name, email } });
       }
 
       const token = await GenerateToken(userDB);
@@ -116,7 +124,7 @@ export const actions: Actions = {
 
       throw redirect(302, serverResolve("/manage/app/site-configurations"));
     } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : "An error occurred during signup";
+      const errorMessage = e instanceof Error ? signupErrorMessages[e.message] || "注册时发生错误" : "注册时发生错误";
       return fail(400, { error: errorMessage, values: { name, email } });
     }
   },

@@ -17,9 +17,9 @@
   const LATENCY_CALCULATION_OPTIONS = ["AVG", "MAX", "MIN"] as const;
   type LatencyCalculationOption = (typeof LATENCY_CALCULATION_OPTIONS)[number];
   const LATENCY_CALCULATION_LABELS: Record<LatencyCalculationOption, string> = {
-    AVG: "Average (mean)",
-    MAX: "Maximum (slowest)",
-    MIN: "Minimum (fastest)"
+    AVG: "平均值",
+    MAX: "最大值（最慢）",
+    MIN: "最小值（最快）"
   };
 
   type GroupMonitorFormData = {
@@ -140,21 +140,20 @@
 <div class="space-y-4">
   <div class="flex flex-col gap-2">
     <div class="flex flex-col gap-1">
-      <Label>Select Monitors to Group</Label>
+      <Label>选择组合成员</Label>
       <p class="text-muted-foreground text-xs">
-        Group monitors aggregate the status of multiple monitors using weighted scores. Each status has a normalized
-        score: UP=1, DEGRADED=0.5, DOWN=0. Maintenance members are treated as UP. The weighted sum determines the group
-        status: 1=UP, between 0 and 1=DEGRADED, 0=DOWN.
+        组合监控通过加权评分汇总多个监控项的状态。各状态的标准分值为：UP=1、DEGRADED=0.5、DOWN=0。 维护中的成员按 UP
+        计算。加权总分决定组合状态：1=UP，0 到 1 之间=DEGRADED，0=DOWN。
       </p>
       <p class="text-muted-foreground text-xs">
-        Select at least {MIN_SELECTED_MONITORS} monitors. Weights must sum to 1.
+        请至少选择 {MIN_SELECTED_MONITORS} 个监控项，权重总和必须为 1。
       </p>
     </div>
 
     {#if eligibleMonitors.length > 0 || formData.monitors.length > 0}
       <MonitorPicker monitors={eligibleMonitors} {selectedTags} onToggle={toggleMonitor} onAddMany={addMonitors} />
     {:else}
-      <p class="text-muted-foreground text-sm">No eligible monitors available. Create some non-group monitors first.</p>
+      <p class="text-muted-foreground text-sm">没有可选的监控项，请先创建非组合监控项。</p>
     {/if}
   </div>
 
@@ -165,9 +164,9 @@
           ? 'border-green-500/50 bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300'
           : 'border-destructive/50 text-destructive bg-red-50 dark:bg-red-950'}"
       >
-        Total weight: {totalWeight}
+        总权重：{totalWeight}
         {#if !weightsValid}
-          <span class="text-xs">(must equal 1)</span>
+          <span class="text-xs">（必须等于 1）</span>
         {/if}
       </div>
       <Button
@@ -177,7 +176,7 @@
         class="text-muted-foreground hover:text-foreground h-auto p-0 text-xs"
         onclick={distributeEqually}
       >
-        Distribute equally
+        平均分配
       </Button>
       <Button
         type="button"
@@ -186,7 +185,7 @@
         class="text-muted-foreground hover:text-destructive h-auto p-0 text-xs"
         onclick={clearAll}
       >
-        Clear all
+        全部清除
       </Button>
     </div>
   {/if}
@@ -194,17 +193,15 @@
   <div class="grid gap-4 md:grid-cols-2">
     <div class="space-y-2">
       <div class="flex items-center justify-between">
-        <Label for="group-execution-delay">Execution Delay (ms)</Label>
-        <span class="text-muted-foreground text-xs">Minimum {MIN_DELAY_MS}ms</span>
+        <Label for="group-execution-delay">执行延迟（毫秒）</Label>
+        <span class="text-muted-foreground text-xs">最小 {MIN_DELAY_MS} 毫秒</span>
       </div>
       <Input id="group-execution-delay" type="number" min={MIN_DELAY_MS} step={100} bind:value={executionDelayInput} />
-      <p class="text-muted-foreground text-xs">
-        Determines how long to wait for all child monitors before aggregating results.
-      </p>
+      <p class="text-muted-foreground text-xs">在汇总结果前等待所有子监控项完成的最长时间。</p>
     </div>
 
     <div class="space-y-2">
-      <Label for="group-latency-calculation">Latency calculation</Label>
+      <Label for="group-latency-calculation">延迟计算方式</Label>
       <Select.Root
         type="single"
         value={formData.latencyCalculation}
@@ -223,15 +220,15 @@
           {/each}
         </Select.Content>
       </Select.Root>
-      <p class="text-muted-foreground text-xs">Choose how latency should be derived from the selected monitors.</p>
+      <p class="text-muted-foreground text-xs">选择如何根据所选监控项计算延迟。</p>
     </div>
   </div>
 
   {#if formData.monitors.length > 0}
     <div class="rounded-lg border">
       <div class="mb-2 border-b px-3 py-2">
-        <p class="text-sm font-medium">Selected: {formData.monitors.length} monitor(s) — Execution Order</p>
-        <p class="text-muted-foreground text-xs">Monitors will be executed in this order. Use arrows to reorder.</p>
+        <p class="text-sm font-medium">已选择 {formData.monitors.length} 个监控项 — 执行顺序</p>
+        <p class="text-muted-foreground text-xs">监控项将按此顺序执行。可使用箭头调整顺序。</p>
       </div>
       {#each formData.monitors as m, index (m.tag)}
         {@const monitorInfo = availableMonitors.find((am) => am.tag === m.tag)}
@@ -262,9 +259,9 @@
                   <Badge
                     variant="outline"
                     class="text-muted-foreground shrink-0 text-[10px]"
-                    title="Not currently checked; excluded from group score"
+                    title="当前未检查，已从组合评分中排除"
                   >
-                    inactive
+                    未启用
                   </Badge>
                 {/if}
               </p>
@@ -273,7 +270,7 @@
           </div>
           <div class="flex shrink-0 items-center gap-1">
             <div class="flex items-center gap-1.5">
-              <Label class="text-muted-foreground text-xs" for="group-member-weight-{m.tag}">Weight</Label>
+              <Label class="text-muted-foreground text-xs" for="group-member-weight-{m.tag}">权重</Label>
               <Input
                 id="group-member-weight-{m.tag}"
                 type="number"
@@ -310,7 +307,7 @@
               variant="ghost"
               size="icon"
               class="hover:text-destructive h-7 w-7"
-              title="Remove from group"
+              title="从组合中移除"
               onclick={() => removeMonitor(m.tag)}
             >
               <X class="h-3.5 w-3.5" />

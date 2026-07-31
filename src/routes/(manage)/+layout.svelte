@@ -37,24 +37,24 @@
 
   // Navigation items - single source of truth
   const allNavItems = [
-    { title: "Site Configurations", url: "/manage/app/site-configurations", icon: Settings2Icon },
-    { title: "Internationalization", url: "/manage/app/internationalization", icon: GlobeIcon },
-    { title: "Customizations", url: "/manage/app/customizations", icon: Columns3CogIcon },
-    { title: "Analytics Providers", url: "/manage/app/analytics-providers", icon: ChartSplineIcon },
-    { title: "Pages", url: "/manage/app/pages", icon: BookOpenIcon },
-    { title: "Monitors", url: "/manage/app/monitors", icon: BlendIcon },
-    { title: "Monitoring Data", url: "/manage/app/monitoring-data", icon: DatabaseIcon },
-    { title: "Incidents", url: "/manage/app/incidents", icon: CloudAlertIcon },
-    { title: "Maintenances", url: "/manage/app/maintenances", icon: ClockAlertIcon },
-    { title: "Alerts", url: "/manage/app/alerts", icon: SirenIcon },
-    { title: "Subscriptions", url: "/manage/app/subscriptions", icon: BellIcon },
-    { title: "Users", url: "/manage/app/users", icon: UsersIcon },
-    { title: "Roles", url: "/manage/app/roles", icon: ShieldIcon },
-    { title: "Triggers", url: "/manage/app/triggers", icon: MailboxIcon },
-    { title: "Templates", url: "/manage/app/templates", icon: TemplateIcon },
-    { title: "Badges", url: "/manage/app/badges", icon: BadgeIcon },
-    { title: "Embed", url: "/manage/app/embed", icon: CodeIcon },
-    { title: "API Keys", url: "/manage/app/api-keys", icon: KeyIcon }
+    { title: "站点配置", url: "/manage/app/site-configurations", icon: Settings2Icon },
+    { title: "多语言设置", url: "/manage/app/internationalization", icon: GlobeIcon },
+    { title: "外观定制", url: "/manage/app/customizations", icon: Columns3CogIcon },
+    { title: "统计服务", url: "/manage/app/analytics-providers", icon: ChartSplineIcon },
+    { title: "页面", url: "/manage/app/pages", icon: BookOpenIcon },
+    { title: "监控项", url: "/manage/app/monitors", icon: BlendIcon },
+    { title: "监控数据", url: "/manage/app/monitoring-data", icon: DatabaseIcon },
+    { title: "故障事件", url: "/manage/app/incidents", icon: CloudAlertIcon },
+    { title: "维护计划", url: "/manage/app/maintenances", icon: ClockAlertIcon },
+    { title: "告警", url: "/manage/app/alerts", icon: SirenIcon },
+    { title: "订阅", url: "/manage/app/subscriptions", icon: BellIcon },
+    { title: "用户", url: "/manage/app/users", icon: UsersIcon },
+    { title: "角色", url: "/manage/app/roles", icon: ShieldIcon },
+    { title: "触发器", url: "/manage/app/triggers", icon: MailboxIcon },
+    { title: "通知模板", url: "/manage/app/templates", icon: TemplateIcon },
+    { title: "状态徽章", url: "/manage/app/badges", icon: BadgeIcon },
+    { title: "嵌入代码", url: "/manage/app/embed", icon: CodeIcon },
+    { title: "API 密钥", url: "/manage/app/api-keys", icon: KeyIcon }
   ];
 
   const navItems = allNavItems
@@ -68,10 +68,10 @@
     .map((item) => ({ ...item, url: clientResolver(resolve, item.url) }));
 
   // Derive page title from current URL
-  let pageTitle = $derived(navItems.find((item) => page.url.pathname.startsWith(item.url))?.title || "Dashboard");
+  let pageTitle = $derived(navItems.find((item) => page.url.pathname.startsWith(item.url))?.title || "管理后台");
 </script>
 
-<ModeWatcher defaultMode={data.defaultSiteTheme as 'light' | 'dark' | 'system'} />
+<ModeWatcher defaultMode={data.defaultSiteTheme as "light" | "dark" | "system"} />
 <Toaster />
 
 <svelte:head>

@@ -99,15 +99,15 @@
   <Card.Header>
     <div class="flex items-center justify-between">
       <div>
-        <Card.Title>Recent Logs</Card.Title>
-        <Card.Description>Last 10 monitoring data points</Card.Description>
+        <Card.Title>最近日志</Card.Title>
+        <Card.Description>最近 10 个监控数据点</Card.Description>
       </div>
       <div class="flex items-center gap-2">
         <Button variant="ghost" size="icon" onclick={fetchLogs} disabled={loading}>
           <RefreshCwIcon class="size-4 {loading ? 'animate-spin' : ''}" />
         </Button>
         <Button variant="outline" size="sm" href={clientResolver(resolve, "/manage/app/monitoring-data")}>
-          View All
+          查看全部
           <ExternalLinkIcon class="ml-1 size-3" />
         </Button>
       </div>
@@ -119,17 +119,17 @@
         <Spinner class="size-6" />
       </div>
     {:else if logs.length === 0}
-      <div class="text-muted-foreground py-8 text-center text-sm">No monitoring data found for this monitor</div>
+      <div class="text-muted-foreground py-8 text-center text-sm">未找到此监控项的数据</div>
     {:else}
       <div class="ktable rounded-lg border">
         <Table.Root>
           <Table.Header>
             <Table.Row>
-              <Table.Head class="w-44">Timestamp</Table.Head>
-              <Table.Head class="w-20">Status</Table.Head>
-              <Table.Head class="w-20">Latency</Table.Head>
-              <Table.Head class="w-20">Type</Table.Head>
-              <Table.Head>Error</Table.Head>
+              <Table.Head class="w-44">时间</Table.Head>
+              <Table.Head class="w-20">状态</Table.Head>
+              <Table.Head class="w-20">延迟</Table.Head>
+              <Table.Head class="w-20">类型</Table.Head>
+              <Table.Head>错误</Table.Head>
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -140,7 +140,7 @@
                 </Table.Cell>
                 <Table.Cell>
                   <Badge variant={getStatusBadgeVariant(log.status)}>
-                    {log.status || "N/A"}
+                    {log.status || "暂无"}
                   </Badge>
                 </Table.Cell>
                 <Table.Cell>

@@ -43,7 +43,7 @@ export default {
   DEFAULT_STATUS: "DEFAULT",
   SIGNAL: "SIGNAL",
   INVITE_VERIFY_EMAIL: "invite_verify_email",
-  ERROR_NO_SETUP: "Set up not done yet. Create a user first.",
+  ERROR_NO_SETUP: "尚未完成初始化，请先创建用户。",
   INVESTIGATING: "INVESTIGATING",
   IDENTIFIED: "IDENTIFIED",
   MONITORING: "MONITORING",

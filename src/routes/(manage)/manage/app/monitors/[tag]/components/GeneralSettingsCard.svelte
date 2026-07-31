@@ -36,12 +36,12 @@
 
     const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/svg+xml", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
-      toast.error("Invalid file type. Allowed: PNG, JPG, SVG, WebP");
+      toast.error("文件类型无效。允许使用：PNG、JPG、SVG、WebP");
       return;
     }
 
     if (file.size > GC.MAX_UPLOAD_BYTES) {
-      toast.error(`File too large. Maximum size is ${GC.MAX_UPLOAD_BYTES / (1024 * 1024)}MB`);
+      toast.error(`文件过大。最大大小为 ${GC.MAX_UPLOAD_BYTES / (1024 * 1024)}MB`);
       return;
     }
 
@@ -71,10 +71,10 @@
         toast.error(result.error);
       } else {
         monitor.image = result.url;
-        toast.success("Image uploaded successfully");
+        toast.success("图片已成功上传");
       }
     } catch (e) {
-      toast.error("Failed to upload image");
+      toast.error("上传图片失败");
     } finally {
       uploadingImage = false;
       input.value = "";
@@ -125,13 +125,13 @@
       if (result.error) {
         toast.error(result.error);
       } else if (isNew) {
-        toast.success("Monitor created successfully");
+        toast.success("监控项已成功创建");
         goto(clientResolver(resolve, `/manage/app/monitors/${monitor.tag}`));
       } else {
-        toast.success("General settings saved successfully");
+        toast.success("常规设置已成功保存");
       }
     } catch (e) {
-      const message = e instanceof Error ? e.message : "Failed to save general settings";
+      const message = e instanceof Error ? e.message : "保存常规设置失败";
       toast.error(message);
     } finally {
       savingGeneral = false;
@@ -141,47 +141,43 @@
 
 <Card.Root>
   <Card.Header>
-    <Card.Title>General Settings</Card.Title>
-    <Card.Description>Basic information about this monitor</Card.Description>
+    <Card.Title>常规设置</Card.Title>
+    <Card.Description>此监控项的基本信息</Card.Description>
   </Card.Header>
   <Card.Content class="space-y-4">
     <div class="grid grid-cols-2 gap-4">
       <div class="flex flex-col gap-2">
-        <Label for="monitor-name">Name <span class="text-destructive">*</span></Label>
-        <Input id="monitor-name" bind:value={monitor.name} placeholder="My API Monitor" />
+        <Label for="monitor-name">名称 <span class="text-destructive">*</span></Label>
+        <Input id="monitor-name" bind:value={monitor.name} placeholder="我的 API 监控项" />
       </div>
       <div class="flex flex-col gap-2">
-        <Label for="monitor-tag">Tag <span class="text-destructive">*</span></Label>
+        <Label for="monitor-tag">标签 <span class="text-destructive">*</span></Label>
         <Input id="monitor-tag" bind:value={monitor.tag} placeholder="my-api-monitor" disabled={!isNew} />
-        <p class="text-muted-foreground mt-1 text-xs">Unique identifier (cannot be changed after creation)</p>
+        <p class="text-muted-foreground mt-1 text-xs">唯一标识符（创建后无法更改）</p>
       </div>
     </div>
 
     <div class="flex flex-col gap-2">
-      <Label for="monitor-description">Description</Label>
+      <Label for="monitor-description">描述</Label>
       <Textarea
         id="monitor-description"
         bind:value={monitor.description}
-        placeholder="A brief description of what this monitor checks"
+        placeholder="简要描述此监控项检查的内容"
         rows={3}
       />
     </div>
     <div class="flex flex-col gap-2">
-      <Label for="monitor-external_url">Service URL</Label>
+      <Label for="monitor-external_url">服务 URL</Label>
       <Input id="monitor-external_url" bind:value={monitor.external_url} placeholder="https://example.com/api/health" />
     </div>
 
     <div class="grid grid-cols-2 gap-4">
       <div class="flex flex-col gap-2">
-        <Label>Monitor Image</Label>
+        <Label>监控项图片</Label>
         <div class="flex items-center gap-3">
           <div class="bg-muted flex h-12 w-12 items-center justify-center rounded-md border">
             {#if monitor.image}
-              <img
-                src={clientResolver(resolve, monitor.image)}
-                alt="Monitor"
-                class="max-h-10 max-w-10 object-contain"
-              />
+              <img src={clientResolver(resolve, monitor.image)} alt="监控项" class="max-h-10 max-w-10 object-contain" />
             {:else}
               <ImageIcon class="text-muted-foreground h-5 w-5" />
             {/if}
@@ -195,10 +191,10 @@
             >
               {#if uploadingImage}
                 <Loader class="h-4 w-4 animate-spin" />
-                Uploading...
+                正在上传...
               {:else}
                 <UploadIcon class="h-4 w-4" />
-                Upload
+                上传
               {/if}
             </Button>
             <input
@@ -216,18 +212,18 @@
             {/if}
           </div>
         </div>
-        <p class="text-muted-foreground text-xs">Max 128x128px, PNG/JPG/SVG/WebP</p>
+        <p class="text-muted-foreground text-xs">最大 128x128 像素，支持 PNG/JPG/SVG/WebP</p>
       </div>
       <div class="flex flex-col gap-2">
-        <Label for="monitor-cron">Cron Schedule</Label>
+        <Label for="monitor-cron">Cron 计划</Label>
         <Input id="monitor-cron" bind:value={monitor.cron} placeholder="* * * * *" />
-        <p class="text-muted-foreground mt-1 text-xs">How often to check (cron format)</p>
+        <p class="text-muted-foreground mt-1 text-xs">检查频率（Cron 格式）</p>
       </div>
     </div>
 
     <div class="grid grid-cols-2 gap-4">
       <div class="flex flex-col gap-2">
-        <Label for="monitor-default-status">Default Status</Label>
+        <Label for="monitor-default-status">默认状态</Label>
         <Select.Root
           type="single"
           value={monitor.default_status}
@@ -247,7 +243,7 @@
         </Select.Root>
       </div>
       <div class="flex flex-col gap-2">
-        <Label for="hidden-switch">Hidden in Status Page</Label>
+        <Label for="hidden-switch">在状态页隐藏</Label>
         <div class="flex items-center gap-2">
           <Switch
             id="hidden-switch"
@@ -255,16 +251,15 @@
             onCheckedChange={(checked) => (monitor.is_hidden = checked ? "YES" : "NO")}
           />
           <span class="text-muted-foreground text-xs">
-            {monitor.is_hidden === "YES" ? "Hidden" : "Visible"}
+            {monitor.is_hidden === "YES" ? "隐藏" : "可见"}
           </span>
         </div>
         <p class="text-muted-foreground text-xs">
-          Hidden monitors won't appear on any status pages, but monitoring, alerting, and all other features will
-          continue to work normally.
+          隐藏的监控项不会出现在任何状态页上，但监控、告警及其他功能仍会正常运行。
         </p>
       </div>
       <div class="flex flex-col gap-2">
-        <Label for="monitor-confirmation-threshold">Grace period</Label>
+        <Label for="monitor-confirmation-threshold">确认阈值</Label>
         <Input
           id="monitor-confirmation-threshold"
           type="number"
@@ -277,9 +272,7 @@
             monitor.confirmation_threshold = Number.isNaN(v) ? 1 : Math.min(60, Math.max(1, v));
           }}
         />
-        <p class="text-muted-foreground text-xs">
-          Require this many consecutive checks before a status change is recorded. 1 = off (record every check immediately).
-        </p>
+        <p class="text-muted-foreground text-xs">连续检查达到此次数后才记录状态变化。1 = 关闭（每次检查立即记录）。</p>
       </div>
     </div>
   </Card.Content>
@@ -290,7 +283,7 @@
       {:else}
         <SaveIcon class="size-4" />
       {/if}
-      {isNew ? "Create Monitor" : "Save General Settings"}
+      {isNew ? "创建监控项" : "保存常规设置"}
     </Button>
   </Card.Footer>
 </Card.Root>

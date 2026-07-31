@@ -25,25 +25,23 @@
 </script>
 
 <svelte:head>
-  <title>{!isAdminAccountCreated ? "Create Admin Account" : "Sign In"}</title>
+  <title>{!isAdminAccountCreated ? "创建管理员账户" : "登录"}</title>
 </svelte:head>
 <div class="flex min-h-screen items-center justify-center p-4">
   <Card.Root class="kener-card w-full max-w-md">
     <Card.Header>
-      <Card.Title>{!isAdminAccountCreated ? "Create Admin Account" : "Sign In"}</Card.Title>
+      <Card.Title>{!isAdminAccountCreated ? "创建管理员账户" : "登录"}</Card.Title>
       <Card.Description>
-        {!isAdminAccountCreated
-          ? "Set up your admin account to get started"
-          : "Enter your credentials to access the dashboard"}
+        {!isAdminAccountCreated ? "创建管理员账户以开始使用" : "输入账户信息以进入管理后台"}
       </Card.Description>
     </Card.Header>
     <Card.Content>
       {#if !isSetupComplete}
         <Alert.Root variant="destructive">
           <AlertCircleIcon />
-          <Alert.Title>Set up not completed.</Alert.Title>
+          <Alert.Title>初始化尚未完成。</Alert.Title>
           <Alert.Description>
-            <p>Please make sure to set the below environment variables:</p>
+            <p>请确认已设置以下环境变量：</p>
             <ul class="list-inside list-disc text-sm">
               <li>KENER_SECRET_KEY</li>
               <li>ORIGIN</li>
@@ -55,7 +53,7 @@
               class="text-destructive w-full justify-start underline"
               href="https://kener.ing/docs/v4/setup/environment-variables"
             >
-              Go to docs
+              查看文档
             </Button>
           </Alert.Description>
         </Alert.Root>
@@ -70,7 +68,7 @@
           {#if form?.error}
             <Alert.Root variant="destructive" class="mb-4">
               <AlertCircleIcon />
-              <Alert.Title>{!isAdminAccountCreated ? "Signup failed" : "Login failed"}</Alert.Title>
+              <Alert.Title>{!isAdminAccountCreated ? "注册失败" : "登录失败"}</Alert.Title>
               <Alert.Description>{form.error}</Alert.Description>
             </Alert.Root>
           {/if}
@@ -78,7 +76,7 @@
           <Field.Group>
             {#if !isAdminAccountCreated}
               <Field.Field>
-                <Field.Label for="name">Name</Field.Label>
+                <Field.Label for="name">姓名</Field.Label>
                 <InputGroup.Root>
                   <InputGroup.Addon>
                     <UserIcon />
@@ -87,7 +85,7 @@
                     id="name"
                     name="name"
                     type="text"
-                    placeholder="Your name"
+                    placeholder="你的姓名"
                     value={nameValue}
                     required
                   />
@@ -96,7 +94,7 @@
             {/if}
 
             <Field.Field class="relative flex flex-col gap-1">
-              <Field.Label for="email">Email</Field.Label>
+              <Field.Label for="email">邮箱</Field.Label>
               <InputGroup.Root>
                 <InputGroup.Addon>
                   <MailIcon />
@@ -114,14 +112,14 @@
 
             <Field.Field class="relative flex flex-col gap-1">
               <Field.Label for="password" class="relative">
-                Password
+                密码
                 <Button
                   variant="link"
                   size="sm"
                   class="text-muted-foreground absolute top-0 right-0 h-auto p-0 text-xs"
                   href="/account/forgot"
                 >
-                  Forgot?
+                  忘记密码？
                 </Button>
               </Field.Label>
               <InputGroup.Root>
@@ -139,8 +137,8 @@
                 <InputGroup.Addon align="inline-end">
                   <InputGroup.Button
                     type="button"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                    title={showPassword ? "Hide password" : "Show password"}
+                    aria-label={showPassword ? "隐藏密码" : "显示密码"}
+                    title={showPassword ? "隐藏密码" : "显示密码"}
                     size="icon-xs"
                     onclick={() => (showPassword = !showPassword)}
                   >
@@ -154,7 +152,7 @@
               </InputGroup.Root>
               {#if !isAdminAccountCreated}
                 <Field.Description>
-                  Password must contain at least 8 characters, one uppercase, one lowercase, and one number.
+                  密码至少需要 8 个字符，并包含一个大写字母、一个小写字母和一个数字。
                 </Field.Description>
               {/if}
             </Field.Field>
@@ -163,9 +161,9 @@
           <div class="mt-6">
             <Button type="submit" class="w-full" disabled={loading}>
               {#if loading}
-                {!isAdminAccountCreated ? "Creating Account..." : "Signing In..."}
+                {!isAdminAccountCreated ? "正在创建账户……" : "正在登录……"}
               {:else}
-                {!isAdminAccountCreated ? "Create Account" : "Sign In"}
+                {!isAdminAccountCreated ? "创建账户" : "登录"}
               {/if}
             </Button>
           </div>

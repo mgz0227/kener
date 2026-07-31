@@ -29,6 +29,7 @@
   import { goto } from "$app/navigation";
   import { toast } from "svelte-sonner";
   import { format, formatDistanceToNow, isPast, isFuture, isWithinInterval, addDays } from "date-fns";
+  import { zhCN } from "date-fns/locale";
   import { rrulestr } from "rrule";
   import { resolve } from "$app/paths";
   import clientResolver from "$lib/client/resolver.js";
@@ -87,12 +88,12 @@
 
   // Sample RRULE patterns
   const sampleRrules = [
-    { label: "Every Sunday", value: "FREQ=WEEKLY;BYDAY=SU" },
-    { label: "Every Day", value: "FREQ=DAILY" },
-    { label: "Weekdays", value: "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR" },
-    { label: "Every Monday", value: "FREQ=WEEKLY;BYDAY=MO" },
-    { label: "Bi-weekly Monday", value: "FREQ=WEEKLY;INTERVAL=2;BYDAY=MO" },
-    { label: "First of Month", value: "FREQ=MONTHLY;BYMONTHDAY=1" }
+    { label: "每周日", value: "FREQ=WEEKLY;BYDAY=SU" },
+    { label: "每天", value: "FREQ=DAILY" },
+    { label: "工作日", value: "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR" },
+    { label: "每周一", value: "FREQ=WEEKLY;BYDAY=MO" },
+    { label: "每两周的周一", value: "FREQ=WEEKLY;INTERVAL=2;BYDAY=MO" },
+    { label: "每月第一天", value: "FREQ=MONTHLY;BYMONTHDAY=1" }
   ];
 
   // Monitor selection
@@ -103,6 +104,12 @@
   }
   let availableMonitors = $state<MonitorRecord[]>([]);
   let selectedMonitors = $state<SelectedMonitor[]>([]);
+  const monitorStatusLabels: Record<MonitorStatus, string> = {
+    UP: "正常",
+    DOWN: "中断",
+    DEGRADED: "性能下降",
+    MAINTENANCE: "维护中"
+  };
 
   // Derived for backward compatibility
   const selectedMonitorTags = $derived(selectedMonitors.map((m) => m.tag));
@@ -130,19 +137,19 @@
   const eventStatusDialogCopy = $derived.by(() => {
     if (pendingEventStatusUpdate?.status === "COMPLETED") {
       return {
-        title: "Complete Maintenance Event",
-        description: "This will mark the event as completed and set its end time to the current time.",
-        confirmLabel: "Complete Event",
-        cancelLabel: "Keep Ongoing",
+        title: "完成维护事件",
+        description: "这会将事件标记为已完成，并将结束时间设为当前时间。",
+        confirmLabel: "完成事件",
+        cancelLabel: "保持进行中",
         confirmVariant: "default" as const
       };
     }
 
     return {
-      title: "Cancel Maintenance Event",
-      description: "This will mark the event as cancelled and remove it from active scheduling.",
-      confirmLabel: "Cancel Event",
-      cancelLabel: "Keep Scheduled",
+      title: "取消维护事件",
+      description: "这会将事件标记为已取消，并从有效计划中移除。",
+      confirmLabel: "取消事件",
+      cancelLabel: "保留计划",
       confirmVariant: "destructive" as const
     };
   });
@@ -196,7 +203,7 @@
       const now = new Date();
       const windowEnd = addDays(now, 30);
       const occurrences = rule.between(now, windowEnd, true).slice(0, 5);
-      return occurrences.map((d) => format(d, "EEE, MMM d, yyyy 'at' h:mm a"));
+      return occurrences.map((d) => format(d, "yyyy-MM-dd HH:mm"));
     } catch (e) {
       return [];
     }
@@ -214,7 +221,7 @@
       rrulestr(fullRrule);
       return null;
     } catch (e) {
-      return "Invalid RRULE format";
+      return "RRULE 格式无效";
     }
   }
 
@@ -291,10 +298,10 @@
 
         events = result.events || [];
       } else {
-        error = "Maintenance not found";
+        error = "未找到维护计划";
       }
     } catch (e) {
-      error = e instanceof Error ? e.message : "Failed to fetch maintenance";
+      error = e instanceof Error ? e.message : "获取维护计划失败";
     } finally {
       loading = false;
     }
@@ -367,7 +374,7 @@
         if (result.error) {
           toast.error(result.error);
         } else {
-          toast.success("Maintenance created successfully");
+          toast.success("维护计划创建成功");
           goto(clientResolver(resolve, `/manage/app/maintenances/${result.maintenance_id}`));
         }
       } else {
@@ -392,11 +399,11 @@
         if (result.error) {
           toast.error(result.error);
         } else {
-          toast.success("Maintenance updated successfully");
+          toast.success("维护计划更新成功");
         }
       }
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to save");
+      toast.error(e instanceof Error ? e.message : "保存失败");
     } finally {
       saving = false;
     }
@@ -404,7 +411,7 @@
 
   // Delete maintenance
   async function deleteMaintenance() {
-    if (!confirm("Are you sure you want to delete this maintenance? All events will also be deleted.")) return;
+    if (!confirm("确定要删除此维护计划吗？所有事件也将被删除。")) return;
 
     try {
       const response = await fetch(clientResolver(resolve, "/manage/api"), {
@@ -416,17 +423,17 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Maintenance deleted");
+        toast.success("维护计划已删除");
         goto(clientResolver(resolve, "/manage/app/maintenances"));
       }
     } catch {
-      toast.error("Failed to delete maintenance");
+      toast.error("删除维护计划失败");
     }
   }
 
   // Delete event
   async function deleteEvent(eventId: number) {
-    if (!confirm("Are you sure you want to delete this event?")) return;
+    if (!confirm("确定要删除此事件吗？")) return;
 
     try {
       const response = await fetch(clientResolver(resolve, "/manage/api"), {
@@ -438,11 +445,11 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Event deleted");
+        toast.success("事件已删除");
         await fetchEvents();
       }
     } catch {
-      toast.error("Failed to delete event");
+      toast.error("删除事件失败");
     }
   }
 
@@ -460,12 +467,12 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success(status === "COMPLETED" ? "Event completed" : "Event cancelled");
+        toast.success(status === "COMPLETED" ? "事件已完成" : "事件已取消");
         await fetchEvents();
         closeEventStatusDialog();
       }
     } catch {
-      toast.error("Failed to update event status");
+      toast.error("更新事件状态失败");
     } finally {
       updatingEventStatus = false;
     }
@@ -487,14 +494,14 @@
     // Terminal statuses no longer follow time — the stored status wins
     if (event.status === "CANCELLED") {
       return {
-        label: "Cancelled",
+        label: "已取消",
         variant: "destructive",
         icon: "x"
       };
     }
     if (event.status === "COMPLETED") {
       return {
-        label: "Completed",
+        label: "已完成",
         variant: "secondary",
         icon: "check"
       };
@@ -507,7 +514,7 @@
     // Check if currently ongoing
     if (isWithinInterval(now, { start: startDate, end: endDate })) {
       return {
-        label: "Ongoing",
+        label: "进行中",
         variant: "default",
         icon: "play"
       };
@@ -515,9 +522,9 @@
 
     // Check if in the future (upcoming)
     if (isFuture(startDate)) {
-      const distance = formatDistanceToNow(startDate, { addSuffix: false });
+      const distance = formatDistanceToNow(startDate, { addSuffix: false, locale: zhCN });
       return {
-        label: `Upcoming • starts in ${distance}`,
+        label: `即将开始：${distance}后`,
         variant: "outline",
         icon: "clock"
       };
@@ -526,7 +533,7 @@
     // If in the past (completed)
     if (isPast(endDate)) {
       return {
-        label: "Completed",
+        label: "已完成",
         variant: "secondary",
         icon: "check"
       };
@@ -534,7 +541,7 @@
 
     // Fallback
     return {
-      label: "Scheduled",
+      label: "已计划",
       variant: "outline",
       icon: "clock"
     };
@@ -573,11 +580,11 @@
     <Breadcrumb.Root>
       <Breadcrumb.List>
         <Breadcrumb.Item>
-          <Breadcrumb.Link href={clientResolver(resolve, "/manage/app/maintenances")}>Maintenances</Breadcrumb.Link>
+          <Breadcrumb.Link href={clientResolver(resolve, "/manage/app/maintenances")}>维护计划</Breadcrumb.Link>
         </Breadcrumb.Item>
         <Breadcrumb.Separator />
         <Breadcrumb.Item>
-          <Breadcrumb.Page>{isNew ? "New Maintenance" : `Edit #${params.id}`}</Breadcrumb.Page>
+          <Breadcrumb.Page>{isNew ? "新建维护" : `编辑 #${params.id}`}</Breadcrumb.Page>
         </Breadcrumb.Item>
       </Breadcrumb.List>
     </Breadcrumb.Root>
@@ -590,7 +597,7 @@
           class="mr-2"
           href={clientResolver(resolve, `/maintenances/${maintenance.id}?type=maintenance`)}
         >
-          View
+          查看
         </Button>
       {/if}
     </div>
@@ -613,32 +620,32 @@
     <!-- Main Details Card -->
     <Card.Root>
       <Card.Header>
-        <Card.Title>{isNew ? "Create New Maintenance" : "Maintenance Details"}</Card.Title>
+        <Card.Title>{isNew ? "创建新维护" : "维护详情"}</Card.Title>
         <Card.Description>
           {#if isNew}
-            Schedule a new maintenance window using iCalendar RRULE format
+            使用 iCalendar RRULE 格式安排新的维护时段
           {:else}
-            Edit maintenance details
+            编辑维护详情
           {/if}
         </Card.Description>
       </Card.Header>
       <Card.Content class="space-y-6">
         <!-- Schedule Type Selection -->
         <div class="flex flex-col gap-3">
-          <Label>Schedule Type <span class="text-destructive">*</span></Label>
+          <Label>计划类型 <span class="text-destructive">*</span></Label>
           <RadioGroup.Root bind:value={scheduleType} class="flex gap-6">
             <div class="flex items-center gap-2">
               <RadioGroup.Item value="ONE_TIME" id="type-onetime" />
               <Label for="type-onetime" class="flex cursor-pointer items-center gap-2 font-normal">
                 <CalendarIcon class="size-4" />
-                One-Time
+                单次
               </Label>
             </div>
             <div class="flex items-center gap-2">
               <RadioGroup.Item value="RECURRING" id="type-recurring" />
               <Label for="type-recurring" class="flex cursor-pointer items-center gap-2 font-normal">
                 <RepeatIcon class="size-4" />
-                Recurring
+                重复
               </Label>
             </div>
           </RadioGroup.Root>
@@ -646,28 +653,21 @@
 
         <!-- Title -->
         <div class="flex flex-col gap-2">
-          <Label for="title">Title <span class="text-destructive">*</span></Label>
-          <Input id="title" bind:value={maintenance.title} placeholder="Scheduled maintenance window" />
+          <Label for="title">标题 <span class="text-destructive">*</span></Label>
+          <Input id="title" bind:value={maintenance.title} placeholder="计划维护时段" />
         </div>
 
         <!-- Description -->
         <div class="flex flex-col gap-2">
-          <Label for="description">Description</Label>
-          <Textarea
-            id="description"
-            bind:value={maintenance.description}
-            placeholder="Details about the maintenance..."
-            rows={3}
-          />
+          <Label for="description">描述</Label>
+          <Textarea id="description" bind:value={maintenance.description} placeholder="维护详情..." rows={3} />
         </div>
 
         <!-- Global Visibility -->
         <div class="flex items-center justify-between rounded-md border p-3">
           <div class="flex flex-col gap-1">
-            <Label for="is-global">Global Maintenance</Label>
-            <p class="text-muted-foreground text-xs">
-              When enabled, this maintenance will be visible on all status pages
-            </p>
+            <Label for="is-global">全局维护</Label>
+            <p class="text-muted-foreground text-xs">启用后，此维护计划将在所有状态页上显示</p>
           </div>
           <Switch
             id="is-global"
@@ -681,32 +681,30 @@
         <!-- Start Date/Time -->
         <div class="flex flex-col gap-2">
           <Label for="start-time">
-            {scheduleType === "ONE_TIME" ? "Start Date/Time" : "First Occurrence Date/Time"}
+            {scheduleType === "ONE_TIME" ? "开始日期/时间" : "首次发生日期/时间"}
             <span class="text-destructive">*</span>
           </Label>
           <Input id="start-time" type="datetime-local" bind:value={startDateTimeLocal} />
           {#if scheduleType === "RECURRING"}
-            <p class="text-muted-foreground text-xs">
-              Recurring maintenances will occur at this same time of day. The date pattern is configured below.
-            </p>
+            <p class="text-muted-foreground text-xs">重复维护将在每天的相同时间发生，日期规则在下方配置。</p>
           {/if}
         </div>
 
         <!-- Duration -->
         <div class="flex flex-col gap-2">
-          <Label>Duration <span class="text-destructive">*</span></Label>
+          <Label>持续时间 <span class="text-destructive">*</span></Label>
           <div class="flex items-center gap-2">
             <div class="flex items-center gap-1">
               <Input type="number" min={0} max={72} class="w-20" bind:value={durationHours} />
-              <span class="text-muted-foreground text-sm">hours</span>
+              <span class="text-muted-foreground text-sm">小时</span>
             </div>
             <div class="flex items-center gap-1">
               <Input type="number" min={0} max={59} class="w-20" bind:value={durationMinutes} />
-              <span class="text-muted-foreground text-sm">minutes</span>
+              <span class="text-muted-foreground text-sm">分钟</span>
             </div>
           </div>
           <p class="text-muted-foreground text-xs">
-            Total: {calculatedDurationSeconds} seconds ({Math.floor(calculatedDurationSeconds / 60)} minutes)
+            总计：{calculatedDurationSeconds} 秒（{Math.floor(calculatedDurationSeconds / 60)} 分钟）
           </p>
         </div>
 
@@ -715,18 +713,16 @@
           <Card.Header class="pb-3">
             <Card.Title class="flex items-center gap-2 text-base">
               <InfoIcon class="size-4" />
-              {scheduleType === "ONE_TIME" ? "Schedule Pattern" : "Recurrence Pattern (RRULE)"}
+              {scheduleType === "ONE_TIME" ? "计划规则" : "重复规则（RRULE）"}
             </Card.Title>
           </Card.Header>
           <Card.Content class="space-y-4">
             {#if scheduleType === "ONE_TIME"}
               <!-- One-time: Show readonly RRULE -->
               <div class="flex flex-col gap-2">
-                <Label class="text-muted-foreground text-xs">iCalendar RRULE (auto-generated)</Label>
+                <Label class="text-muted-foreground text-xs">iCalendar RRULE（自动生成）</Label>
                 <Input value="FREQ=MINUTELY;COUNT=1" disabled class="bg-muted font-mono text-sm" />
-                <p class="text-muted-foreground text-xs">
-                  One-time maintenance uses a fixed RRULE that triggers only once.
-                </p>
+                <p class="text-muted-foreground text-xs">单次维护使用只触发一次的固定 RRULE。</p>
               </div>
             {:else}
               <!-- Recurring: Editable RRULE -->
@@ -746,7 +742,7 @@
               <!-- Sample Patterns -->
               {#if isNew}
                 <div class="flex flex-col gap-2">
-                  <Label class="text-muted-foreground text-xs">Quick Patterns:</Label>
+                  <Label class="text-muted-foreground text-xs">快捷规则：</Label>
                   <div class="flex flex-wrap gap-2">
                     {#each sampleRrules as sample (sample.value)}
                       <Button
@@ -764,7 +760,7 @@
               <!-- Preview Dates -->
               {#if previewDates.length > 0}
                 <div class="bg-background rounded-md border p-3">
-                  <Label class="text-muted-foreground text-xs">Upcoming Occurrences:</Label>
+                  <Label class="text-muted-foreground text-xs">即将发生：</Label>
                   <ul class="mt-2 space-y-1 text-sm">
                     {#each previewDates as date (date)}
                       <li class="flex items-center gap-2">
@@ -781,11 +777,11 @@
 
         <!-- Monitor Selection -->
         <div class="flex flex-col gap-3">
-          <Label>Affected Monitors</Label>
+          <Label>受影响的监控器</Label>
 
           <!-- Available monitors to add -->
           <div class="rounded-md border p-3">
-            <Label class="text-muted-foreground mb-2 block text-xs">Select monitors to add:</Label>
+            <Label class="text-muted-foreground mb-2 block text-xs">选择要添加的监控器：</Label>
             <div class="grid max-h-32 grid-cols-2 gap-2 overflow-y-auto">
               {#each availableMonitors as monitor (monitor.tag)}
                 <div class="flex items-center gap-2">
@@ -800,7 +796,7 @@
                 </div>
               {/each}
               {#if availableMonitors.length === 0}
-                <p class="text-muted-foreground col-span-2 text-sm">No monitors available</p>
+                <p class="text-muted-foreground col-span-2 text-sm">暂无可用监控器</p>
               {/if}
             </div>
           </div>
@@ -808,7 +804,7 @@
           <!-- Selected monitors with status -->
           {#if selectedMonitors.length > 0}
             <div class="rounded-md border p-3">
-              <Label class="text-muted-foreground mb-2 block text-xs">Monitor status during maintenance:</Label>
+              <Label class="text-muted-foreground mb-2 block text-xs">维护期间的监控器状态：</Label>
               <div class="space-y-2">
                 {#each selectedMonitors as selectedMonitor, index (selectedMonitor.tag)}
                   {@const currentStatus = selectedMonitor.status}
@@ -825,13 +821,13 @@
                       }}
                     >
                       <Select.Trigger class="h-8 w-36 text-xs">
-                        {currentStatus}
+                        {monitorStatusLabels[currentStatus]}
                       </Select.Trigger>
                       <Select.Content>
-                        <Select.Item value="UP">UP</Select.Item>
-                        <Select.Item value="DOWN">DOWN</Select.Item>
-                        <Select.Item value="DEGRADED">DEGRADED</Select.Item>
-                        <Select.Item value="MAINTENANCE">MAINTENANCE</Select.Item>
+                        <Select.Item value="UP">正常</Select.Item>
+                        <Select.Item value="DOWN">中断</Select.Item>
+                        <Select.Item value="DEGRADED">性能下降</Select.Item>
+                        <Select.Item value="MAINTENANCE">维护中</Select.Item>
                       </Select.Content>
                     </Select.Root>
                   </div>
@@ -839,29 +835,27 @@
               </div>
             </div>
           {/if}
-          <p class="text-muted-foreground text-xs">
-            Select monitors and set their status during the maintenance window
-          </p>
+          <p class="text-muted-foreground text-xs">选择监控器并设置其在维护时段内的状态</p>
         </div>
 
         <!-- Status Toggle (only for existing) -->
         {#if !isNew}
           <div class="flex flex-col gap-2">
-            <Label>Status</Label>
+            <Label>状态</Label>
             <div class="flex gap-2">
               <Button
                 variant={maintenance.status === "ACTIVE" ? "default" : "outline"}
                 size="sm"
                 onclick={() => (maintenance.status = "ACTIVE")}
               >
-                Active
+                启用
               </Button>
               <Button
                 variant={maintenance.status === "INACTIVE" ? "default" : "outline"}
                 size="sm"
                 onclick={() => (maintenance.status = "INACTIVE")}
               >
-                Inactive
+                停用
               </Button>
             </div>
           </div>
@@ -871,7 +865,7 @@
         {#if !isNew}
           <Button variant="destructive" onclick={deleteMaintenance}>
             <TrashIcon class="size-4" />
-            Delete
+            删除
           </Button>
         {/if}
         <Button onclick={saveMaintenance} disabled={saving || !isValid}>
@@ -880,7 +874,7 @@
           {:else}
             <SaveIcon class="size-4" />
           {/if}
-          {isNew ? "Create Maintenance" : "Save Changes"}
+          {isNew ? "创建维护" : "保存更改"}
         </Button>
       </Card.Footer>
     </Card.Root>
@@ -890,8 +884,8 @@
       <Card.Root>
         <Card.Header>
           <div>
-            <Card.Title>Maintenance Events</Card.Title>
-            <Card.Description>Pre-generated maintenance windows for the next 7 days</Card.Description>
+            <Card.Title>维护事件</Card.Title>
+            <Card.Description>预先生成未来 7 天的维护时段</Card.Description>
           </div>
         </Card.Header>
         <Card.Content>
@@ -901,7 +895,7 @@
             </div>
           {:else if events.length === 0}
             <p class="text-muted-foreground py-4 text-center text-sm">
-              No events scheduled. Events are generated automatically when maintenance is created or updated.
+              暂无计划事件。创建或更新维护计划时会自动生成事件。
             </p>
           {:else}
             <div class="space-y-3">
@@ -925,9 +919,9 @@
                         <Badge variant={displayStatus.variant}>{displayStatus.label}</Badge>
                       </div>
                       <p class="text-muted-foreground text-sm">
-                        {format(new Date(event.start_date_time * 1000), "MMM d, yyyy HH:mm")}
+                        {format(new Date(event.start_date_time * 1000), "yyyy-MM-dd HH:mm")}
                         →
-                        {format(new Date(event.end_date_time * 1000), "MMM d, yyyy HH:mm")}
+                        {format(new Date(event.end_date_time * 1000), "yyyy-MM-dd HH:mm")}
                       </p>
                     </div>
                   </div>
@@ -935,13 +929,13 @@
                     {#if event.status === "ONGOING"}
                       <Button variant="outline" size="sm" onclick={() => openEventStatusDialog(event.id, "COMPLETED")}>
                         <CheckCircleIcon class="size-4" />
-                        Complete
+                        完成
                       </Button>
                     {/if}
                     {#if event.status === "SCHEDULED" || event.status === "READY" || event.status === "ONGOING"}
                       <Button variant="outline" size="sm" onclick={() => openEventStatusDialog(event.id, "CANCELLED")}>
                         <XCircleIcon class="size-4" />
-                        Cancel
+                        取消
                       </Button>
                     {/if}
                     <Button variant="ghost" size="icon" onclick={() => deleteEvent(event.id)}>

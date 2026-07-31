@@ -89,10 +89,10 @@
       });
       const result = await res.json();
       if (result.error) throw new Error(result.error);
-      toast.success("RSS feed preference saved");
+      toast.success("RSS 订阅源设置已保存");
     } catch {
       subMenuOptions.showRssFeed = previous;
-      toast.error("Failed to save RSS feed preference");
+      toast.error("保存 RSS 订阅源设置失败");
     } finally {
       savingRssToggle = false;
     }
@@ -144,7 +144,7 @@
       });
       config = await res.json();
     } catch (error) {
-      toast.error("Failed to load configuration");
+      toast.error("加载配置失败");
     } finally {
       loadingConfig = false;
     }
@@ -162,9 +162,9 @@
           data: config
         })
       });
-      toast.success("Configuration saved");
+      toast.success("配置已保存");
     } catch (error) {
-      toast.error("Failed to save configuration");
+      toast.error("保存配置失败");
     } finally {
       savingConfig = false;
     }
@@ -189,7 +189,7 @@
         totalPages = result.totalPages || 0;
       }
     } catch (error) {
-      toast.error("Failed to load subscribers");
+      toast.error("加载订阅者失败");
     } finally {
       loadingSubscribers = false;
     }
@@ -231,7 +231,7 @@
         }
       }
     } catch (error) {
-      toast.error("Failed to update subscription");
+      toast.error("更新订阅失败");
       // Revert
       if (eventType === "incidents") {
         subscriber.incidents_enabled = !enabled;
@@ -246,7 +246,7 @@
   // Add subscriber
   async function addSubscriber() {
     if (!newEmail.trim()) {
-      addError = "Email is required";
+      addError = "电子邮箱为必填项";
       return;
     }
 
@@ -272,11 +272,11 @@
       } else {
         showAddDialog = false;
         resetAddForm();
-        toast.success("Subscriber added successfully");
+        toast.success("订阅者添加成功");
         await fetchSubscribers();
       }
     } catch (error) {
-      addError = "Failed to add subscriber";
+      addError = "添加订阅者失败";
     } finally {
       addingSubscriber = false;
     }
@@ -309,11 +309,11 @@
       } else {
         showDeleteDialog = false;
         deletingSubscriber = null;
-        toast.success("Subscriber deleted");
+        toast.success("订阅者已删除");
         await fetchSubscribers();
       }
     } catch (error) {
-      toast.error("Failed to delete subscriber");
+      toast.error("删除订阅者失败");
     } finally {
       isDeleting = false;
     }
@@ -346,21 +346,21 @@
     <Card.Header>
       <Card.Title class="flex items-center gap-2">
         <Bell class="h-5 w-5" />
-        Subscriptions Settings
+        订阅设置
       </Card.Title>
-      <Card.Description>Configure subscription options for your status page</Card.Description>
+      <Card.Description>配置状态页的订阅选项</Card.Description>
     </Card.Header>
     <Card.Content class="space-y-4">
       {#if pageData.data.canSendEmail === false}
         <Alert.Root variant="destructive">
           <AlertCircleIcon />
-          <Alert.Title>Email is not setup</Alert.Title>
+          <Alert.Title>电子邮件尚未配置</Alert.Title>
           <Alert.Description>
             <p>
-              Please visit the email set up documentation <a
+              请查看电子邮件设置文档，点击<a
                 class="underline"
-                href={clientResolver(resolve, "https://kener.ing/docs/v4/setup/email-setup")}>here</a
-              >.
+                href={clientResolver(resolve, "https://kener.ing/docs/v4/setup/email-setup")}>这里</a
+              >。
             </p>
           </Alert.Description>
         </Alert.Root>
@@ -372,7 +372,7 @@
       {:else}
         <div class="space-y-6">
           <div class="flex items-center justify-between">
-            <Label for="enable-subscriptions" class="mb-0">Enable Subscriptions</Label>
+            <Label for="enable-subscriptions" class="mb-0">启用订阅</Label>
             <Switch
               id="enable-subscriptions"
               checked={config.enable}
@@ -389,13 +389,13 @@
             <div class="space-y-4 border-l-2 pl-4">
               <p class="flex items-center gap-2 text-sm font-semibold">
                 <Mail class="h-4 w-4" />
-                Email Notifications
+                电子邮件通知
               </p>
               <div class="space-y-4 pl-4">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
                     <AlertTriangle class="h-4 w-4 text-orange-500" />
-                    <Label for="enable-email-incidents" class="mb-0">Incident Updates</Label>
+                    <Label for="enable-email-incidents" class="mb-0">事件更新</Label>
                   </div>
                   <Switch
                     id="enable-email-incidents"
@@ -409,7 +409,7 @@
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
                     <Wrench class="h-4 w-4 text-blue-500" />
-                    <Label for="enable-email-maintenances" class="mb-0">Maintenance Updates</Label>
+                    <Label for="enable-email-maintenances" class="mb-0">维护更新</Label>
                   </div>
                   <Switch
                     id="enable-email-maintenances"
@@ -430,15 +430,15 @@
           <div class="space-y-4 border-l-2 pl-4">
             <p class="flex items-center gap-2 text-sm font-semibold">
               <Rss class="h-4 w-4" />
-              RSS Feed
+              RSS 订阅源
             </p>
             <div class="space-y-4 pl-4">
               <div class="flex items-center justify-between">
                 <div class="space-y-0.5">
-                  <Label for="enable-rss-feed" class="mb-0">Show RSS feed link</Label>
+                  <Label for="enable-rss-feed" class="mb-0">显示 RSS 订阅源链接</Label>
                   <p class="text-muted-foreground text-xs">
-                    Adds an RSS icon to the public page header. The feed routes
-                    (<code class="text-xs">/rss.xml</code>) remain reachable either way.
+                    在公开页面页眉中添加 RSS 图标。无论是否启用，订阅源路由 (<code class="text-xs">/rss.xml</code>)
+                    均可访问。
                   </p>
                 </div>
                 <Switch
@@ -460,8 +460,8 @@
     <Card.Header>
       <div class="flex items-center justify-between">
         <div>
-          <Card.Title>Subscribers</Card.Title>
-          <Card.Description>Manage email subscribers for notifications</Card.Description>
+          <Card.Title>订阅者</Card.Title>
+          <Card.Description>管理接收通知的电子邮件订阅者</Card.Description>
         </div>
         <div class="flex items-center gap-2">
           {#if loadingSubscribers}
@@ -469,7 +469,7 @@
           {/if}
           <Button onclick={() => (showAddDialog = true)}>
             <PlusIcon class="h-4 w-4" />
-            Add Subscriber
+            添加订阅者
           </Button>
         </div>
       </div>
@@ -479,21 +479,21 @@
         <Table.Root>
           <Table.Header>
             <Table.Row>
-              <Table.Head>Email</Table.Head>
+              <Table.Head>电子邮箱</Table.Head>
               <Table.Head class="text-center">
                 <div class="flex items-center justify-center gap-1">
                   <AlertTriangle class="h-4 w-4 text-orange-500" />
-                  Incidents
+                  事件
                 </div>
               </Table.Head>
               <Table.Head class="text-center">
                 <div class="flex items-center justify-center gap-1">
                   <Wrench class="h-4 w-4 text-blue-500" />
-                  Maintenances
+                  维护
                 </div>
               </Table.Head>
-              <Table.Head>Subscribed At</Table.Head>
-              <Table.Head class="w-20 text-center">Actions</Table.Head>
+              <Table.Head>订阅时间</Table.Head>
+              <Table.Head class="w-20 text-center">操作</Table.Head>
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -502,14 +502,14 @@
                 <Table.Cell colspan={5} class="py-8 text-center">
                   <div class="flex items-center justify-center gap-2">
                     <Spinner class="size-4" />
-                    <span class="text-muted-foreground text-sm">Loading subscribers...</span>
+                    <span class="text-muted-foreground text-sm">正在加载订阅者...</span>
                   </div>
                 </Table.Cell>
               </Table.Row>
             {:else if subscribers.length === 0}
               <Table.Row>
                 <Table.Cell colspan={5} class="text-muted-foreground py-8 text-center">
-                  No subscribers yet. Add your first subscriber above.
+                  暂无订阅者，请在上方添加第一个订阅者。
                 </Table.Cell>
               </Table.Row>
             {:else}
@@ -531,7 +531,7 @@
                     />
                   </Table.Cell>
                   <Table.Cell>
-                    {format(new Date(subscriber.created_at), "MMM d, yyyy")}
+                    {format(new Date(subscriber.created_at), "yyyy-MM-dd")}
                   </Table.Cell>
                   <Table.Cell class="text-center">
                     <Button
@@ -555,7 +555,7 @@
         {@const startItem = (page - 1) * limit + 1}
         {@const endItem = Math.min(page * limit, total)}
         <div class="mt-4 flex items-center justify-between">
-          <span class="text-muted-foreground text-sm">Showing {startItem}-{endItem} of {total}</span>
+          <span class="text-muted-foreground text-sm">显示第 {startItem}-{endItem} 项，共 {total} 项</span>
           {#if totalPages > 1}
             <div class="flex items-center gap-2">
               <Button variant="outline" size="icon" disabled={page === 1} onclick={() => goToPage(page - 1)}>
@@ -591,12 +591,12 @@
 <Dialog.Root bind:open={showAddDialog}>
   <Dialog.Content class="sm:max-w-md">
     <Dialog.Header>
-      <Dialog.Title>Add Subscriber</Dialog.Title>
-      <Dialog.Description>Add a new email subscriber for notifications</Dialog.Description>
+      <Dialog.Title>添加订阅者</Dialog.Title>
+      <Dialog.Description>添加用于接收通知的电子邮件订阅者</Dialog.Description>
     </Dialog.Header>
     <div class="space-y-4 py-4">
       <div class="space-y-2">
-        <Label for="new-email">Email Address</Label>
+        <Label for="new-email">电子邮箱地址</Label>
         <Input
           id="new-email"
           type="email"
@@ -609,14 +609,14 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <AlertTriangle class="h-4 w-4 text-orange-500" />
-            <Label for="new-incidents" class="mb-0">Subscribe to Incidents</Label>
+            <Label for="new-incidents" class="mb-0">订阅事件</Label>
           </div>
           <Switch id="new-incidents" bind:checked={newIncidents} disabled={addingSubscriber} />
         </div>
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <Wrench class="h-4 w-4 text-blue-500" />
-            <Label for="new-maintenances" class="mb-0">Subscribe to Maintenances</Label>
+            <Label for="new-maintenances" class="mb-0">订阅维护</Label>
           </div>
           <Switch id="new-maintenances" bind:checked={newMaintenances} disabled={addingSubscriber} />
         </div>
@@ -636,14 +636,14 @@
         }}
         disabled={addingSubscriber}
       >
-        Cancel
+        取消
       </Button>
       <Button onclick={addSubscriber} disabled={addingSubscriber}>
         {#if addingSubscriber}
           <Spinner class="size-4" />
-          Adding...
+          添加中...
         {:else}
-          Add Subscriber
+          添加订阅者
         {/if}
       </Button>
     </Dialog.Footer>
@@ -654,15 +654,13 @@
 <Dialog.Root bind:open={showDeleteDialog}>
   <Dialog.Content class="sm:max-w-md">
     <Dialog.Header>
-      <Dialog.Title>Delete Subscriber</Dialog.Title>
-      <Dialog.Description>
-        Are you sure you want to delete this subscriber? This action cannot be undone.
-      </Dialog.Description>
+      <Dialog.Title>删除订阅者</Dialog.Title>
+      <Dialog.Description>确定要删除此订阅者吗？此操作无法撤销。</Dialog.Description>
     </Dialog.Header>
     {#if deletingSubscriber}
       <div class="py-4">
         <p class="text-sm">
-          <span class="text-muted-foreground">Email:</span>
+          <span class="text-muted-foreground">电子邮箱：</span>
           <span class="font-medium">{deletingSubscriber.email}</span>
         </p>
       </div>
@@ -676,14 +674,14 @@
         }}
         disabled={isDeleting}
       >
-        Cancel
+        取消
       </Button>
       <Button variant="destructive" onclick={deleteSubscriber} disabled={isDeleting}>
         {#if isDeleting}
           <Spinner class="size-4" />
-          Deleting...
+          删除中...
         {:else}
-          Delete
+          删除
         {/if}
       </Button>
     </Dialog.Footer>

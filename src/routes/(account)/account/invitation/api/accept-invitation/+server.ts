@@ -9,46 +9,46 @@ export const POST: RequestHandler = async ({ request }) => {
   const { receivedToken, newPassword } = body;
 
   if (!receivedToken) {
-    return json({ error: "Token is required" }, { status: 400 });
+    return json({ error: "令牌不能为空" }, { status: 400 });
   }
 
   if (!newPassword) {
-    return json({ error: "Password is required" }, { status: 400 });
+    return json({ error: "密码不能为空" }, { status: 400 });
   }
 
   // Verify token
   const tokenData = await VerifyToken(receivedToken);
   if (!tokenData) {
-    return json({ error: "Invalid or expired invitation link" }, { status: 400 });
+    return json({ error: "邀请链接无效或已过期" }, { status: 400 });
   }
 
   const email = tokenData.email;
   if (!email) {
-    return json({ error: "Invalid token data" }, { status: 400 });
+    return json({ error: "令牌数据无效" }, { status: 400 });
   }
 
   // Check token expiry
   const validTill = tokenData.validTill;
   if (!validTill || Date.now() > validTill) {
-    return json({ error: "This invitation link has expired" }, { status: 400 });
+    return json({ error: "此邀请链接已过期" }, { status: 400 });
   }
 
   // Check user exists with empty password
   const user = await db.getUserByEmail(email);
   if (!user) {
-    return json({ error: "User does not exist" }, { status: 401 });
+    return json({ error: "用户不存在" }, { status: 401 });
   }
 
   const passwordData = await GetUserPasswordHashById(user.id);
   if (passwordData && passwordData.password_hash !== "") {
-    return json({ error: "This invitation has already been accepted" }, { status: 400 });
+    return json({ error: "此邀请已接受" }, { status: 400 });
   }
 
   // Validate password strength
   if (!ValidatePassword(newPassword)) {
     return json(
       {
-        error: "Password must contain at least 8 characters, one uppercase letter, one lowercase letter and one number",
+        error: "密码至少需要 8 个字符，并包含一个大写字母、一个小写字母和一个数字",
       },
       { status: 400 },
     );

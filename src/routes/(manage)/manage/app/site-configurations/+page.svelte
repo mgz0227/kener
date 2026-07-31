@@ -251,7 +251,7 @@
         }
       }
     } catch (e) {
-      toast.error("Failed to load site data");
+      toast.error("加载站点数据失败");
     } finally {
       loading = false;
     }
@@ -278,10 +278,10 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Site information saved successfully");
+        toast.success("站点信息已保存");
       }
     } catch (e) {
-      toast.error("Failed to save site information");
+      toast.error("保存站点信息失败");
     } finally {
       savingSiteInfo = false;
     }
@@ -303,10 +303,10 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Logo saved successfully");
+        toast.success("徽标已保存");
       }
     } catch (e) {
-      toast.error("Failed to save logo");
+      toast.error("保存徽标失败");
     } finally {
       savingLogo = false;
     }
@@ -328,10 +328,10 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Favicon saved successfully");
+        toast.success("网站图标已保存");
       }
     } catch (e) {
-      toast.error("Failed to save favicon");
+      toast.error("保存网站图标失败");
     } finally {
       savingFavicon = false;
     }
@@ -357,10 +357,10 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Social preview & SEO settings saved successfully");
+        toast.success("社交预览和 SEO 设置已保存");
       }
     } catch (e) {
-      toast.error("Failed to save social preview & SEO settings");
+      toast.error("保存社交预览和 SEO 设置失败");
     } finally {
       savingSocialPreviewImage = false;
     }
@@ -386,10 +386,10 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Navigation saved successfully");
+        toast.success("导航设置已保存");
       }
     } catch (e) {
-      toast.error("Failed to save navigation");
+      toast.error("保存导航设置失败");
     } finally {
       savingNav = false;
     }
@@ -410,10 +410,10 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Sub menu options saved successfully");
+        toast.success("子菜单选项已保存");
       }
     } catch (e) {
-      toast.error("Failed to save sub menu options");
+      toast.error("保存子菜单选项失败");
     } finally {
       savingSubMenuOptions = false;
     }
@@ -440,10 +440,10 @@
         toast.error(result.error);
       } else {
         globalPageVisibilitySettings = payload;
-        toast.success("Global page visibility settings saved successfully");
+        toast.success("全局页面可见性设置已保存");
       }
     } catch (e) {
-      toast.error("Failed to save global page visibility settings");
+      toast.error("保存全局页面可见性设置失败");
     } finally {
       savingGlobalPageVisibilitySettings = false;
     }
@@ -471,10 +471,10 @@
         toast.error(result.error);
       } else {
         dataRetentionPolicy.retentionDays = safeRetentionDays;
-        toast.success("Data retention policy saved successfully");
+        toast.success("数据保留策略已保存");
       }
     } catch (e) {
-      toast.error("Failed to save data retention policy");
+      toast.error("保存数据保留策略失败");
     } finally {
       savingDataRetentionPolicy = false;
     }
@@ -496,10 +496,10 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Event display settings saved successfully");
+        toast.success("事件显示设置已保存");
       }
     } catch (e) {
-      toast.error("Failed to save event display settings");
+      toast.error("保存事件显示设置失败");
     } finally {
       savingEventDisplaySettings = false;
     }
@@ -577,10 +577,10 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Sitemap settings saved successfully");
+        toast.success("站点地图设置已保存");
       }
     } catch (e) {
-      toast.error("Failed to save sitemap settings");
+      toast.error("保存站点地图设置失败");
     } finally {
       savingSitemap = false;
     }
@@ -589,7 +589,7 @@
   async function saveMaintenanceNotificationSettings() {
     const bufferHours = Number(maintenanceNotificationSettings.reminder_buffer_hours);
     if (!Number.isFinite(bufferHours) || bufferHours < 1) {
-      toast.error("Reminder buffer hours must be a number of at least 1");
+      toast.error("提醒提前时间必须是不小于 1 的数字");
       return;
     }
     savingMaintenanceNotificationSettings = true;
@@ -617,10 +617,10 @@
         toast.error(result.error);
       } else {
         maintenanceNotificationSettings.reminder_buffer_hours = payload.reminder_buffer_hours;
-        toast.success("Maintenance notification settings saved successfully");
+        toast.success("维护通知设置已保存");
       }
     } catch (e) {
-      toast.error("Failed to save maintenance notification settings");
+      toast.error("保存维护通知设置失败");
     } finally {
       savingMaintenanceNotificationSettings = false;
     }
@@ -634,13 +634,13 @@
     // Validate file type
     const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
-      toast.error("Invalid file type. Allowed: PNG, JPG, SVG, WebP");
+      toast.error("文件类型无效，允许：PNG、JPG、WebP");
       return;
     }
 
     // Validate file size (max 2MB)
     if (file.size > GC.MAX_UPLOAD_BYTES) {
-      toast.error(`File too large. Maximum size is ${GC.MAX_UPLOAD_BYTES / (1024 * 1024)}MB`);
+      toast.error(`文件过大，最大为 ${GC.MAX_UPLOAD_BYTES / (1024 * 1024)}MB`);
       return;
     }
 
@@ -684,12 +684,10 @@
         } else {
           siteData.favicon = result.url;
         }
-        toast.success(
-          `${type === "logo" ? "Logo" : type === "favicon" ? "Favicon" : "Social preview image"} uploaded successfully`
-        );
+        toast.success(`${type === "logo" ? "徽标" : type === "favicon" ? "网站图标" : "社交预览图"}上传成功`);
       }
     } catch (e) {
-      toast.error(`Failed to upload ${type}`);
+      toast.error(`上传${type === "logo" ? "徽标" : type === "favicon" ? "网站图标" : "社交预览图"}失败`);
     } finally {
       if (type === "logo") {
         uploadingLogo = false;
@@ -709,7 +707,7 @@
     if (!file) return;
 
     if (file.size > 102400) {
-      toast.error("File size should be less than 100KB");
+      toast.error("文件大小应小于 100KB");
       return;
     }
 
@@ -738,7 +736,7 @@
         nav[index].iconURL = result.url;
       }
     } catch (e) {
-      toast.error("Failed to upload icon");
+      toast.error("上传图标失败");
     } finally {
       nav[index].uploading = false;
     }
@@ -793,35 +791,32 @@
     <!-- Site Information Card -->
     <Card.Root>
       <Card.Header>
-        <Card.Title>Site Information</Card.Title>
-        <Card.Description>Basic information about your status page</Card.Description>
+        <Card.Title>站点信息</Card.Title>
+        <Card.Description>状态页的基本信息</Card.Description>
       </Card.Header>
       <Card.Content class="space-y-4">
         <div class="grid gap-4 md:grid-cols-2">
           <!-- Site Name -->
           <div class="space-y-2">
-            <Label for="siteName">Site Name *</Label>
-            <Input id="siteName" type="text" bind:value={siteData.siteName} placeholder="My Status Page" />
-            <p class="text-muted-foreground text-xs">The name displayed in the header and browser tab</p>
+            <Label for="siteName">站点名称 *</Label>
+            <Input id="siteName" type="text" bind:value={siteData.siteName} placeholder="我的状态页" />
+            <p class="text-muted-foreground text-xs">显示在页头和浏览器标签页中的名称</p>
           </div>
 
           <!-- Site URL -->
           <div class="space-y-2">
-            <Label for="siteURL">Site URL *</Label>
+            <Label for="siteURL">站点 URL *</Label>
             <Input id="siteURL" type="url" bind:value={siteData.siteURL} placeholder="https://status.example.com" />
             {#if siteData.siteURL.trim().length > 0 && !isOriginOnlySiteURL}
-              <p class="text-destructive text-xs">
-                Invalid site URL. Please enter only protocol + domain (no path, query, or hash).
-              </p>
+              <p class="text-destructive text-xs">站点 URL 无效，请只输入协议和域名，不要包含路径、查询参数或锚点。</p>
             {/if}
             {#if siteData.siteURL.trim().length > 0 && isOriginOnlySiteURL && hasOriginMismatch}
               <p class="text-xs text-amber-600 dark:text-amber-400">
-                Warning: Entered origin ({enteredSiteOrigin}) does not match current origin ({currentOrigin}).
+                警告：输入的源（{enteredSiteOrigin}）与当前源（{currentOrigin}）不一致。
               </p>
             {/if}
             <p class="text-muted-foreground text-xs">
-              Effective URL: {(isOriginOnlySiteURL ? enteredSiteOrigin : siteData.siteURL) +
-                clientResolver(resolve, "/")}
+              实际 URL：{(isOriginOnlySiteURL ? enteredSiteOrigin : siteData.siteURL) + clientResolver(resolve, "/")}
             </p>
           </div>
         </div>
@@ -830,10 +825,10 @@
         <Button onclick={saveSiteInfo} disabled={savingSiteInfo || !isValidSiteInfo} class="cursor-pointer">
           {#if savingSiteInfo}
             <Loader class="h-4 w-4 animate-spin" />
-            Saving...
+            正在保存...
           {:else}
             <SaveIcon class="h-4 w-4" />
-            Save
+            保存
           {/if}
         </Button>
       </Card.Footer>
@@ -842,15 +837,19 @@
     <!-- Logo Card -->
     <Card.Root>
       <Card.Header>
-        <Card.Title>Logo</Card.Title>
-        <Card.Description>Upload your site logo (max 256x256px, PNG/JPG/SVG/WebP)</Card.Description>
+        <Card.Title>站点徽标</Card.Title>
+        <Card.Description>上传站点徽标（最大 256x256 像素，PNG/JPG/WebP）</Card.Description>
       </Card.Header>
       <Card.Content class="space-y-4">
         <div class="flex items-start gap-4">
           <!-- Preview -->
           <div class="bg-muted flex h-24 w-24 items-center justify-center rounded-lg border">
             {#if siteData.logo}
-              <img src={clientResolver(resolve, siteData.logo)} alt="Logo" class="max-h-20 max-w-20 object-contain" />
+              <img
+                src={clientResolver(resolve, siteData.logo)}
+                alt="站点徽标"
+                class="max-h-20 max-w-20 object-contain"
+              />
             {:else}
               <ImageIcon class="text-muted-foreground h-8 w-8" />
             {/if}
@@ -866,10 +865,10 @@
               >
                 {#if uploadingLogo}
                   <Loader class="h-4 w-4 animate-spin" />
-                  Uploading...
+                  正在上传...
                 {:else}
                   <UploadIcon class="h-4 w-4" />
-                  Upload Logo
+                  上传徽标
                 {/if}
               </Button>
               <input
@@ -896,10 +895,10 @@
         <Button onclick={saveLogo} disabled={savingLogo} class="cursor-pointer">
           {#if savingLogo}
             <Loader class="h-4 w-4 animate-spin" />
-            Saving...
+            正在保存...
           {:else}
             <SaveIcon class="h-4 w-4" />
-            Save
+            保存
           {/if}
         </Button>
       </Card.Footer>
@@ -908,8 +907,8 @@
     <!-- Favicon Card -->
     <Card.Root>
       <Card.Header>
-        <Card.Title>Favicon</Card.Title>
-        <Card.Description>Upload your site favicon (max 64x64px, PNG/JPG/SVG/WebP)</Card.Description>
+        <Card.Title>网站图标</Card.Title>
+        <Card.Description>上传网站图标（最大 64x64 像素，PNG/JPG/WebP）</Card.Description>
       </Card.Header>
       <Card.Content class="space-y-4">
         <div class="flex items-start gap-4">
@@ -918,7 +917,7 @@
             {#if siteData.favicon}
               <img
                 src={clientResolver(resolve, siteData.favicon)}
-                alt="Favicon"
+                alt="网站图标"
                 class="max-h-12 max-w-12 object-contain"
               />
             {:else}
@@ -936,10 +935,10 @@
               >
                 {#if uploadingFavicon}
                   <Loader class="h-4 w-4 animate-spin" />
-                  Uploading...
+                  正在上传...
                 {:else}
                   <UploadIcon class="h-4 w-4" />
-                  Upload Favicon
+                  上传网站图标
                 {/if}
               </Button>
               <input
@@ -966,10 +965,10 @@
         <Button onclick={saveFavicon} disabled={savingFavicon} class="cursor-pointer">
           {#if savingFavicon}
             <Loader class="h-4 w-4 animate-spin" />
-            Saving...
+            正在保存...
           {:else}
             <SaveIcon class="h-4 w-4" />
-            Save
+            保存
           {/if}
         </Button>
       </Card.Footer>
@@ -978,8 +977,8 @@
     <!-- Social Preview & SEO Card -->
     <Card.Root>
       <Card.Header>
-        <Card.Title>Social Preview & SEO</Card.Title>
-        <Card.Description>Configure social preview image and meta tags for search engines</Card.Description>
+        <Card.Title>社交预览和 SEO</Card.Title>
+        <Card.Description>配置社交预览图和搜索引擎元标签</Card.Description>
       </Card.Header>
       <Card.Content class="space-y-4">
         <div class="flex items-start gap-4">
@@ -988,7 +987,7 @@
             {#if siteData.socialPreviewImage}
               <img
                 src={clientResolver(resolve, siteData.socialPreviewImage)}
-                alt="Social preview"
+                alt="社交预览"
                 class="h-full w-full rounded-lg object-cover"
               />
             {:else}
@@ -1006,10 +1005,10 @@
               >
                 {#if uploadingSocialPreviewImage}
                   <Loader class="h-4 w-4 animate-spin" />
-                  Uploading...
+                  正在上传...
                 {:else}
                   <UploadIcon class="h-4 w-4" />
-                  Upload Social Preview
+                  上传社交预览图
                 {/if}
               </Button>
               <input
@@ -1029,40 +1028,35 @@
             {#if siteData.socialPreviewImage}
               <p class="text-muted-foreground truncate text-xs">{siteData.socialPreviewImage}</p>
             {:else}
-              <p class="text-muted-foreground text-xs">Optional. Leave empty to use no social preview image.</p>
+              <p class="text-muted-foreground text-xs">可选，留空则不使用社交预览图。</p>
             {/if}
           </div>
         </div>
 
         <div class="space-y-2">
-          <Label for="metaSiteTitle">Meta Title</Label>
-          <Input
-            id="metaSiteTitle"
-            type="text"
-            bind:value={metaSiteTitle}
-            placeholder="Custom page title for search engines"
-          />
-          <p class="text-muted-foreground text-xs">Overrides the default page title in search results</p>
+          <Label for="metaSiteTitle">Meta 标题</Label>
+          <Input id="metaSiteTitle" type="text" bind:value={metaSiteTitle} placeholder="搜索引擎使用的自定义页面标题" />
+          <p class="text-muted-foreground text-xs">覆盖搜索结果中的默认页面标题</p>
         </div>
         <div class="space-y-2">
-          <Label for="metaSiteDescription">Meta Description</Label>
+          <Label for="metaSiteDescription">Meta 描述</Label>
           <Textarea
             id="metaSiteDescription"
             bind:value={metaSiteDescription}
-            placeholder="Custom description for search engines"
+            placeholder="搜索引擎使用的自定义描述"
             rows={3}
           />
-          <p class="text-muted-foreground text-xs">Shown as the snippet text in search engine results</p>
+          <p class="text-muted-foreground text-xs">作为搜索结果中的摘要文字显示</p>
         </div>
       </Card.Content>
       <Card.Footer class="flex justify-end">
         <Button onclick={saveSocialPreviewImage} disabled={savingSocialPreviewImage} class="cursor-pointer">
           {#if savingSocialPreviewImage}
             <Loader class="h-4 w-4 animate-spin" />
-            Saving...
+            正在保存...
           {:else}
             <SaveIcon class="h-4 w-4" />
-            Save
+            保存
           {/if}
         </Button>
       </Card.Footer>
@@ -1071,26 +1065,26 @@
     <!-- Navigation Menu Card -->
     <Card.Root>
       <Card.Header>
-        <Card.Title>Navigation Menu</Card.Title>
-        <Card.Description>Add custom navigation links to your status page header</Card.Description>
+        <Card.Title>导航菜单</Card.Title>
+        <Card.Description>将自定义导航链接添加到状态页页眉</Card.Description>
       </Card.Header>
       <Card.Content class="space-y-4">
         {#each nav as item, index (index)}
           <div class="flex items-end gap-2 rounded-lg border p-3">
             <div class="grid flex-1 gap-2 sm:grid-cols-3">
               <div class="space-y-1">
-                <Label for="nav-name-{index}">Name</Label>
-                <Input id="nav-name-{index}" type="text" bind:value={item.name} placeholder="Documentation" />
+                <Label for="nav-name-{index}">名称</Label>
+                <Input id="nav-name-{index}" type="text" bind:value={item.name} placeholder="文档" />
               </div>
               <div class="space-y-1">
                 <Label for="nav-url-{index}">URL</Label>
                 <Input id="nav-url-{index}" type="text" bind:value={item.url} placeholder="https://docs.example.com" />
               </div>
               <div class="space-y-1">
-                <Label for="nav-icon-{index}">Icon</Label>
+                <Label for="nav-icon-{index}">图标</Label>
                 <div class="flex items-center gap-2">
                   {#if item.iconURL}
-                    <img src={clientResolver(resolve, item.iconURL)} alt="Icon" class="h-6 w-6 object-contain" />
+                    <img src={clientResolver(resolve, item.iconURL)} alt="图标" class="h-6 w-6 object-contain" />
                     <Button variant="ghost" size="sm" onclick={() => (item.iconURL = "")}>
                       <XIcon class="h-4 w-4" />
                     </Button>
@@ -1125,17 +1119,17 @@
         {/each}
         <Button variant="outline" onclick={addNavItem}>
           <Plus class="h-4 w-4" />
-          Add Navigation Item
+          添加导航项
         </Button>
       </Card.Content>
       <Card.Footer class="flex justify-end">
         <Button onclick={saveNavigation} disabled={savingNav} class="cursor-pointer">
           {#if savingNav}
             <Loader class="h-4 w-4 animate-spin" />
-            Saving...
+            正在保存...
           {:else}
             <SaveIcon class="h-4 w-4" />
-            Save
+            保存
           {/if}
         </Button>
       </Card.Footer>
@@ -1144,31 +1138,29 @@
     <!-- Sub Menu Options Card -->
     <Card.Root>
       <Card.Header>
-        <Card.Title>Monitor Sub Menu Options</Card.Title>
-        <Card.Description>Configure which options appear in the monitor sub menu on the status page</Card.Description>
+        <Card.Title>监控器子菜单选项</Card.Title>
+        <Card.Description>配置状态页监控器子菜单中显示的选项</Card.Description>
       </Card.Header>
       <Card.Content class="space-y-6">
         <div class="flex items-center justify-between">
           <div class="space-y-0.5">
-            <Label>Share Badge</Label>
-            <p class="text-muted-foreground text-xs">
-              Show option to get embeddable status and uptime badges for the monitor
-            </p>
+            <Label>分享徽章</Label>
+            <p class="text-muted-foreground text-xs">显示获取可嵌入的监控器状态和可用率徽章的选项</p>
           </div>
           <Switch bind:checked={subMenuOptions.showShareBadgeMonitor} />
         </div>
         <div class="flex items-center justify-between">
           <div class="space-y-0.5">
-            <Label>Share Embed</Label>
-            <p class="text-muted-foreground text-xs">Show option to get iframe or script embed code for the monitor</p>
+            <Label>分享嵌入</Label>
+            <p class="text-muted-foreground text-xs">显示获取监控器 iframe 或 script 嵌入代码的选项</p>
           </div>
           <Switch bind:checked={subMenuOptions.showShareEmbedMonitor} />
         </div>
         <div class="flex items-center justify-between">
           <div class="space-y-0.5">
-            <Label>RSS Feed</Label>
+            <Label>RSS 订阅源</Label>
             <p class="text-muted-foreground text-xs">
-              Show an RSS feed link in the page header. The feed itself is always reachable at /rss.xml.
+              在页眉中显示 RSS 订阅源链接。订阅源本身始终可通过 /rss.xml 访问。
             </p>
           </div>
           <Switch bind:checked={subMenuOptions.showRssFeed} />
@@ -1178,10 +1170,10 @@
         <Button onclick={saveSubMenuOptions} disabled={savingSubMenuOptions} class="cursor-pointer">
           {#if savingSubMenuOptions}
             <Loader class="h-4 w-4 animate-spin" />
-            Saving...
+            正在保存...
           {:else}
             <SaveIcon class="h-4 w-4" />
-            Save
+            保存
           {/if}
         </Button>
       </Card.Footer>
@@ -1190,16 +1182,14 @@
     <!-- Global Page Visibility Settings Card -->
     <Card.Root>
       <Card.Header>
-        <Card.Title>Global Page Visibility Settings</Card.Title>
-        <Card.Description>
-          Configure page switcher visibility and global exclusivity behavior for page-linked content.
-        </Card.Description>
+        <Card.Title>全局页面可见性设置</Card.Title>
+        <Card.Description>配置页面切换器的可见性以及页面关联内容的全局独占行为。</Card.Description>
       </Card.Header>
       <Card.Content class="space-y-6">
         <div class="flex items-center justify-between">
           <div class="space-y-0.5">
-            <Label>Show page switcher</Label>
-            <p class="text-muted-foreground text-xs">This will hide the pages dropdown from the menu.</p>
+            <Label>显示页面切换器</Label>
+            <p class="text-muted-foreground text-xs">这会从菜单中隐藏页面下拉列表。</p>
           </div>
           <Switch
             bind:checked={globalPageVisibilitySettings.showSwitcher}
@@ -1209,11 +1199,10 @@
 
         <div class="flex items-center justify-between">
           <div class="space-y-0.5">
-            <Label>Force exclusivity</Label>
+            <Label>强制独占</Label>
             <p class="text-muted-foreground text-xs">
-              This sets <code>showSwitcher</code> to true and makes it read-only. It also enables brand icon link
-              overwrite and calendar event updates for affected monitors. Global events (incidents and maintenances with
-              <code>is_global=YES</code>) are still shown.
+              这会将 <code>showSwitcher</code> 设为 true
+              并设为只读。它还会覆盖品牌图标链接，并更新受影响监控器的日历事件。全局事件（<code>is_global=YES</code> 的事件和维护）仍会显示。
             </p>
           </div>
           <Switch checked={globalPageVisibilitySettings.forceExclusivity} onCheckedChange={onForceExclusivityChange} />
@@ -1227,10 +1216,10 @@
         >
           {#if savingGlobalPageVisibilitySettings}
             <Loader class="h-4 w-4 animate-spin" />
-            Saving...
+            正在保存...
           {:else}
             <SaveIcon class="h-4 w-4" />
-            Save
+            保存
           {/if}
         </Button>
       </Card.Footer>
@@ -1239,20 +1228,20 @@
     <!-- Data Retention Policy Card -->
     <Card.Root>
       <Card.Header>
-        <Card.Title>Data Retention Policy</Card.Title>
-        <Card.Description>Configure automatic cleanup for old monitor status data</Card.Description>
+        <Card.Title>数据保留策略</Card.Title>
+        <Card.Description>配置旧监控器状态数据的自动清理</Card.Description>
       </Card.Header>
       <Card.Content class="space-y-6">
         <div class="flex items-center justify-between">
           <div class="space-y-0.5">
-            <Label>Enable Data Retention</Label>
-            <p class="text-muted-foreground text-xs">Automatically remove status data older than retention days</p>
+            <Label>启用数据保留</Label>
+            <p class="text-muted-foreground text-xs">自动删除早于保留天数的状态数据</p>
           </div>
           <Switch bind:checked={dataRetentionPolicy.enabled} />
         </div>
 
         <div class="space-y-2">
-          <Label for="retention-days">Retention Days</Label>
+          <Label for="retention-days">保留天数</Label>
           <Input
             id="retention-days"
             type="number"
@@ -1260,17 +1249,17 @@
             bind:value={dataRetentionPolicy.retentionDays}
             disabled={!dataRetentionPolicy.enabled}
           />
-          <p class="text-muted-foreground text-xs">Default is 90 days if not configured.</p>
+          <p class="text-muted-foreground text-xs">未配置时默认为 90 天。</p>
         </div>
       </Card.Content>
       <Card.Footer class="flex justify-end">
         <Button onclick={saveDataRetentionPolicy} disabled={savingDataRetentionPolicy} class="cursor-pointer">
           {#if savingDataRetentionPolicy}
             <Loader class="h-4 w-4 animate-spin" />
-            Saving...
+            正在保存...
           {:else}
             <SaveIcon class="h-4 w-4" />
-            Save
+            保存
           {/if}
         </Button>
       </Card.Footer>
@@ -1279,16 +1268,14 @@
     <!-- Event Display Settings Card -->
     <Card.Root>
       <Card.Header>
-        <Card.Title>Event Display Settings</Card.Title>
-        <Card.Description>Configure which incidents and maintenances are shown on the site</Card.Description>
+        <Card.Title>事件显示设置</Card.Title>
+        <Card.Description>配置站点上显示的事件和维护计划</Card.Description>
       </Card.Header>
       <Card.Content class="space-y-6">
         <div class="flex items-center justify-between rounded-lg border p-4">
           <div class="space-y-0.5">
-            <Label for="events-display-inline">Display Events Inline</Label>
-            <p class="text-muted-foreground text-xs">
-              Turn on to show events inline on the status page. Off shows them in the notification list.
-            </p>
+            <Label for="events-display-inline">内联显示事件</Label>
+            <p class="text-muted-foreground text-xs">启用后在状态页内联显示事件；停用后在通知列表中显示。</p>
           </div>
           <Switch id="events-display-inline" bind:checked={eventDisplaySettings.showInlineEvents} />
         </div>
@@ -1297,8 +1284,8 @@
         <div class="space-y-4">
           <div class="flex items-center justify-between">
             <div class="space-y-0.5">
-              <Label>Incidents</Label>
-              <p class="text-muted-foreground text-xs">Enable or disable incident display globally</p>
+              <Label>事件</Label>
+              <p class="text-muted-foreground text-xs">全局启用或停用事件显示</p>
             </div>
             <Switch bind:checked={eventDisplaySettings.incidents.enabled} />
           </div>
@@ -1307,16 +1294,16 @@
             <div class="border-muted ml-4 space-y-4 border-l-2 pl-4">
               <div class="flex items-center justify-between">
                 <div class="space-y-0.5">
-                  <Label>Show Ongoing Incidents</Label>
-                  <p class="text-muted-foreground text-xs">Display active incidents</p>
+                  <Label>显示进行中的事件</Label>
+                  <p class="text-muted-foreground text-xs">显示当前活动的事件</p>
                 </div>
                 <Switch bind:checked={eventDisplaySettings.incidents.ongoing.show} />
               </div>
 
               <div class="flex items-center justify-between">
                 <div class="space-y-0.5">
-                  <Label>Show Resolved Incidents</Label>
-                  <p class="text-muted-foreground text-xs">Display recently resolved incidents</p>
+                  <Label>显示已解决的事件</Label>
+                  <p class="text-muted-foreground text-xs">显示最近解决的事件</p>
                 </div>
                 <Switch bind:checked={eventDisplaySettings.incidents.resolved.show} />
               </div>
@@ -1324,7 +1311,7 @@
               {#if eventDisplaySettings.incidents.resolved.show}
                 <div class="grid gap-4 md:grid-cols-2">
                   <div class="space-y-2">
-                    <Label for="events-incidents-max-count">Max Resolved Count</Label>
+                    <Label for="events-incidents-max-count">已解决事件最大数量</Label>
                     <Input
                       id="events-incidents-max-count"
                       type="number"
@@ -1334,7 +1321,7 @@
                     />
                   </div>
                   <div class="space-y-2">
-                    <Label for="events-incidents-days-in-past">Days in Past</Label>
+                    <Label for="events-incidents-days-in-past">过去天数</Label>
                     <Input
                       id="events-incidents-days-in-past"
                       type="number"
@@ -1355,8 +1342,8 @@
         <div class="space-y-4">
           <div class="flex items-center justify-between">
             <div class="space-y-0.5">
-              <Label>Maintenances</Label>
-              <p class="text-muted-foreground text-xs">Enable or disable maintenance display globally</p>
+              <Label>维护计划</Label>
+              <p class="text-muted-foreground text-xs">全局启用或停用维护计划显示</p>
             </div>
             <Switch bind:checked={eventDisplaySettings.maintenances.enabled} />
           </div>
@@ -1365,16 +1352,16 @@
             <div class="border-muted ml-4 space-y-4 border-l-2 pl-4">
               <div class="flex items-center justify-between">
                 <div class="space-y-0.5">
-                  <Label>Show Ongoing Maintenances</Label>
-                  <p class="text-muted-foreground text-xs">Display active maintenance windows</p>
+                  <Label>显示进行中的维护</Label>
+                  <p class="text-muted-foreground text-xs">显示当前活动的维护时段</p>
                 </div>
                 <Switch bind:checked={eventDisplaySettings.maintenances.ongoing.show} />
               </div>
 
               <div class="flex items-center justify-between">
                 <div class="space-y-0.5">
-                  <Label>Show Past Maintenances</Label>
-                  <p class="text-muted-foreground text-xs">Display completed maintenance windows</p>
+                  <Label>显示过去的维护</Label>
+                  <p class="text-muted-foreground text-xs">显示已完成的维护时段</p>
                 </div>
                 <Switch bind:checked={eventDisplaySettings.maintenances.past.show} />
               </div>
@@ -1382,7 +1369,7 @@
               {#if eventDisplaySettings.maintenances.past.show}
                 <div class="grid gap-4 md:grid-cols-2">
                   <div class="space-y-2">
-                    <Label for="events-maint-past-max-count">Max Past Count</Label>
+                    <Label for="events-maint-past-max-count">过去维护最大数量</Label>
                     <Input
                       id="events-maint-past-max-count"
                       type="number"
@@ -1392,7 +1379,7 @@
                     />
                   </div>
                   <div class="space-y-2">
-                    <Label for="events-maint-past-days-in-past">Days in Past</Label>
+                    <Label for="events-maint-past-days-in-past">过去天数</Label>
                     <Input
                       id="events-maint-past-days-in-past"
                       type="number"
@@ -1406,8 +1393,8 @@
 
               <div class="flex items-center justify-between">
                 <div class="space-y-0.5">
-                  <Label>Show Upcoming Maintenances</Label>
-                  <p class="text-muted-foreground text-xs">Display scheduled maintenance windows</p>
+                  <Label>显示即将进行的维护</Label>
+                  <p class="text-muted-foreground text-xs">显示已计划的维护时段</p>
                 </div>
                 <Switch bind:checked={eventDisplaySettings.maintenances.upcoming.show} />
               </div>
@@ -1415,7 +1402,7 @@
               {#if eventDisplaySettings.maintenances.upcoming.show}
                 <div class="grid gap-4 md:grid-cols-2">
                   <div class="space-y-2">
-                    <Label for="events-maint-upcoming-max-count">Max Upcoming Count</Label>
+                    <Label for="events-maint-upcoming-max-count">即将进行的维护最大数量</Label>
                     <Input
                       id="events-maint-upcoming-max-count"
                       type="number"
@@ -1425,7 +1412,7 @@
                     />
                   </div>
                   <div class="space-y-2">
-                    <Label for="events-maint-upcoming-days-in-future">Days in Future</Label>
+                    <Label for="events-maint-upcoming-days-in-future">未来天数</Label>
                     <Input
                       id="events-maint-upcoming-days-in-future"
                       type="number"
@@ -1444,10 +1431,10 @@
         <Button onclick={saveEventDisplaySettings} disabled={savingEventDisplaySettings} class="cursor-pointer">
           {#if savingEventDisplaySettings}
             <Loader class="h-4 w-4 animate-spin" />
-            Saving...
+            正在保存...
           {:else}
             <SaveIcon class="h-4 w-4" />
-            Save
+            保存
           {/if}
         </Button>
       </Card.Footer>
@@ -1456,12 +1443,12 @@
     <!-- Sitemap Configuration Card -->
     <Card.Root>
       <Card.Header>
-        <Card.Title>Sitemap</Card.Title>
-        <Card.Description>Configure how your sitemap.xml is generated</Card.Description>
+        <Card.Title>站点地图</Card.Title>
+        <Card.Description>配置 sitemap.xml 的生成方式</Card.Description>
       </Card.Header>
       <Card.Content class="space-y-6">
         <div class="space-y-3">
-          <Label>Mode</Label>
+          <Label>模式</Label>
           <RadioGroup.Root
             value={sitemap.mode}
             onValueChange={(v: string) => {
@@ -1474,31 +1461,31 @@
           >
             <div class="flex items-center space-x-2">
               <RadioGroup.Item value="auto" id="sitemap-auto" />
-              <Label for="sitemap-auto" class="cursor-pointer font-normal">Auto</Label>
+              <Label for="sitemap-auto" class="cursor-pointer font-normal">自动</Label>
             </div>
             <div class="flex items-center space-x-2">
               <RadioGroup.Item value="manual" id="sitemap-manual" />
-              <Label for="sitemap-manual" class="cursor-pointer font-normal">Manual</Label>
+              <Label for="sitemap-manual" class="cursor-pointer font-normal">手动</Label>
             </div>
             <div class="flex items-center space-x-2">
               <RadioGroup.Item value="off" id="sitemap-off" />
-              <Label for="sitemap-off" class="cursor-pointer font-normal">Off</Label>
+              <Label for="sitemap-off" class="cursor-pointer font-normal">关闭</Label>
             </div>
           </RadioGroup.Root>
           <p class="text-muted-foreground text-xs">
             {#if sitemap.mode === "auto"}
-              Sitemap will be auto-generated from your monitors and pages. You can also add additional URLs below.
+              将根据监控器和页面自动生成站点地图。也可以在下方添加其他 URL。
             {:else if sitemap.mode === "manual"}
-              Provide custom URLs to include in the sitemap.
+              提供要包含在站点地图中的自定义 URL。
             {:else}
-              Sitemap generation is disabled.
+              已停用站点地图生成。
             {/if}
           </p>
         </div>
 
         {#if sitemap.mode === "manual" || sitemap.mode === "auto"}
           <div class="space-y-3">
-            <Label>{sitemap.mode === "auto" ? "Additional URLs" : "URLs"}</Label>
+            <Label>{sitemap.mode === "auto" ? "附加 URL" : "URL"}</Label>
             {#each sitemap.urls as url, index (index)}
               <div class="flex items-center gap-2">
                 <Input type="url" bind:value={url.loc} placeholder="https://example.com/page" class="flex-1" />
@@ -1514,10 +1501,10 @@
             {/each}
             <Button variant="outline" onclick={addSitemapUrl}>
               <Plus class="h-4 w-4" />
-              {sitemap.urls.length > 0 ? "Add More URLs" : "Add URL"}
+              {sitemap.urls.length > 0 ? "添加更多 URL" : "添加 URL"}
             </Button>
             {#if sitemap.mode === "manual" && sitemap.urls.length === 0}
-              <p class="text-destructive text-xs">At least one URL is required for manual mode.</p>
+              <p class="text-destructive text-xs">手动模式至少需要一个 URL。</p>
             {/if}
           </div>
         {/if}
@@ -1526,7 +1513,7 @@
         {#if sitemap.mode !== "off" && sitemapURL}
           <CopyButton variant="outline" size="default" text={sitemapURL}>
             <CopyIcon class="mr-2 h-4 w-4" />
-            Copy URL
+            复制 URL
           </CopyButton>
           <Button
             variant="outline"
@@ -1534,16 +1521,16 @@
             onclick={() => window.open(clientResolver(resolve, "/sitemap.xml"), "_blank")}
           >
             <ExternalLinkIcon class="h-4 w-4" />
-            View
+            查看
           </Button>
         {/if}
         <Button onclick={saveSitemap} disabled={savingSitemap || !isValidSitemap} class="cursor-pointer">
           {#if savingSitemap}
             <Loader class="h-4 w-4 animate-spin" />
-            Saving...
+            正在保存...
           {:else}
             <SaveIcon class="h-4 w-4" />
-            Save
+            保存
           {/if}
         </Button>
       </Card.Footer>
@@ -1552,19 +1539,17 @@
     <!-- Maintenance Notification Settings Card -->
     <Card.Root>
       <Card.Header>
-        <Card.Title>Maintenance Notification Settings</Card.Title>
-        <Card.Description
-          >Configure which maintenance lifecycle events trigger subscriber notifications</Card.Description
-        >
+        <Card.Title>维护通知设置</Card.Title>
+        <Card.Description>配置哪些维护生命周期事件会触发订阅者通知</Card.Description>
       </Card.Header>
       <Card.Content class="space-y-6">
         <div class="space-y-4">
-          <Label>Event Types</Label>
+          <Label>事件类型</Label>
           <div class="grid gap-4 sm:grid-cols-2">
             <div class="flex items-center justify-between gap-2 rounded-lg border p-3">
               <div>
-                <p class="text-sm font-medium">Created</p>
-                <p class="text-muted-foreground text-xs">When a maintenance is created</p>
+                <p class="text-sm font-medium">已创建</p>
+                <p class="text-muted-foreground text-xs">创建维护计划时</p>
               </div>
               <Switch
                 checked={maintenanceNotificationSettings.event_types.created}
@@ -1575,8 +1560,8 @@
             </div>
             <div class="flex items-center justify-between gap-2 rounded-lg border p-3">
               <div>
-                <p class="text-sm font-medium">Reminder</p>
-                <p class="text-muted-foreground text-xs">Before a scheduled maintenance starts</p>
+                <p class="text-sm font-medium">提醒</p>
+                <p class="text-muted-foreground text-xs">计划维护开始前</p>
               </div>
               <Switch
                 checked={maintenanceNotificationSettings.event_types.reminder}
@@ -1587,8 +1572,8 @@
             </div>
             <div class="flex items-center justify-between gap-2 rounded-lg border p-3">
               <div>
-                <p class="text-sm font-medium">Started</p>
-                <p class="text-muted-foreground text-xs">When a maintenance begins</p>
+                <p class="text-sm font-medium">已开始</p>
+                <p class="text-muted-foreground text-xs">维护开始时</p>
               </div>
               <Switch
                 checked={maintenanceNotificationSettings.event_types.started}
@@ -1599,8 +1584,8 @@
             </div>
             <div class="flex items-center justify-between gap-2 rounded-lg border p-3">
               <div>
-                <p class="text-sm font-medium">Ended</p>
-                <p class="text-muted-foreground text-xs">When a maintenance completes</p>
+                <p class="text-sm font-medium">已结束</p>
+                <p class="text-muted-foreground text-xs">维护完成时</p>
               </div>
               <Switch
                 checked={maintenanceNotificationSettings.event_types.ended}
@@ -1614,16 +1599,14 @@
 
         {#if maintenanceNotificationSettings.event_types.reminder}
           <div class="space-y-2">
-            <Label for="reminder-buffer-hours">Reminder Buffer (hours)</Label>
+            <Label for="reminder-buffer-hours">提醒提前时间（小时）</Label>
             <Input
               id="reminder-buffer-hours"
               type="number"
               min={1}
               bind:value={maintenanceNotificationSettings.reminder_buffer_hours}
             />
-            <p class="text-muted-foreground text-xs">
-              How many hours before the maintenance start time to send the reminder notification
-            </p>
+            <p class="text-muted-foreground text-xs">在维护开始前多少小时发送提醒通知</p>
           </div>
         {/if}
       </Card.Content>
@@ -1635,10 +1618,10 @@
         >
           {#if savingMaintenanceNotificationSettings}
             <Loader class="h-4 w-4 animate-spin" />
-            Saving...
+            正在保存...
           {:else}
             <SaveIcon class="h-4 w-4" />
-            Save
+            保存
           {/if}
         </Button>
       </Card.Footer>

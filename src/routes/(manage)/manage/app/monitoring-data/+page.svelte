@@ -149,13 +149,13 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Monitoring data deleted successfully");
+        toast.success("监控数据已成功删除");
         monitorTagFilter = "ALL";
         pageNo = 1;
         fetchData();
       }
     } catch (e) {
-      toast.error("Failed to delete monitoring data");
+      toast.error("删除监控数据失败");
     } finally {
       deleting = false;
     }
@@ -258,9 +258,9 @@
     <div class="flex items-center gap-2">
       <Button variant={showFilters ? "default" : "outline"} size="sm" onclick={() => (showFilters = !showFilters)}>
         <FilterIcon class="size-4" />
-        Filters
+        筛选
         {#if hasActiveFilters}
-          <Badge variant="secondary" class="ml-1 px-1.5 py-0 text-[10px]">ON</Badge>
+          <Badge variant="secondary" class="ml-1 px-1.5 py-0 text-[10px]">已启用</Badge>
         {/if}
       </Button>
       {#if loading}
@@ -271,7 +271,7 @@
     {#if showFilters}
       <div class="bg-muted/50 flex flex-wrap items-end gap-3 rounded-lg border p-3">
         <div class="flex flex-col gap-1">
-          <Label for="start-datetime" class="text-muted-foreground text-xs font-medium">From</Label>
+          <Label for="start-datetime" class="text-muted-foreground text-xs font-medium">开始时间</Label>
           <Input
             id="start-datetime"
             type="datetime-local"
@@ -281,7 +281,7 @@
           />
         </div>
         <div class="flex flex-col gap-1">
-          <Label for="end-datetime" class="text-muted-foreground text-xs font-medium">To</Label>
+          <Label for="end-datetime" class="text-muted-foreground text-xs font-medium">结束时间</Label>
           <Input
             id="end-datetime"
             type="datetime-local"
@@ -291,13 +291,13 @@
           />
         </div>
         <div class="flex flex-col gap-1">
-          <span class="text-muted-foreground text-xs font-medium">Monitor</span>
+          <span class="text-muted-foreground text-xs font-medium">监控项</span>
           <Select.Root type="single" value={monitorTagFilter} onValueChange={handleMonitorChange}>
             <Select.Trigger class="w-48">
-              {monitorTagFilter === "ALL" ? "All Monitors" : monitorTagFilter}
+              {monitorTagFilter === "ALL" ? "全部监控项" : monitorTagFilter}
             </Select.Trigger>
             <Select.Content>
-              <Select.Item value="ALL">All Monitors</Select.Item>
+              <Select.Item value="ALL">全部监控项</Select.Item>
               {#each monitors as monitor (monitor.tag)}
                 <Select.Item value={monitor.tag}>{monitor.name || monitor.tag}</Select.Item>
               {/each}
@@ -306,21 +306,21 @@
         </div>
         <Button size="sm" onclick={applyFilters}>
           <SearchIcon class="size-4" />
-          Search
+          搜索
         </Button>
         <Button size="sm" variant="destructive" onclick={openDeleteDialog} disabled={deleting}>
           {#if deleting}
             <Spinner class="size-4" />
-            Deleting...
+            正在删除...
           {:else}
             <TrashIcon class="size-4" />
-            Delete
+            删除
           {/if}
         </Button>
         {#if hasActiveFilters}
           <Button variant="ghost" size="sm" onclick={clearFilters}>
             <XIcon class="size-4" />
-            Clear
+            清除
           </Button>
         {/if}
       </div>
@@ -332,18 +332,18 @@
     <Table.Root>
       <Table.Header>
         <Table.Row>
-          <Table.Head>Monitor Tag</Table.Head>
-          <Table.Head class="w-48">Timestamp</Table.Head>
-          <Table.Head class="w-24">Status</Table.Head>
-          <Table.Head class="w-24">Latency</Table.Head>
-          <Table.Head class="w-24">Type</Table.Head>
-          <Table.Head>Error Message</Table.Head>
+          <Table.Head>监控标签</Table.Head>
+          <Table.Head class="w-48">时间</Table.Head>
+          <Table.Head class="w-24">状态</Table.Head>
+          <Table.Head class="w-24">延迟</Table.Head>
+          <Table.Head class="w-24">类型</Table.Head>
+          <Table.Head>错误信息</Table.Head>
         </Table.Row>
       </Table.Header>
       <Table.Body>
         {#if monitoringData.length === 0 && !loading}
           <Table.Row>
-            <Table.Cell colspan={6} class="text-muted-foreground py-8 text-center">No monitoring data found</Table.Cell>
+            <Table.Cell colspan={6} class="text-muted-foreground py-8 text-center">未找到监控数据</Table.Cell>
           </Table.Row>
         {:else}
           {#each monitoringData as row (row.monitor_tag + "_" + row.timestamp)}
@@ -363,7 +363,7 @@
               </Table.Cell>
               <Table.Cell>
                 <span class="text-xs font-semibold text-{row.status?.toLowerCase()}">
-                  {row.status || "N/A"}
+                  {row.status || "暂无"}
                 </span>
               </Table.Cell>
               <Table.Cell>
@@ -406,7 +406,7 @@
     {@const startItem = (pageNo - 1) * limit + 1}
     {@const endItem = Math.min(pageNo * limit, totalCount)}
     <div class="flex items-center justify-between">
-      <span class="text-muted-foreground text-sm">Showing {startItem}-{endItem} of {totalCount}</span>
+      <span class="text-muted-foreground text-sm">显示第 {startItem}-{endItem} 条，共 {totalCount} 条</span>
       {#if totalPages > 1}
         <div class="flex items-center gap-2">
           <Button variant="outline" size="icon" disabled={pageNo === 1} onclick={() => goToPage(pageNo - 1)}>
@@ -435,19 +435,19 @@
 <AlertDialog.Root bind:open={deleteDialogOpen}>
   <AlertDialog.Content>
     <AlertDialog.Header>
-      <AlertDialog.Title>Delete Monitoring Data</AlertDialog.Title>
+      <AlertDialog.Title>删除监控数据</AlertDialog.Title>
       <AlertDialog.Description>
         {#if monitorTagFilter === "ALL"}
-          This will delete monitoring data for <strong>all monitors</strong> from {startDateTime} to {endDateTime}.
+          这将删除<strong>全部监控项</strong>从 {startDateTime} 到 {endDateTime} 的监控数据。
         {:else}
-          This will delete monitoring data for <strong>{monitorTagFilter}</strong> from {startDateTime} to {endDateTime}.
+          这将删除 <strong>{monitorTagFilter}</strong> 从 {startDateTime} 到 {endDateTime} 的监控数据。
         {/if}
-        This action cannot be undone.
+        此操作无法撤销。
       </AlertDialog.Description>
     </AlertDialog.Header>
     <AlertDialog.Footer>
-      <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-      <AlertDialog.Action onclick={deleteFilteredData}>Delete</AlertDialog.Action>
+      <AlertDialog.Cancel>取消</AlertDialog.Cancel>
+      <AlertDialog.Action onclick={deleteFilteredData}>删除</AlertDialog.Action>
     </AlertDialog.Footer>
   </AlertDialog.Content>
 </AlertDialog.Root>

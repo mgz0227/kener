@@ -28,7 +28,6 @@
   if (data.follow_redirects === undefined) data.follow_redirects = true;
   if (data.max_redirects === undefined) data.max_redirects = 5;
 
-
   const methods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"];
 
   function addHeader() {
@@ -47,7 +46,7 @@
       <Input id="api-url" bind:value={data.url} placeholder="https://api.example.com/health" />
     </div>
     <div class="col-span-1 flex flex-col gap-2">
-      <Label for="api-method">Method</Label>
+      <Label for="api-method">请求方法</Label>
       <Select.Root
         type="single"
         value={data.method}
@@ -68,24 +67,24 @@
   </div>
 
   <div class="flex flex-col gap-2">
-    <Label for="api-timeout">Timeout (ms)</Label>
+    <Label for="api-timeout">超时时间（毫秒）</Label>
     <Input id="api-timeout" type="number" bind:value={data.timeout} placeholder="10000" />
   </div>
 
   <div>
     <div class="mb-2 flex items-center justify-between">
-      <Label>Headers</Label>
+      <Label>请求头</Label>
       <Button variant="outline" size="sm" onclick={addHeader}>
         <Plus class="mr-1 size-4" />
-        Add Header
+        添加请求头
       </Button>
     </div>
     {#if data.headers && data.headers.length > 0}
       <div class="space-y-2">
         {#each data.headers as header, index}
           <div class="flex items-center gap-2">
-            <Input bind:value={header.key} placeholder="Header Key" class="flex-1" />
-            <Input bind:value={header.value} placeholder="Header Value" class="flex-1" />
+            <Input bind:value={header.key} placeholder="请求头名称" class="flex-1" />
+            <Input bind:value={header.value} placeholder="请求头值" class="flex-1" />
             <Button variant="ghost" size="icon" onclick={() => removeHeader(index)}>
               <X class="size-4" />
             </Button>
@@ -97,23 +96,23 @@
 
   {#if data.method !== "GET" && data.method !== "HEAD"}
     <div class="flex flex-col gap-2">
-      <Label for="api-body">Request Body</Label>
+      <Label for="api-body">请求体</Label>
       <Textarea id="api-body" bind:value={data.body} placeholder={'{"key": "value"}'} rows={4} />
     </div>
   {/if}
 
   <div class="flex items-center space-x-2">
     <Switch id="api-self-signed" bind:checked={data.allowSelfSignedCert} />
-    <Label for="api-self-signed">Allow Self-Signed Certificates</Label>
+    <Label for="api-self-signed">允许自签名证书</Label>
   </div>
 
   <div class="flex items-center space-x-2">
     <Switch id="api-follow-redirects" bind:checked={data.follow_redirects} />
-    <Label for="api-follow-redirects">Follow Redirects</Label>
+    <Label for="api-follow-redirects">跟随重定向</Label>
   </div>
 
   <div class="flex flex-col gap-2">
-    <Label for="api-max-redirects">Max Redirects</Label>
+    <Label for="api-max-redirects">最大重定向次数</Label>
     <Input
       id="api-max-redirects"
       type="number"
@@ -125,9 +124,8 @@
     />
   </div>
 
-
   <div class="flex flex-col gap-2">
-    <Label for="api-eval">Custom Eval Function</Label>
+    <Label for="api-eval">自定义评估函数</Label>
     <div class="rounded-md border">
       <CodeMirror
         bind:value={data.eval}
@@ -142,7 +140,7 @@
       />
     </div>
     <p class="text-muted-foreground mt-1 text-xs">
-      Function receives (statusCode, responseTime, responseRaw, modules) and should return {`{ status, latency }`}
+      函数接收 (statusCode, responseTime, responseRaw, modules)，并应返回 {`{ status, latency }`}
     </p>
   </div>
 </div>

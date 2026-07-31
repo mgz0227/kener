@@ -20,24 +20,24 @@ export function getAlertText({
   if (kind === "label") {
     switch (alert_for) {
       case GC.STATUS:
-        return "Status Value";
+        return "状态值";
       case GC.LATENCY:
-        return "Latency Threshold (ms)";
+        return "延迟阈值（毫秒）";
       case GC.UPTIME:
-        return "Uptime Threshold (%)";
+        return "可用率阈值（%）";
       default:
-        return "Value";
+        return "数值";
     }
   }
 
   if (kind === "help") {
     switch (alert_for) {
       case GC.STATUS:
-        return "Alert when monitor status equals this value";
+        return "监控状态等于此值时触发告警";
       case GC.LATENCY:
-        return "Alert when latency exceeds this value (in milliseconds)";
+        return "延迟超过此值（毫秒）时触发告警";
       case GC.UPTIME:
-        return "Alert when uptime falls below this percentage";
+        return "可用率低于此百分比时触发告警";
       default:
         return "";
     }
@@ -48,15 +48,15 @@ export function getAlertText({
   const value = alert_value ?? "";
 
   if (alert_for === GC.STATUS) {
-    return `Alert when ${thresholdValue} consecutive checks result in ${value}. Resolve after ${resolveThreshold} successful check(s).`;
+    return `连续 ${thresholdValue} 次检查结果为 ${value} 时触发告警。连续 ${resolveThreshold} 次检查成功后恢复。`;
   }
 
   if (alert_for === GC.LATENCY) {
-    return `Alert when latency exceeds ${value}ms for ${thresholdValue} consecutive checks. Resolve after ${resolveThreshold} check(s) below threshold.`;
+    return `连续 ${thresholdValue} 次检查的延迟超过 ${value} 毫秒时触发告警。连续 ${resolveThreshold} 次检查低于阈值后恢复。`;
   }
 
   if (alert_for === GC.UPTIME) {
-    return `Alert when uptime falls below ${value}% for ${thresholdValue} checks. Resolve after ${resolveThreshold} check(s) above threshold.`;
+    return `连续 ${thresholdValue} 次检查的可用率低于 ${value}% 时触发告警。连续 ${resolveThreshold} 次检查高于阈值后恢复。`;
   }
 
   return "";

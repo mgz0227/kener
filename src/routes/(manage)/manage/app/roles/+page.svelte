@@ -93,6 +93,60 @@
   let removingUserId = $state<number | null>(null);
 
   const apiUrl = clientResolver(resolve, "/manage/api");
+  const permissionGroupLabels: Record<string, string> = {
+    monitors: "监控项",
+    incidents: "故障事件",
+    maintenances: "维护计划",
+    pages: "页面",
+    triggers: "触发器",
+    alerts: "告警",
+    api_keys: "API 密钥",
+    users: "用户",
+    settings: "站点设置",
+    subscribers: "订阅者",
+    email_templates: "邮件模板",
+    images: "图片",
+    roles: "角色"
+  };
+  const permissionLabels: Record<string, string> = {
+    "monitors.read": "查看监控项和监控数据",
+    "monitors.write": "创建、更新、删除和克隆监控项",
+    "incidents.read": "查看故障事件和评论",
+    "incidents.write": "创建、更新和删除故障事件及评论",
+    "maintenances.read": "查看维护计划和事件",
+    "maintenances.write": "创建、更新和删除维护计划及事件",
+    "pages.read": "查看页面",
+    "pages.write": "创建、更新和删除页面",
+    "triggers.read": "查看触发器",
+    "triggers.write": "创建、更新、删除和测试触发器",
+    "alerts.read": "查看告警配置和告警历史",
+    "alerts.write": "创建、更新和删除告警配置",
+    "api_keys.read": "查看 API 密钥",
+    "api_keys.write": "创建和更新 API 密钥",
+    "api_keys.delete": "删除 API 密钥",
+    "users.read": "查看用户",
+    "users.write": "管理用户、邀请和验证",
+    "settings.read": "查看站点设置和订阅配置",
+    "settings.write": "更新站点设置和订阅配置",
+    "subscribers.read": "查看订阅者",
+    "subscribers.write": "管理订阅者和订阅",
+    "email_templates.read": "查看邮件模板",
+    "email_templates.write": "更新邮件模板",
+    "images.write": "上传和删除图片",
+    "roles.read": "查看角色、权限和用户分配",
+    "roles.write": "创建、更新和删除角色",
+    "roles.assign_permissions": "为角色添加或移除权限",
+    "roles.assign_users": "为角色添加或移除用户"
+  };
+  const roleDisplayNames: Record<string, string> = {
+    Administrator: "管理员",
+    Editor: "编辑者",
+    Member: "成员"
+  };
+
+  function getRoleDisplayName(name: string | null | undefined): string {
+    return (name && roleDisplayNames[name]) || name || "";
+  }
 
   async function apiCall(action: string, data: Record<string, unknown> = {}) {
     const res = await fetch(apiUrl, {
@@ -111,7 +165,7 @@
       const result = await apiCall("getRoles");
       roles = result;
     } catch {
-      toast.error("Failed to load roles");
+      toast.error("加载角色失败");
     } finally {
       loading = false;
     }
@@ -121,7 +175,7 @@
     try {
       allPermissions = await apiCall("getAllPermissions");
     } catch {
-      toast.error("Failed to load permissions");
+      toast.error("加载权限失败");
     }
   }
 
@@ -130,7 +184,7 @@
       const result = await apiCall("getUsers", { page: 1, limit: 1000 });
       allUsers = result.users || [];
     } catch {
-      toast.error("Failed to load users");
+      toast.error("加载用户失败");
     }
   }
 
@@ -152,15 +206,15 @@
   async function handleCreateRole() {
     createError = "";
     if (!newRole.role_id.trim()) {
-      createError = "Role ID is required";
+      createError = "角色 ID 不能为空";
       return;
     }
     if (!newRole.name.trim()) {
-      createError = "Role name is required";
+      createError = "角色名称不能为空";
       return;
     }
     if (createPermissionMode === "clone" && !cloneFromRoleId) {
-      createError = "Please select a role to clone permissions from";
+      createError = "请选择要复制权限的角色";
       return;
     }
     creatingRole = true;
@@ -179,7 +233,7 @@
         }
       }
 
-      toast.success("Role created");
+      toast.success("角色已创建");
       showCreateDialog = false;
       const createdRoleId = newRole.role_id.trim().toLowerCase().replace(/\s+/g, "_");
       newRole = { role_id: "", name: "" };
@@ -193,7 +247,7 @@
         openPermissions(createdRole);
       }
     } catch (e: unknown) {
-      createError = e instanceof Error ? e.message : "Failed to create role";
+      createError = e instanceof Error ? e.message : "创建角色失败";
     } finally {
       creatingRole = false;
     }
@@ -209,12 +263,12 @@
           ? { action: "migrate" as const, targetRoleId: deleteTargetRoleId }
           : { action: "remove" as const };
       await apiCall("deleteRole", { roleId: roleToDelete.id, options });
-      toast.success("Role deleted");
+      toast.success("角色已删除");
       showDeleteDialog = false;
       roleToDelete = null;
       await fetchRoles();
     } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : "Failed to delete role");
+      toast.error(e instanceof Error ? e.message : "删除角色失败");
     } finally {
       deletingRole = false;
     }
@@ -232,7 +286,7 @@
     if (!roleToEdit) return;
     editError = "";
     if (!editRole.name.trim()) {
-      editError = "Role name is required";
+      editError = "角色名称不能为空";
       return;
     }
     editingRole = true;
@@ -242,12 +296,12 @@
         name: editRole.name,
         status: editRole.status
       });
-      toast.success("Role updated");
+      toast.success("角色已更新");
       showEditDialog = false;
       roleToEdit = null;
       await fetchRoles();
     } catch (e: unknown) {
-      editError = e instanceof Error ? e.message : "Failed to update role";
+      editError = e instanceof Error ? e.message : "更新角色失败";
     } finally {
       editingRole = false;
     }
@@ -263,7 +317,7 @@
       const perms = await apiCall("getRolePermissions", { roleId: role.id });
       rolePermissionIds = new Set(perms.map((p: { permissions_id: string }) => p.permissions_id));
     } catch {
-      toast.error("Failed to load permissions");
+      toast.error("加载权限失败");
     } finally {
       loadingPermissions = false;
     }
@@ -278,10 +332,10 @@
         roleId: permissionsRole.id,
         permissionIds: Array.from(rolePermissionIds)
       });
-      toast.success("Permissions updated");
+      toast.success("权限已更新");
       showPermissionsSheet = false;
     } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : "Failed to update permissions");
+      toast.error(e instanceof Error ? e.message : "更新权限失败");
     } finally {
       savingPermissions = false;
     }
@@ -311,7 +365,7 @@
       ]);
       roleUsers = users;
     } catch {
-      toast.error("Failed to load role users");
+      toast.error("加载角色用户失败");
     } finally {
       loadingUsers = false;
     }
@@ -323,10 +377,10 @@
     addingUserId = userId;
     try {
       await apiCall("addUserToRole", { roleId: usersRole.id, userId });
-      toast.success("User added to role");
+      toast.success("用户已添加到角色");
       roleUsers = await apiCall("getRoleUsers", { roleId: usersRole.id });
     } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : "Failed to add user");
+      toast.error(e instanceof Error ? e.message : "添加用户失败");
     } finally {
       addingUserId = null;
     }
@@ -338,10 +392,10 @@
     removingUserId = userId;
     try {
       await apiCall("removeUserFromRole", { roleId: usersRole.id, userId });
-      toast.success("User removed from role");
+      toast.success("用户已从角色移除");
       roleUsers = await apiCall("getRoleUsers", { roleId: usersRole.id });
     } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : "Failed to remove user");
+      toast.error(e instanceof Error ? e.message : "移除用户失败");
     } finally {
       removingUserId = null;
     }
@@ -357,7 +411,7 @@
       groupMap.get(group)!.push(perm);
     }
     for (const [group, perms] of groupMap) {
-      const label = group.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+      const label = permissionGroupLabels[group] ?? group.replace(/_/g, " ");
       groups.push({ group, label, permissions: perms });
     }
     return groups;
@@ -379,12 +433,12 @@
   <div class="flex items-center justify-between">
     <div class="flex items-center gap-2">
       <ShieldIcon class="h-5 w-5" />
-      <h2 class="text-xl font-semibold">Roles</h2>
+      <h2 class="text-xl font-semibold">角色</h2>
     </div>
     {#if hasPermission("roles.write")}
       <Button size="sm" onclick={() => openCreateDialog()}>
         <PlusIcon class="mr-1 h-4 w-4" />
-        Create Role
+        创建角色
       </Button>
     {/if}
   </div>
@@ -396,16 +450,16 @@
         <Spinner class="h-6 w-6" />
       </div>
     {:else if roles.length === 0}
-      <div class="text-muted-foreground p-8 text-center text-sm">No roles found</div>
+      <div class="text-muted-foreground p-8 text-center text-sm">暂无角色</div>
     {:else}
       <div class="ktable overflow-hidden rounded-xl border">
         <Table.Root>
           <Table.Header>
             <Table.Row>
-              <Table.Head>Role ID</Table.Head>
-              <Table.Head>Name</Table.Head>
-              <Table.Head>Status</Table.Head>
-              <Table.Head>Type</Table.Head>
+              <Table.Head>角色 ID</Table.Head>
+              <Table.Head>名称</Table.Head>
+              <Table.Head>状态</Table.Head>
+              <Table.Head>类型</Table.Head>
               <Table.Head class="text-right"></Table.Head>
             </Table.Row>
           </Table.Header>
@@ -413,41 +467,41 @@
             {#each roles as role (role.id)}
               <Table.Row>
                 <Table.Cell class="font-mono text-sm">{role.id}</Table.Cell>
-                <Table.Cell>{role.role_name}</Table.Cell>
+                <Table.Cell>{getRoleDisplayName(role.role_name)}</Table.Cell>
                 <Table.Cell>
                   <Badge variant={role.status === "ACTIVE" ? "default" : "secondary"}>
-                    {role.status}
+                    {role.status === "ACTIVE" ? "已启用" : "已停用"}
                   </Badge>
                 </Table.Cell>
                 <Table.Cell>
                   {#if role.readonly === 1}
                     <Badge variant="outline">
                       <LockIcon class="mr-1 h-3 w-3" />
-                      Readonly
+                      只读
                     </Badge>
                   {:else}
-                    <Badge variant="outline">Custom</Badge>
+                    <Badge variant="outline">自定义</Badge>
                   {/if}
                 </Table.Cell>
                 <Table.Cell class="text-right">
                   <div class="flex items-center justify-end gap-1">
                     <Button variant="ghost" size="sm" onclick={() => openPermissions(role)}>
                       <KeyIcon class="mr-1 h-4 w-4" />
-                      Permissions
+                      权限
                     </Button>
                     <Button variant="ghost" size="sm" onclick={() => openUsers(role)}>
                       <UsersIcon class="mr-1 h-4 w-4" />
-                      Users
+                      用户
                     </Button>
                     {#if hasPermission("roles.write")}
                       <Button
                         variant="ghost"
                         size="sm"
-                        title="Duplicate"
+                        title="复制"
                         onclick={() =>
                           openCreateDialog({
                             role_id: role.id + "-copy",
-                            name: role.role_name + " Copy",
+                            name: role.role_name + " 副本",
                             cloneFromRoleId: role.id
                           })}
                       >
@@ -486,25 +540,25 @@
 <Dialog.Root bind:open={showEditDialog}>
   <Dialog.Content>
     <Dialog.Header>
-      <Dialog.Title>Edit Role</Dialog.Title>
+      <Dialog.Title>编辑角色</Dialog.Title>
       <Dialog.Description>
-        Update <span class="font-semibold">{roleToEdit?.role_name}</span> role.
+        更新角色 <span class="font-semibold">{getRoleDisplayName(roleToEdit?.role_name)}</span>。
       </Dialog.Description>
     </Dialog.Header>
     <div class="grid gap-4 py-4">
       <div class="grid gap-2">
-        <Label for="edit-role-name">Role Name</Label>
+        <Label for="edit-role-name">角色名称</Label>
         <Input id="edit-role-name" bind:value={editRole.name} />
       </div>
       <div class="grid gap-2">
-        <Label for="edit-role-status">Status</Label>
+        <Label for="edit-role-status">状态</Label>
         <select
           id="edit-role-status"
           class="border-input flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-sm"
           bind:value={editRole.status}
         >
-          <option value="ACTIVE">Active</option>
-          <option value="INACTIVE">Inactive</option>
+          <option value="ACTIVE">已启用</option>
+          <option value="INACTIVE">已停用</option>
         </select>
       </div>
       {#if editError}
@@ -512,12 +566,12 @@
       {/if}
     </div>
     <Dialog.Footer>
-      <Button variant="outline" onclick={() => (showEditDialog = false)}>Cancel</Button>
+      <Button variant="outline" onclick={() => (showEditDialog = false)}>取消</Button>
       <Button onclick={handleEditRole} disabled={editingRole}>
         {#if editingRole}
           <Spinner class="mr-2 h-4 w-4" />
         {/if}
-        Save
+        保存
       </Button>
     </Dialog.Footer>
   </Dialog.Content>
@@ -527,21 +581,21 @@
 <Dialog.Root bind:open={showCreateDialog}>
   <Dialog.Content>
     <Dialog.Header>
-      <Dialog.Title>Create Role</Dialog.Title>
-      <Dialog.Description>Create a new custom role with its own permissions.</Dialog.Description>
+      <Dialog.Title>创建角色</Dialog.Title>
+      <Dialog.Description>创建拥有独立权限的自定义角色。</Dialog.Description>
     </Dialog.Header>
     <div class="grid gap-4 py-4">
       <div class="grid gap-2">
-        <Label for="role-id">Role ID</Label>
-        <Input id="role-id" placeholder="e.g. viewer" bind:value={newRole.role_id} />
-        <p class="text-muted-foreground text-xs">Lowercase letters, numbers, underscores, hyphens only.</p>
+        <Label for="role-id">角色 ID</Label>
+        <Input id="role-id" placeholder="例如 viewer" bind:value={newRole.role_id} />
+        <p class="text-muted-foreground text-xs">仅允许小写字母、数字、下划线和连字符。</p>
       </div>
       <div class="grid gap-2">
-        <Label for="role-name">Role Name</Label>
-        <Input id="role-name" placeholder="e.g. Viewer" bind:value={newRole.name} />
+        <Label for="role-name">角色名称</Label>
+        <Input id="role-name" placeholder="例如 访客" bind:value={newRole.name} />
       </div>
       <div class="grid gap-2">
-        <Label>Permissions</Label>
+        <Label>权限</Label>
         <div class="flex gap-2">
           <Button
             variant={createPermissionMode === "pick" ? "default" : "outline"}
@@ -551,28 +605,28 @@
               cloneFromRoleId = "";
             }}
           >
-            Pick after creation
+            创建后选择
           </Button>
           <Button
             variant={createPermissionMode === "clone" ? "default" : "outline"}
             size="sm"
             onclick={() => (createPermissionMode = "clone")}
           >
-            Clone from existing role
+            从现有角色复制
           </Button>
         </div>
       </div>
       {#if createPermissionMode === "clone"}
         <div class="grid gap-2">
-          <Label for="clone-role">Clone permissions from</Label>
+          <Label for="clone-role">复制权限来源</Label>
           <select
             id="clone-role"
             class="border-input flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-sm"
             bind:value={cloneFromRoleId}
           >
-            <option value="">Select a role...</option>
+            <option value="">选择角色...</option>
             {#each roles.filter((r) => r.status === "ACTIVE") as r (r.id)}
-              <option value={r.id}>{r.role_name}</option>
+              <option value={r.id}>{getRoleDisplayName(r.role_name)}</option>
             {/each}
           </select>
         </div>
@@ -582,12 +636,12 @@
       {/if}
     </div>
     <Dialog.Footer>
-      <Button variant="outline" onclick={() => (showCreateDialog = false)}>Cancel</Button>
+      <Button variant="outline" onclick={() => (showCreateDialog = false)}>取消</Button>
       <Button onclick={handleCreateRole} disabled={creatingRole}>
         {#if creatingRole}
           <Spinner class="mr-2 h-4 w-4" />
         {/if}
-        Create
+        创建
       </Button>
     </Dialog.Footer>
   </Dialog.Content>
@@ -597,49 +651,49 @@
 <Dialog.Root bind:open={showDeleteDialog}>
   <Dialog.Content>
     <Dialog.Header>
-      <Dialog.Title>Delete Role</Dialog.Title>
+      <Dialog.Title>删除角色</Dialog.Title>
       <Dialog.Description>
-        Are you sure you want to delete <span class="font-semibold">{roleToDelete?.role_name}</span>?
+        确定要删除角色 <span class="font-semibold">{getRoleDisplayName(roleToDelete?.role_name)}</span> 吗？
       </Dialog.Description>
     </Dialog.Header>
     <div class="grid gap-4 py-4">
       <div class="grid gap-2">
-        <Label>What should happen to users in this role?</Label>
+        <Label>如何处理此角色中的用户？</Label>
         <div class="flex gap-2">
           <Button
             variant={deleteAction === "remove" ? "default" : "outline"}
             size="sm"
             onclick={() => (deleteAction = "remove")}
           >
-            Remove assignments
+            移除角色分配
           </Button>
           <Button
             variant={deleteAction === "migrate" ? "default" : "outline"}
             size="sm"
             onclick={() => (deleteAction = "migrate")}
           >
-            Migrate to another role
+            迁移到其他角色
           </Button>
         </div>
       </div>
       {#if deleteAction === "migrate"}
         <div class="grid gap-2">
-          <Label for="target-role">Target Role</Label>
+          <Label for="target-role">目标角色</Label>
           <select
             id="target-role"
             class="border-input flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-sm"
             bind:value={deleteTargetRoleId}
           >
-            <option value="">Select a role...</option>
+            <option value="">选择角色...</option>
             {#each roles.filter((r) => r.id !== roleToDelete?.id && r.status === "ACTIVE") as r (r.id)}
-              <option value={r.id}>{r.role_name}</option>
+              <option value={r.id}>{getRoleDisplayName(r.role_name)}</option>
             {/each}
           </select>
         </div>
       {/if}
     </div>
     <Dialog.Footer>
-      <Button variant="outline" onclick={() => (showDeleteDialog = false)}>Cancel</Button>
+      <Button variant="outline" onclick={() => (showDeleteDialog = false)}>取消</Button>
       <Button
         variant="destructive"
         onclick={handleDeleteRole}
@@ -648,7 +702,7 @@
         {#if deletingRole}
           <Spinner class="mr-2 h-4 w-4" />
         {/if}
-        Delete
+        删除
       </Button>
     </Dialog.Footer>
   </Dialog.Content>
@@ -659,13 +713,13 @@
   <Sheet.Content side="right" class="w-full overflow-y-auto sm:max-w-lg">
     <Sheet.Header>
       <Sheet.Title>
-        Permissions — {permissionsRole?.role_name}
+        权限 - {getRoleDisplayName(permissionsRole?.role_name)}
       </Sheet.Title>
       <Sheet.Description>
         {#if permissionsRole?.readonly === 1}
-          This is a readonly role. Permissions cannot be modified.
+          这是只读角色，无法修改权限。
         {:else}
-          Toggle permissions for this role.
+          为此角色选择权限。
         {/if}
       </Sheet.Description>
     </Sheet.Header>
@@ -707,7 +761,7 @@
                           disabled={permissionsRole?.readonly === 1 || !hasPermission("roles.assign_permissions")}
                         />
                         <div class="flex flex-col">
-                          <span class="text-sm font-medium">{perm.permission_name}</span>
+                          <span class="text-sm font-medium">{permissionLabels[perm.id] ?? perm.permission_name}</span>
                         </div>
                       </Button>
                     {/each}
@@ -720,12 +774,12 @@
 
         {#if permissionsRole?.readonly !== 1 && hasPermission("roles.assign_permissions")}
           <div class="flex justify-end gap-2 p-4">
-            <Button variant="outline" onclick={() => (showPermissionsSheet = false)}>Cancel</Button>
+            <Button variant="outline" onclick={() => (showPermissionsSheet = false)}>取消</Button>
             <Button onclick={savePermissions} disabled={savingPermissions}>
               {#if savingPermissions}
                 <Spinner class="mr-2 h-4 w-4" />
               {/if}
-              Save Permissions
+              保存权限
             </Button>
           </div>
         {/if}
@@ -739,9 +793,9 @@
   <Sheet.Content side="right" class="w-full overflow-y-auto sm:max-w-lg">
     <Sheet.Header>
       <Sheet.Title>
-        Users — {usersRole?.role_name}
+        用户 - {getRoleDisplayName(usersRole?.role_name)}
       </Sheet.Title>
-      <Sheet.Description>Manage users assigned to this role.</Sheet.Description>
+      <Sheet.Description>管理分配到此角色的用户。</Sheet.Description>
     </Sheet.Header>
 
     {#if loadingUsers}
@@ -751,9 +805,9 @@
     {:else}
       <!-- Current users in role -->
       <div class="p-4">
-        <h4 class="mb-2 text-sm font-medium">Current Users ({roleUsers.length})</h4>
+        <h4 class="mb-2 text-sm font-medium">当前用户（{roleUsers.length}）</h4>
         {#if roleUsers.length === 0}
-          <p class="text-muted-foreground text-sm">No users assigned to this role.</p>
+          <p class="text-muted-foreground text-sm">此角色尚未分配用户。</p>
         {:else}
           <div class="flex flex-col gap-2">
             {#each roleUsers as user (user.id)}
@@ -787,9 +841,9 @@
 
         <!-- Add users -->
         <div class="p-4">
-          <h4 class="mb-2 text-sm font-medium">Add Users</h4>
+          <h4 class="mb-2 text-sm font-medium">添加用户</h4>
           {#if availableUsersToAdd.length === 0}
-            <p class="text-muted-foreground text-sm">All users are already in this role.</p>
+            <p class="text-muted-foreground text-sm">所有用户都已属于此角色。</p>
           {:else}
             <div class="flex max-h-64 flex-col gap-2 overflow-y-auto">
               {#each availableUsersToAdd as user (user.id)}

@@ -42,12 +42,21 @@
 
   // Duration presets in seconds
   const durationPresets = [
-    { label: "1 Hour", value: 3600 },
-    { label: "24 Hours", value: 86400 },
-    { label: "7 Days", value: 604800 },
-    { label: "30 Days", value: 2592000 },
-    { label: "90 Days", value: 7776000 }
+    { label: "1 小时", value: 3600 },
+    { label: "24 小时", value: 86400 },
+    { label: "7 天", value: 604800 },
+    { label: "30 天", value: 2592000 },
+    { label: "90 天", value: 7776000 }
   ];
+
+  const badgeTypeLabels = { status: "状态", uptime: "可用率", latency: "延迟" };
+  const badgeStyleLabels: Record<string, string> = {
+    flat: "扁平",
+    "flat-square": "方形扁平",
+    plastic: "塑料",
+    "for-the-badge": "大号徽章",
+    social: "社交"
+  };
 
   // Build the badge URL
   const badgeUrl = $derived.by(() => {
@@ -169,16 +178,14 @@
     <div class="flex flex-col gap-6">
       <Card.Root>
         <Card.Header>
-          <Card.Title>Badge Generator</Card.Title>
-          <Card.Description>
-            Create a customizable badge to display the status, uptime, or latency of your monitors
-          </Card.Description>
+          <Card.Title>状态徽章生成器</Card.Title>
+          <Card.Description>创建可自定义的徽章，用于显示监控项状态、可用率或延迟</Card.Description>
         </Card.Header>
         <Card.Content>
           <div class="grid grid-cols-2 gap-4">
             <div class="flex flex-col gap-4 border-r pr-4">
               <div class="flex flex-col gap-2">
-                <Label for="monitor-select">Monitor</Label>
+                <Label for="monitor-select">监控项</Label>
                 <Select.Root
                   type="single"
                   value={badgeConfig.tag}
@@ -188,11 +195,11 @@
                 >
                   <Select.Trigger id="monitor-select" class="w-full">
                     {badgeConfig.tag === "_"
-                      ? "All Monitors"
-                      : monitors.find((m) => m.tag === badgeConfig.tag)?.name || "Select a monitor"}
+                      ? "所有监控项"
+                      : monitors.find((m) => m.tag === badgeConfig.tag)?.name || "选择监控项"}
                   </Select.Trigger>
                   <Select.Content>
-                    <Select.Item value="_">All Monitors</Select.Item>
+                    <Select.Item value="_">所有监控项</Select.Item>
                     {#each monitors as monitor (monitor.tag)}
                       <Select.Item value={monitor.tag}>{monitor.name}</Select.Item>
                     {/each}
@@ -202,7 +209,7 @@
 
               <!-- Badge Type -->
               <div class="flex flex-col gap-2">
-                <Label for="badge-type">Badge Type</Label>
+                <Label for="badge-type">徽章类型</Label>
                 <Select.Root
                   type="single"
                   value={badgeConfig.badgeType}
@@ -211,21 +218,21 @@
                   }}
                 >
                   <Select.Trigger id="badge-type" class="w-full capitalize">
-                    {badgeConfig.badgeType}
+                    {badgeTypeLabels[badgeConfig.badgeType]}
                   </Select.Trigger>
                   <Select.Content>
-                    <Select.Item value="status">Status</Select.Item>
-                    <Select.Item value="uptime">Uptime</Select.Item>
-                    <Select.Item value="latency">Latency</Select.Item>
+                    <Select.Item value="status">状态</Select.Item>
+                    <Select.Item value="uptime">可用率</Select.Item>
+                    <Select.Item value="latency">延迟</Select.Item>
                   </Select.Content>
                 </Select.Root>
                 <p class="text-muted-foreground text-xs">
                   {#if badgeConfig.badgeType === "status"}
-                    Shows current real-time status (UP, DOWN, DEGRADED)
+                    显示当前实时状态（正常、故障、性能下降）
                   {:else if badgeConfig.badgeType === "uptime"}
-                    Shows uptime percentage over a time period
+                    显示一段时间内的可用率百分比
                   {:else}
-                    Shows latency over a time period
+                    显示一段时间内的延迟
                   {/if}
                 </p>
               </div>
@@ -233,7 +240,7 @@
               <!-- Locale (only for status badges) -->
               {#if badgeConfig.badgeType === "status" && activatedLocales.length > 0}
                 <div class="flex flex-col gap-2">
-                  <Label for="badge-locale">Language</Label>
+                  <Label for="badge-locale">语言</Label>
                   <Select.Root
                     type="single"
                     value={badgeConfig.locale || "en"}
@@ -250,14 +257,14 @@
                       {/each}
                     </Select.Content>
                   </Select.Root>
-                  <p class="text-muted-foreground text-xs">Status text will be shown in the selected language</p>
+                  <p class="text-muted-foreground text-xs">状态文字将使用所选语言显示</p>
                 </div>
               {/if}
 
               <!-- Duration (only for uptime/latency) -->
               {#if badgeConfig.badgeType !== "status"}
                 <div class="flex flex-col gap-2">
-                  <Label for="duration">Time Period</Label>
+                  <Label for="duration">时间范围</Label>
                   <Select.Root
                     type="single"
                     value={badgeConfig.sinceLast.toString()}
@@ -266,7 +273,7 @@
                     }}
                   >
                     <Select.Trigger id="duration" class="w-full">
-                      {durationPresets.find((d) => d.value === badgeConfig.sinceLast)?.label || "Custom"}
+                      {durationPresets.find((d) => d.value === badgeConfig.sinceLast)?.label || "自定义"}
                     </Select.Trigger>
                     <Select.Content>
                       {#each durationPresets as preset (preset.value)}
@@ -279,8 +286,8 @@
                 <!-- Hide Duration Toggle -->
                 <div class="flex items-center justify-between">
                   <div class="space-y-0.5">
-                    <Label for="hide-duration">Hide Duration</Label>
-                    <p class="text-muted-foreground text-xs">Don't show the time period on the badge</p>
+                    <Label for="hide-duration">隐藏时间范围</Label>
+                    <p class="text-muted-foreground text-xs">不在徽章上显示时间范围</p>
                   </div>
                   <Switch
                     id="hide-duration"
@@ -293,7 +300,7 @@
               <!-- Latency Metric (only for latency) -->
               {#if badgeConfig.badgeType === "latency"}
                 <div class="flex flex-col gap-2">
-                  <Label for="latency-metric">Latency Metric</Label>
+                  <Label for="latency-metric">延迟指标</Label>
                   <Select.Root
                     type="single"
                     value={badgeConfig.metric}
@@ -303,24 +310,24 @@
                   >
                     <Select.Trigger id="latency-metric" class="w-full capitalize">
                       {badgeConfig.metric === "average"
-                        ? "Average"
+                        ? "平均值"
                         : badgeConfig.metric === "maximum"
-                          ? "Maximum"
-                          : "Minimum"}
+                          ? "最大值"
+                          : "最小值"}
                     </Select.Trigger>
                     <Select.Content>
-                      <Select.Item value="average">Average</Select.Item>
-                      <Select.Item value="maximum">Maximum</Select.Item>
-                      <Select.Item value="minimum">Minimum</Select.Item>
+                      <Select.Item value="average">平均值</Select.Item>
+                      <Select.Item value="maximum">最大值</Select.Item>
+                      <Select.Item value="minimum">最小值</Select.Item>
                     </Select.Content>
                   </Select.Root>
-                  <p class="text-muted-foreground text-xs">Select which latency metric to display on the badge</p>
+                  <p class="text-muted-foreground text-xs">选择徽章上显示的延迟指标</p>
                 </div>
               {/if}
 
               <!-- Badge Style -->
               <div class="flex flex-col gap-2">
-                <Label for="badge-style">Style</Label>
+                <Label for="badge-style">样式</Label>
                 <Select.Root
                   type="single"
                   value={badgeConfig.style}
@@ -329,11 +336,11 @@
                   }}
                 >
                   <Select.Trigger id="badge-style" class="w-full capitalize">
-                    {badgeConfig.style}
+                    {badgeStyleLabels[badgeConfig.style] ?? badgeConfig.style}
                   </Select.Trigger>
                   <Select.Content>
                     {#each BADGE_STYLES as style (style)}
-                      <Select.Item value={style} class="capitalize">{style}</Select.Item>
+                      <Select.Item value={style} class="capitalize">{badgeStyleLabels[style] ?? style}</Select.Item>
                     {/each}
                   </Select.Content>
                 </Select.Root>
@@ -341,14 +348,14 @@
 
               <!-- Custom Label -->
               <div class="flex flex-col gap-2">
-                <Label for="custom-label">Custom Label</Label>
-                <Input id="custom-label" bind:value={badgeConfig.label} placeholder="Leave empty to use monitor name" />
+                <Label for="custom-label">自定义标签</Label>
+                <Input id="custom-label" bind:value={badgeConfig.label} placeholder="留空则使用监控项名称" />
               </div>
 
               <!-- Colors -->
               <div class="grid grid-cols-2 gap-4">
                 <div class="flex flex-col gap-2">
-                  <Label>Label Color</Label>
+                  <Label>标签颜色</Label>
                   <div class="flex items-center gap-2">
                     <ColorPicker
                       bind:hex={badgeConfig.labelColor}
@@ -360,7 +367,7 @@
                   </div>
                 </div>
                 <div class="flex flex-col gap-2">
-                  <Label>Badge Color</Label>
+                  <Label>徽章颜色</Label>
                   <div class="flex items-center gap-2">
                     <ColorPicker bind:hex={badgeConfig.color} label="" --picker-width="150px" --picker-height="150px" />
                     <Input bind:value={badgeConfig.color} class="w-24 font-mono text-xs" />
@@ -372,23 +379,23 @@
               {#if badgeConfig.tag}
                 <div>
                   <p class="flex items-center justify-between">
-                    <span>Preview</span>
+                    <span>预览</span>
                     <Button variant="ghost" size="icon-sm" onclick={refreshPreview} disabled={!badgeConfig.tag}>
                       <RefreshCwIcon class="size-4" />
                     </Button>
                   </p>
-                  <p class="text-muted-foreground text-sm">See how your badge will look</p>
+                  <p class="text-muted-foreground text-sm">查看徽章显示效果</p>
                 </div>
                 <!-- Badge Preview -->
                 <div class="bg-muted/50 flex items-center justify-center rounded-lg border p-8">
                   {#key previewKey}
-                    <img src={badgeUrl} alt="Badge preview" class="max-w-full" />
+                    <img src={badgeUrl} alt="徽章预览" class="max-w-full" />
                   {/key}
                 </div>
 
                 <!-- URL -->
                 <div class="space-y-2">
-                  <Label>Badge URL</Label>
+                  <Label>徽章 URL</Label>
                   <div class="flex gap-2">
                     <Input value={badgeUrl} readonly class="font-mono text-xs" />
                     <CopyButton text={badgeUrl}>
@@ -420,7 +427,7 @@
                 </div>
               {:else}
                 <div class="text-muted-foreground flex items-center justify-center py-12 text-center">
-                  Select a monitor to preview the badge
+                  选择监控项以预览徽章
                 </div>
               {/if}
             </div>

@@ -51,11 +51,11 @@
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success(checked ? "Monitor added to page" : "Monitor removed from page");
+        toast.success(checked ? "监控项已添加到页面" : "监控项已从页面移除");
         onPagesUpdated();
       }
     } catch (e) {
-      toast.error("Failed to update page");
+      toast.error("更新页面失败");
     } finally {
       savingPages = false;
     }
@@ -66,13 +66,13 @@
   <Card.Header>
     <Card.Title class="flex items-center gap-2">
       <FileTextIcon class="size-5" />
-      Page Visibility
+      页面可见性
     </Card.Title>
-    <Card.Description>Select which pages this monitor should appear on</Card.Description>
+    <Card.Description>选择此监控项要显示在哪些页面上</Card.Description>
   </Card.Header>
   <Card.Content>
     {#if allPages.length === 0}
-      <p class="text-muted-foreground text-sm">No pages available. Create a page first.</p>
+      <p class="text-muted-foreground text-sm">没有可用页面，请先创建页面。</p>
     {:else}
       <div class="flex flex-row flex-wrap gap-2 space-y-3">
         {#each allPages as page (page.id)}

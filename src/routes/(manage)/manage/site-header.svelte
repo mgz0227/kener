@@ -23,10 +23,10 @@
         target="_blank"
         rel="noopener noreferrer"
       >
-        Status Page
+        状态页
       </Button>
       <Button href="https://kener.ing/docs" variant="secondary" size="sm" target="_blank" rel="noopener noreferrer">
-        Documentation
+        使用文档
       </Button>
     </div>
   </div>

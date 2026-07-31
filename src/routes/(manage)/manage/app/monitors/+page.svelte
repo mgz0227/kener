@@ -35,9 +35,9 @@
   const limit = 10;
 
   const statusOptions = [
-    { value: "ALL", label: "All Status" },
-    { value: "ACTIVE", label: "Active" },
-    { value: "INACTIVE", label: "Inactive" }
+    { value: "ALL", label: "全部状态" },
+    { value: "ACTIVE", label: "启用" },
+    { value: "INACTIVE", label: "停用" }
   ];
 
   const totalCount = $derived(monitors.length);
@@ -92,7 +92,7 @@
         monitors = result;
       }
     } catch (e) {
-      error = e instanceof Error ? e.message : "Failed to fetch monitors";
+      error = e instanceof Error ? e.message : "获取监控项失败";
     } finally {
       loading = false;
     }
@@ -120,12 +120,11 @@
       if (result.error) {
         throw new Error(result.error);
       }
-      const stateLabel =
-        field === "status" ? (next === "ACTIVE" ? "active" : "inactive") : next === "YES" ? "hidden" : "visible";
-      toast.success(`${monitor.name} is now ${stateLabel}`);
+      const stateLabel = field === "status" ? (next === "ACTIVE" ? "启用" : "停用") : next === "YES" ? "隐藏" : "可见";
+      toast.success(`${monitor.name} 当前为${stateLabel}`);
     } catch (e) {
       monitor[field] = previous;
-      toast.error(e instanceof Error ? e.message : "Failed to update monitor");
+      toast.error(e instanceof Error ? e.message : "更新监控项失败");
     } finally {
       delete toggling[key];
     }
@@ -142,9 +141,9 @@
       <div class="flex items-center gap-2">
         <Button variant={showFilters ? "default" : "outline"} size="sm" onclick={() => (showFilters = !showFilters)}>
           <FilterIcon class="size-4" />
-          Filters
+          筛选
           {#if hasActiveFilters}
-            <Badge variant="secondary" class="ml-1 px-1.5 py-0 text-[10px]">ON</Badge>
+            <Badge variant="secondary" class="ml-1 px-1.5 py-0 text-[10px]">已启用</Badge>
           {/if}
         </Button>
         {#if loading}
@@ -153,18 +152,18 @@
       </div>
       <Button class="cursor-pointer" href={clientResolver(resolve, "/manage/app/monitors/new")}>
         <Plus class="size-4" />
-        New Monitor
+        新建监控项
       </Button>
     </div>
 
     {#if showFilters}
       <div class="bg-muted/50 flex flex-wrap items-end gap-3 rounded-lg border p-3">
         <div class="flex flex-col gap-1">
-          <span class="text-muted-foreground text-xs font-medium">Search</span>
-          <Input type="text" placeholder="Search by name or tag..." bind:value={searchQuery} class="w-60" />
+          <span class="text-muted-foreground text-xs font-medium">搜索</span>
+          <Input type="text" placeholder="按名称或标签搜索..." bind:value={searchQuery} class="w-60" />
         </div>
         <div class="flex flex-col gap-1">
-          <span class="text-muted-foreground text-xs font-medium">Status</span>
+          <span class="text-muted-foreground text-xs font-medium">状态</span>
           <Select.Root
             type="single"
             value={statusFilter}
@@ -173,7 +172,7 @@
             }}
           >
             <Select.Trigger class="w-40">
-              {statusOptions.find((o) => o.value === statusFilter)?.label || "All Status"}
+              {statusOptions.find((o) => o.value === statusFilter)?.label || "全部状态"}
             </Select.Trigger>
             <Select.Content>
               {#each statusOptions as option (option.value)}
@@ -184,12 +183,12 @@
         </div>
         <Button size="sm" onclick={applyFilters}>
           <SearchIcon class="size-4" />
-          Search
+          搜索
         </Button>
         {#if hasActiveFilters}
           <Button variant="ghost" size="sm" onclick={clearFilters}>
             <XIcon class="size-4" />
-            Clear
+            清除
           </Button>
         {/if}
       </div>
@@ -202,7 +201,7 @@
           <Spinner />
         </Item.Media>
         <Item.Content>
-          <Item.Title class="line-clamp-1">Loading Monitors....</Item.Title>
+          <Item.Title class="line-clamp-1">正在加载监控项...</Item.Title>
         </Item.Content>
         <Item.Content class="flex-none justify-end"></Item.Content>
       </Item.Root>
@@ -212,17 +211,17 @@
       {error}
     </div>
   {:else if monitors.length === 0}
-    <div class="text-muted-foreground py-8 text-center">No monitors found.</div>
+    <div class="text-muted-foreground py-8 text-center">未找到监控项。</div>
   {:else}
     <div class="ktable rounded-xl border">
       <Table.Root>
         <Table.Header>
           <Table.Row>
-            <Table.Head class="w-[300px]">Monitor</Table.Head>
-            <Table.Head class="w-[180px]">Tag</Table.Head>
-            <Table.Head class="w-[130px]">Type</Table.Head>
-            <Table.Head class="w-[120px]">Status</Table.Head>
-            <Table.Head class="w-[120px]">Visible</Table.Head>
+            <Table.Head class="w-[300px]">监控项</Table.Head>
+            <Table.Head class="w-[180px]">标签</Table.Head>
+            <Table.Head class="w-[130px]">类型</Table.Head>
+            <Table.Head class="w-[120px]">状态</Table.Head>
+            <Table.Head class="w-[120px]">可见性</Table.Head>
             <Table.Head class="w-[180px]">Cron</Table.Head>
             <Table.Head class="w-[120px] text-right"></Table.Head>
           </Table.Row>
@@ -254,11 +253,11 @@
                   <Switch
                     checked={(data.status || "INACTIVE") === "ACTIVE"}
                     disabled={!canWrite || !!toggling[`${data.id}:status`]}
-                    aria-label="Toggle status for {data.name}"
+                    aria-label="切换 {data.name} 的状态"
                     onCheckedChange={(checked) => toggleMonitorField(data, "status", checked)}
                   />
                   <span class="text-muted-foreground text-xs">
-                    {(data.status || "INACTIVE") === "ACTIVE" ? "Active" : "Inactive"}
+                    {(data.status || "INACTIVE") === "ACTIVE" ? "启用" : "停用"}
                   </span>
                 </div>
               </Table.Cell>
@@ -267,11 +266,11 @@
                   <Switch
                     checked={data.is_hidden !== "YES"}
                     disabled={!canWrite || !!toggling[`${data.id}:is_hidden`]}
-                    aria-label="Toggle status page visibility for {data.name}"
+                    aria-label="切换 {data.name} 在状态页上的可见性"
                     onCheckedChange={(checked) => toggleMonitorField(data, "is_hidden", checked)}
                   />
                   <span class="text-muted-foreground text-xs">
-                    {data.is_hidden === "YES" ? "Hidden" : "Visible"}
+                    {data.is_hidden === "YES" ? "隐藏" : "可见"}
                   </span>
                 </div>
               </Table.Cell>
@@ -281,7 +280,7 @@
               <Table.Cell class="text-right">
                 <Button variant="outline" size="sm" href={clientResolver(resolve, `/manage/app/monitors/${data.tag}`)}>
                   <SettingsIcon class="mr-1 size-4" />
-                  Configure
+                  配置
                 </Button>
               </Table.Cell>
             </Table.Row>
@@ -294,7 +293,7 @@
     {#if totalPages > 0}
       <div class="flex items-center justify-between">
         <p class="text-muted-foreground text-sm">
-          Showing {(pageNo - 1) * limit + 1} - {Math.min(pageNo * limit, totalCount)} of {totalCount} monitors
+          显示第 {(pageNo - 1) * limit + 1} - {Math.min(pageNo * limit, totalCount)} 条，共 {totalCount} 条
         </p>
         {#if totalPages > 1}
           <div class="flex items-center gap-2">

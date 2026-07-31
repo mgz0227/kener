@@ -85,10 +85,10 @@
         toast.error(result.error);
       } else {
         monitor.monitor_settings_json = JSON.stringify(mergedSettings);
-        toast.success("Sharing options saved successfully");
+        toast.success("共享选项已成功保存");
       }
     } catch (e) {
-      const message = e instanceof Error ? e.message : "Failed to save sharing options";
+      const message = e instanceof Error ? e.message : "保存共享选项失败";
       toast.error(message);
     } finally {
       saving = false;
@@ -98,18 +98,16 @@
 
 <Card.Root>
   <Card.Header>
-    <Card.Title>Sharing Options</Card.Title>
-    <Card.Description>Control which sharing actions are available for this monitor</Card.Description>
+    <Card.Title>共享选项</Card.Title>
+    <Card.Description>控制此监控项可用的共享操作</Card.Description>
   </Card.Header>
   <Card.Content class="space-y-6">
     <div class="flex items-center justify-between">
       <div class="space-y-0.5">
-        <Label>Share Badge</Label>
+        <Label>共享徽章</Label>
         <p class="text-muted-foreground text-xs">
-          Show option to get embeddable status and uptime badges
-          <span class="text-red-500" class:hidden={subMenuOptions?.showShareBadgeMonitor}>
-            Disabled by site settings
-          </span>
+          显示获取可嵌入状态和可用率徽章的选项
+          <span class="text-red-500" class:hidden={subMenuOptions?.showShareBadgeMonitor}> 已被站点设置禁用 </span>
         </p>
       </div>
       <Switch bind:checked={sharingOptions.showShareBadgeMonitor} disabled={!subMenuOptions?.showShareBadgeMonitor} />
@@ -117,12 +115,10 @@
 
     <div class="flex items-center justify-between">
       <div class="space-y-0.5">
-        <Label>Share Embed</Label>
+        <Label>共享嵌入代码</Label>
         <p class="text-muted-foreground text-xs">
-          Show option to get iframe or script embed code for this monitor
-          <span class="text-red-500" class:hidden={subMenuOptions?.showShareEmbedMonitor}>
-            Disabled by site settings
-          </span>
+          显示获取此监控项 iframe 或脚本嵌入代码的选项
+          <span class="text-red-500" class:hidden={subMenuOptions?.showShareEmbedMonitor}> 已被站点设置禁用 </span>
         </p>
       </div>
       <Switch bind:checked={sharingOptions.showShareEmbedMonitor} disabled={!subMenuOptions?.showShareEmbedMonitor} />
@@ -135,7 +131,7 @@
       {:else}
         <SaveIcon class="size-4" />
       {/if}
-      Save Sharing Options
+      保存共享选项
     </Button>
   </Card.Footer>
 </Card.Root>

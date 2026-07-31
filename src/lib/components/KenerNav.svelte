@@ -90,7 +90,7 @@
                 type="button"
                 class="{navigationMenuTriggerStyle()} hover:border-border border border-transparent bg-transparent text-xs hover:bg-transparent sm:hidden"
                 style="border-radius: var(--radius-3xl)"
-                aria-label="Open navigation menu"
+                aria-label="打开导航菜单"
               >
                 <MenuIcon class="h-4 w-4" />
               </button>
