@@ -501,7 +501,9 @@
                       <p class="text-muted-foreground text-xs">{trigger.trigger_desc}</p>
                     {/if}
                   </div>
-                  <Badge variant="outline" class="text-xs capitalize">{trigger.trigger_type}</Badge>
+                  <Badge variant="outline" class="text-xs capitalize">
+                    {trigger.trigger_type === "email" ? "电子邮件" : trigger.trigger_type}
+                  </Badge>
                 </label>
               {/each}
             </div>

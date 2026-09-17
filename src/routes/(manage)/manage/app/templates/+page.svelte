@@ -14,6 +14,7 @@
   import { toast } from "svelte-sonner";
   import { mode } from "mode-watcher";
   import CodeMirror from "svelte-codemirror-editor";
+  import { adminEditorExtensions } from "$lib/client/admin-editor.js";
   import { html } from "@codemirror/lang-html";
   import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
   import { onMount } from "svelte";
@@ -136,8 +137,14 @@
   }
 
   function formatTemplateId(id: string): string {
-    // Convert snake_case or kebab-case to Title Case
-    return id.replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+    const names: Record<string, string> = {
+      forgot_password: "重置密码",
+      verify_email: "验证邮箱",
+      invite_user: "邀请用户",
+      subscription_account_code: "订阅验证码",
+      subscription_update: "订阅更新"
+    };
+    return names[id] || id;
   }
 </script>
 
@@ -207,6 +214,7 @@
             <p class="text-muted-foreground text-xs">电子邮件的 HTML 内容。使用 Mustache 变量插入动态内容。</p>
             <div class="overflow-hidden rounded-md border">
               <CodeMirror
+                extensions={adminEditorExtensions}
                 bind:value={templateHtmlBody}
                 lang={html()}
                 theme={mode.current === "dark" ? githubDark : githubLight}

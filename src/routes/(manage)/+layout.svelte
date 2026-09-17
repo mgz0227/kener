@@ -76,7 +76,7 @@
 </script>
 
 <ModeWatcher defaultMode={data.defaultSiteTheme as "light" | "dark" | "system"} />
-<Toaster />
+<Toaster containerAriaLabel="通知" closeButtonAriaLabel="关闭通知" />
 
 <svelte:head>
   <meta name="robots" content="noindex, nofollow" />
@@ -106,7 +106,7 @@
 		}
 	</style>`}
 </svelte:head>
-<main class="kener-manage">
+<main class="kener-manage" lang="zh-CN">
   <Sidebar.Provider style="--sidebar-width: calc(var(--spacing) * 72); --header-height: calc(var(--spacing) * 12);">
     <AppSidebar variant="inset" {navItems} />
     <Sidebar.Inset>

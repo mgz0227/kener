@@ -40,10 +40,11 @@ describe("CopyButton", () => {
     vi.spyOn(navigator.clipboard, "writeText").mockResolvedValue(undefined);
     const onclick = vi.fn();
 
-    const screen = await render(CopyButton, { text: "x", onclick });
+    const screen = await render(CopyButton, { text: "x", onclick, copiedLabel: "已复制" });
     await screen.getByRole("button").click();
 
     expect(onclick).toHaveBeenCalledOnce();
+    await expect.element(screen.getByText("已复制")).toHaveClass(/scale-100/);
   });
 
   it("does not touch the clipboard when no text is provided", async () => {

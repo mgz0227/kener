@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { monitorTypeLabels, monitorStatusLabels } from "$lib/client/admin-labels.js";
   import { Button } from "$lib/components/ui/button/index.js";
   import { Label } from "$lib/components/ui/label/index.js";
   import * as Card from "$lib/components/ui/card/index.js";
@@ -106,22 +107,6 @@
   let savingType = $state(false);
   let testingMonitor = $state(false);
   let testResult = $state<MonitoringResult | null>(null);
-
-  const monitorTypeLabels: Record<MonitorType, string> = {
-    API: "HTTP/API",
-    PING: "Ping 检测",
-    TCP: "TCP 端口",
-    DNS: "DNS",
-    NONE: "手动",
-    GROUP: "组合",
-    SSL: "SSL 证书",
-    SQL: "数据库",
-    HEARTBEAT: "心跳",
-    GAMEDIG: "游戏服务器",
-    GRPC: "gRPC 健康检查",
-    PROMETHEUS: "Prometheus",
-    DOCKER: "Docker 容器"
-  };
 
   // Validation for each monitor type
   const isTypeSettingsValid = $derived.by(() => {
@@ -351,7 +336,7 @@
         }}
       >
         <Select.Trigger id="monitor-type" class="w-full">
-          {monitorTypeLabels[monitor.monitor_type as MonitorType]}
+          {monitorTypeLabels[monitor.monitor_type] ?? monitor.monitor_type}
         </Select.Trigger>
         <Select.Content>
           {#each MONITOR_TYPES as type (type)}
@@ -434,7 +419,7 @@
                 <div class="rounded-lg border p-4 text-center">
                   <div class="text-muted-foreground text-xs uppercase">状态</div>
                   <div class="mt-1 text-2xl font-bold text-{testResult.status.toLowerCase()}">
-                    {testResult.status}
+                    {monitorStatusLabels[testResult.status] ?? testResult.status}
                   </div>
                 </div>
                 <div class="rounded-lg border p-4 text-center">

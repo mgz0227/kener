@@ -205,7 +205,7 @@
       <p class="text-muted-foreground text-xs">
         每次检查都会重新查找容器，只要名称不变，重建容器后仍可继续监控。运行中的容器为正常（UP）， 除非 <code
           >HEALTHCHECK</code
-        > 返回异常；重启或启动中为性能下降（DEGRADED）；暂停、停止、不健康或不存在为中断（DOWN）。
+        > 返回异常；重启或启动中为性能下降（DEGRADED）；暂停、停止、不健康或不存在为故障（DOWN）。
       </p>
     </div>
   {/if}

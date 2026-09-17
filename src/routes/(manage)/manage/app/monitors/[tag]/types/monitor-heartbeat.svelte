@@ -39,7 +39,7 @@
     <div class="flex flex-col">
       <InputGroup.Root>
         <InputGroup.Addon>
-          <InputGroup.Text><span class="text-degraded">DEGRADED</span> 阈值</InputGroup.Text>
+          <InputGroup.Text><span class="text-degraded">性能下降</span> 阈值</InputGroup.Text>
         </InputGroup.Addon>
         <InputGroup.Input
           class="text-right"
@@ -51,19 +51,19 @@
           <InputGroup.Text>分钟</InputGroup.Text>
         </InputGroup.Addon>
       </InputGroup.Root>
-      <p class="text-muted-foreground mt-1 text-xs">若在指定分钟数内未收到心跳，则标记为 DEGRADED</p>
+      <p class="text-muted-foreground mt-1 text-xs">若在指定分钟数内未收到心跳，则标记为性能下降</p>
     </div>
     <div class="flex flex-col">
       <InputGroup.Root>
         <InputGroup.Addon>
-          <InputGroup.Text><span class="text-down">DOWN</span> 阈值</InputGroup.Text>
+          <InputGroup.Text><span class="text-down">故障</span> 阈值</InputGroup.Text>
         </InputGroup.Addon>
         <InputGroup.Input class="text-right" id="hb-down" bind:value={data.downRemainingMinutes} placeholder="10" />
         <InputGroup.Addon align="inline-end">
           <InputGroup.Text>分钟</InputGroup.Text>
         </InputGroup.Addon>
       </InputGroup.Root>
-      <p class="text-muted-foreground mt-1 text-xs">若在指定分钟数内未收到心跳，则标记为 DOWN</p>
+      <p class="text-muted-foreground mt-1 text-xs">若在指定分钟数内未收到心跳，则标记为故障</p>
     </div>
   </div>
 
@@ -81,7 +81,7 @@
           <InputGroup.Addon align="inline-end">
             <InputGroup.Button variant="secondary" onclick={refreshSecret}>生成新 URL</InputGroup.Button>
 
-            <CopyButton variant="ghost" size="icon-sm" text={heartbeatUrl}>
+            <CopyButton variant="ghost" size="icon-sm" text={heartbeatUrl} title="复制心跳 URL" copiedLabel="已复制">
               <Copy class="size-4" />
             </CopyButton>
           </InputGroup.Addon>

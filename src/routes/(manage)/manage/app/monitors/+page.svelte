@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { monitorTypeLabels } from "$lib/client/admin-labels.js";
   import { Badge } from "$lib/components/ui/badge/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
@@ -222,7 +223,7 @@
             <Table.Head class="w-[130px]">类型</Table.Head>
             <Table.Head class="w-[120px]">状态</Table.Head>
             <Table.Head class="w-[120px]">可见性</Table.Head>
-            <Table.Head class="w-[180px]">Cron</Table.Head>
+            <Table.Head class="w-[180px]">检查计划</Table.Head>
             <Table.Head class="w-[120px] text-right"></Table.Head>
           </Table.Row>
         </Table.Header>
@@ -246,7 +247,7 @@
                 <Badge variant="outline">{data.tag}</Badge>
               </Table.Cell>
               <Table.Cell>
-                <Badge variant="secondary">{data.monitor_type}</Badge>
+                <Badge variant="secondary">{monitorTypeLabels[data.monitor_type] ?? data.monitor_type}</Badge>
               </Table.Cell>
               <Table.Cell>
                 <div class="flex items-center gap-2">
@@ -297,7 +298,13 @@
         </p>
         {#if totalPages > 1}
           <div class="flex items-center gap-2">
-            <Button variant="outline" size="icon" disabled={pageNo === 1} onclick={() => goToPage(pageNo - 1)}>
+            <Button
+              variant="outline"
+              size="icon"
+              aria-label="上一页"
+              disabled={pageNo === 1}
+              onclick={() => goToPage(pageNo - 1)}
+            >
               <ChevronLeftIcon class="size-4" />
             </Button>
             <div class="flex items-center gap-1">
@@ -329,7 +336,13 @@
                 </Button>
               {/if}
             </div>
-            <Button variant="outline" size="icon" disabled={pageNo === totalPages} onclick={() => goToPage(pageNo + 1)}>
+            <Button
+              variant="outline"
+              size="icon"
+              aria-label="下一页"
+              disabled={pageNo === totalPages}
+              onclick={() => goToPage(pageNo + 1)}
+            >
               <ChevronRightIcon class="size-4" />
             </Button>
           </div>

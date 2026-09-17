@@ -1,4 +1,5 @@
 import GC from "$lib/global-constants";
+import { monitorStatusLabels } from "$lib/client/admin-labels";
 
 type AlertTextKind = "label" | "help" | "description";
 
@@ -48,7 +49,7 @@ export function getAlertText({
   const value = alert_value ?? "";
 
   if (alert_for === GC.STATUS) {
-    return `连续 ${thresholdValue} 次检查结果为 ${value} 时触发告警。连续 ${resolveThreshold} 次检查成功后恢复。`;
+    return `连续 ${thresholdValue} 次检查结果为 ${monitorStatusLabels[value] ?? value} 时触发告警。连续 ${resolveThreshold} 次检查成功后恢复。`;
   }
 
   if (alert_for === GC.LATENCY) {

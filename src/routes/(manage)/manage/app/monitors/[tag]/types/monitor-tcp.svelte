@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { hostTypeLabels } from "$lib/client/admin-labels.js";
   import { Input } from "$lib/components/ui/input/index.js";
   import { Label } from "$lib/components/ui/label/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
@@ -8,6 +9,7 @@
   import X from "@lucide/svelte/icons/x";
   import { DefaultTCPEval } from "$lib/anywhere.js";
   import CodeMirror from "svelte-codemirror-editor";
+  import { adminEditorExtensions } from "$lib/client/admin-editor.js";
   import { javascript } from "@codemirror/lang-javascript";
   import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
   import { mode } from "mode-watcher";
@@ -71,7 +73,7 @@
           <div class="bg-muted/50 rounded-lg border p-3">
             <div class="mb-2 flex items-center justify-between">
               <span class="text-sm font-medium">主机 {index + 1}</span>
-              <Button variant="ghost" size="icon" onclick={() => removeHost(index)}>
+              <Button variant="ghost" size="icon" aria-label="移除主机 {index + 1}" onclick={() => removeHost(index)}>
                 <X class="size-4" />
               </Button>
             </div>
@@ -84,11 +86,11 @@
                   onValueChange={(v) => (host.type = normalizeHostType(v))}
                 >
                   <Select.Trigger id="tcp-type-{index}" class="w-full">
-                    {normalizeHostType(host.type)}
+                    {hostTypeLabels[normalizeHostType(host.type)] ?? normalizeHostType(host.type)}
                   </Select.Trigger>
                   <Select.Content>
                     {#each PING_HOST_TYPES as typeOption (typeOption)}
-                      <Select.Item value={typeOption}>{typeOption}</Select.Item>
+                      <Select.Item value={typeOption}>{hostTypeLabels[typeOption] ?? typeOption}</Select.Item>
                     {/each}
                   </Select.Content>
                 </Select.Root>
@@ -123,6 +125,7 @@
     <Label for="tcp-eval">自定义评估函数</Label>
     <div class="rounded-md border">
       <CodeMirror
+        extensions={adminEditorExtensions}
         bind:value={data.tcpEval}
         lang={javascript()}
         theme={mode.current === "dark" ? githubDark : githubLight}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { monitorStatusLabels } from "$lib/client/admin-labels.js";
   import { Input } from "$lib/components/ui/input/index.js";
   import { Label } from "$lib/components/ui/label/index.js";
   import { Textarea } from "$lib/components/ui/textarea/index.js";
@@ -56,7 +57,7 @@
   <!-- Down condition -->
   <div class="flex items-center space-x-2">
     <Switch id="prom-down-enabled" checked={!!data.down} onCheckedChange={toggleDown} />
-    <Label for="prom-down-enabled">中断条件</Label>
+    <Label for="prom-down-enabled">故障条件</Label>
   </div>
   {#if data.down}
     <div class="grid grid-cols-2 gap-4">
@@ -84,7 +85,7 @@
     </div>
     <p class="text-muted-foreground -mt-2 text-xs">
       指标值满足 {data.down.operator}
-      {data.down.value} 时，状态为中断（DOWN）。
+      {data.down.value} 时，状态为故障（DOWN）。
     </p>
   {/if}
 
@@ -119,7 +120,7 @@
     </div>
     <p class="text-muted-foreground -mt-2 text-xs">
       指标值满足 {data.degraded.operator}
-      {data.degraded.value} 时，状态为性能下降（DEGRADED），在中断条件之后检查。
+      {data.degraded.value} 时，状态为性能下降（DEGRADED），在故障条件之后检查。
     </p>
   {/if}
 
@@ -133,10 +134,12 @@
         if (v) data.noDataStatus = v;
       }}
     >
-      <Select.Trigger id="prom-nodata" class="w-full">{data.noDataStatus}</Select.Trigger>
+      <Select.Trigger id="prom-nodata" class="w-full"
+        >{monitorStatusLabels[data.noDataStatus] ?? data.noDataStatus}</Select.Trigger
+      >
       <Select.Content>
         {#each STATUS_OPTIONS as opt}
-          <Select.Item value={opt}>{opt}</Select.Item>
+          <Select.Item value={opt}>{monitorStatusLabels[opt] ?? opt}</Select.Item>
         {/each}
       </Select.Content>
     </Select.Root>
@@ -152,10 +155,12 @@
         if (v) data.errorStatus = v;
       }}
     >
-      <Select.Trigger id="prom-error" class="w-full">{data.errorStatus}</Select.Trigger>
+      <Select.Trigger id="prom-error" class="w-full"
+        >{monitorStatusLabels[data.errorStatus] ?? data.errorStatus}</Select.Trigger
+      >
       <Select.Content>
         {#each STATUS_OPTIONS as opt}
-          <Select.Item value={opt}>{opt}</Select.Item>
+          <Select.Item value={opt}>{monitorStatusLabels[opt] ?? opt}</Select.Item>
         {/each}
       </Select.Content>
     </Select.Root>
@@ -180,7 +185,7 @@
           <div class="flex items-center gap-2">
             <Input bind:value={header.key} placeholder="请求头名称" class="flex-1" />
             <Input bind:value={header.value} placeholder="请求头值" class="flex-1" />
-            <Button variant="ghost" size="icon" onclick={() => removeHeader(index)}>
+            <Button variant="ghost" size="icon" aria-label="移除请求头" onclick={() => removeHeader(index)}>
               <X class="size-4" />
             </Button>
           </div>

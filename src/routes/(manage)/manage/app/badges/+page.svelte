@@ -9,6 +9,7 @@
   import * as Select from "$lib/components/ui/select/index.js";
   import CopyButton from "$lib/components/CopyButton.svelte";
   import ColorPicker from "svelte-awesome-color-picker";
+  import { colorPickerTexts } from "$lib/client/admin-labels.js";
   import CopyIcon from "@lucide/svelte/icons/copy";
   import EyeIcon from "@lucide/svelte/icons/eye";
   import RefreshCwIcon from "@lucide/svelte/icons/refresh-cw";
@@ -249,7 +250,7 @@
                     }}
                   >
                     <Select.Trigger id="badge-locale" class="w-full">
-                      {activatedLocales.find((l) => l.code === (badgeConfig.locale || "en"))?.name || "English"}
+                      {activatedLocales.find((l) => l.code === (badgeConfig.locale || "en"))?.name || "英语"}
                     </Select.Trigger>
                     <Select.Content>
                       {#each activatedLocales as locale (locale.code)}
@@ -358,6 +359,7 @@
                   <Label>标签颜色</Label>
                   <div class="flex items-center gap-2">
                     <ColorPicker
+                      texts={colorPickerTexts}
                       bind:hex={badgeConfig.labelColor}
                       label=""
                       --picker-width="150px"
@@ -369,7 +371,13 @@
                 <div class="flex flex-col gap-2">
                   <Label>徽章颜色</Label>
                   <div class="flex items-center gap-2">
-                    <ColorPicker bind:hex={badgeConfig.color} label="" --picker-width="150px" --picker-height="150px" />
+                    <ColorPicker
+                      texts={colorPickerTexts}
+                      bind:hex={badgeConfig.color}
+                      label=""
+                      --picker-width="150px"
+                      --picker-height="150px"
+                    />
                     <Input bind:value={badgeConfig.color} class="w-24 font-mono text-xs" />
                   </div>
                 </div>
@@ -398,7 +406,7 @@
                   <Label>徽章 URL</Label>
                   <div class="flex gap-2">
                     <Input value={badgeUrl} readonly class="font-mono text-xs" />
-                    <CopyButton text={badgeUrl}>
+                    <CopyButton text={badgeUrl} copiedLabel="已复制">
                       <CopyIcon class="size-4" />
                     </CopyButton>
                   </div>
@@ -409,7 +417,7 @@
                   <Label>Markdown</Label>
                   <div class="flex gap-2">
                     <Input value={markdownSnippet} readonly class="font-mono text-xs" />
-                    <CopyButton text={markdownSnippet}>
+                    <CopyButton text={markdownSnippet} copiedLabel="已复制">
                       <CopyIcon class="size-4" />
                     </CopyButton>
                   </div>
@@ -420,7 +428,7 @@
                   <Label>HTML</Label>
                   <div class="flex gap-2">
                     <Input value={htmlSnippet} readonly class="font-mono text-xs" />
-                    <CopyButton text={htmlSnippet}>
+                    <CopyButton text={htmlSnippet} copiedLabel="已复制">
                       <CopyIcon class="size-4" />
                     </CopyButton>
                   </div>

@@ -32,6 +32,7 @@
   import { SveltePurify } from "@humanspeak/svelte-purify";
 
   import CodeMirror from "svelte-codemirror-editor";
+  import { adminEditorExtensions } from "$lib/client/admin-editor.js";
   import { markdown } from "@codemirror/lang-markdown";
   import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
   import mdToHTML from "$lib/marked";
@@ -827,6 +828,7 @@
             <Label for="first-comment">初始更新（可选）</Label>
             <div class="overflow-hidden rounded-md border">
               <CodeMirror
+                extensions={adminEditorExtensions}
                 bind:value={firstComment}
                 lang={markdown()}
                 theme={mode.current === "dark" ? githubDark : githubLight}
@@ -1014,6 +1016,7 @@
                 <Label>更新内容</Label>
                 <div class="overflow-hidden rounded-md border">
                   <CodeMirror
+                    extensions={adminEditorExtensions}
                     bind:value={commentText}
                     lang={markdown()}
                     theme={mode.current === "dark" ? githubDark : githubLight}
@@ -1080,6 +1083,7 @@
                         <Label>更新内容</Label>
                         <div class="overflow-hidden rounded-md border">
                           <CodeMirror
+                            extensions={adminEditorExtensions}
                             bind:value={commentText}
                             lang={markdown()}
                             theme={mode.current === "dark" ? githubDark : githubLight}

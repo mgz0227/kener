@@ -142,8 +142,8 @@
     <div class="flex flex-col gap-1">
       <Label>选择组合成员</Label>
       <p class="text-muted-foreground text-xs">
-        组合监控通过加权评分汇总多个监控项的状态。各状态的标准分值为：UP=1、DEGRADED=0.5、DOWN=0。 维护中的成员按 UP
-        计算。加权总分决定组合状态：1=UP，0 到 1 之间=DEGRADED，0=DOWN。
+        组合监控通过加权评分汇总多个监控项的状态。各状态的标准分值为：正常=1、性能下降=0.5、故障=0。维护中的成员按正常
+        计算。加权总分决定组合状态：1=正常，0 到 1 之间=性能下降，0=故障。
       </p>
       <p class="text-muted-foreground text-xs">
         请至少选择 {MIN_SELECTED_MONITORS} 个监控项，权重总和必须为 1。
@@ -290,6 +290,7 @@
               size="icon"
               class="h-7 w-7"
               disabled={index === 0}
+              aria-label="上移监控项"
               onclick={() => moveMonitorUp(index)}
             >
               <ArrowUp class="h-3.5 w-3.5" />
@@ -299,6 +300,7 @@
               size="icon"
               class="h-7 w-7"
               disabled={index === formData.monitors.length - 1}
+              aria-label="下移监控项"
               onclick={() => moveMonitorDown(index)}
             >
               <ArrowDown class="h-3.5 w-3.5" />

@@ -40,10 +40,10 @@
             placeholder="168"
           />
           <InputGroup.Addon align="inline-end">
-            <InputGroup.Text>小时则为 DEGRADED</InputGroup.Text>
+            <InputGroup.Text>小时则为性能下降</InputGroup.Text>
           </InputGroup.Addon>
         </InputGroup.Root>
-        <p class="text-muted-foreground mt-1 text-xs">证书将在指定小时数内过期时标记为 DEGRADED</p>
+        <p class="text-muted-foreground mt-1 text-xs">证书将在指定小时数内过期时标记为性能下降</p>
       </div>
     </div>
     <div class="flex flex-col gap-2">
@@ -60,10 +60,10 @@
             placeholder="24"
           />
           <InputGroup.Addon align="inline-end">
-            <InputGroup.Text>小时则为 DOWN</InputGroup.Text>
+            <InputGroup.Text>小时则为故障</InputGroup.Text>
           </InputGroup.Addon>
         </InputGroup.Root>
-        <p class="text-muted-foreground mt-1 text-xs">证书将在指定小时数内过期时标记为 DOWN</p>
+        <p class="text-muted-foreground mt-1 text-xs">证书将在指定小时数内过期时标记为故障</p>
       </div>
     </div>
   </div>

@@ -22,6 +22,7 @@
   import clientResolver from "$lib/client/resolver.js";
   import GC, { isMonitoringStatus } from "$lib/global-constants";
   import type { MonitoringStatus } from "$lib/types/status.js";
+  import { monitoringDataTypeLabels, monitorStatusLabels } from "$lib/client/admin-labels.js";
 
   // Types
   interface MonitoringData {
@@ -315,13 +316,13 @@
           <span class="text-muted-foreground text-xs font-medium">状态</span>
           <Select.Root type="single" value={statusFilter} onValueChange={handleStatusChange}>
             <Select.Trigger class="w-36" aria-label="状态">
-              {statusFilter === "ALL" ? "全部状态" : statusFilter}
+              {statusFilter === "ALL" ? "全部状态" : monitorStatusLabels[statusFilter] || statusFilter}
             </Select.Trigger>
             <Select.Content>
               <Select.Item value="ALL">全部状态</Select.Item>
-              <Select.Item value={GC.UP}>UP</Select.Item>
-              <Select.Item value={GC.DOWN}>DOWN</Select.Item>
-              <Select.Item value={GC.DEGRADED}>DEGRADED</Select.Item>
+              <Select.Item value={GC.UP}>{monitorStatusLabels[GC.UP]}</Select.Item>
+              <Select.Item value={GC.DOWN}>{monitorStatusLabels[GC.DOWN]}</Select.Item>
+              <Select.Item value={GC.DEGRADED}>{monitorStatusLabels[GC.DEGRADED]}</Select.Item>
             </Select.Content>
           </Select.Root>
         </div>
@@ -384,7 +385,7 @@
               </Table.Cell>
               <Table.Cell>
                 <span class="text-xs font-semibold text-{row.status?.toLowerCase()}">
-                  {row.status || "暂无"}
+                  {monitorStatusLabels[row.status || ""] || row.status || "暂无"}
                 </span>
               </Table.Cell>
               <Table.Cell>
@@ -396,7 +397,7 @@
               </Table.Cell>
               <Table.Cell>
                 {#if row.type}
-                  <Badge variant="secondary">{row.type}</Badge>
+                  <Badge variant="secondary">{monitoringDataTypeLabels[row.type] || row.type}</Badge>
                 {:else}
                   <span class="text-muted-foreground text-sm">—</span>
                 {/if}
@@ -465,7 +466,7 @@
           <strong>{monitorTagFilter}</strong>
         {/if}
         {#if statusFilter !== "ALL"}
-          且状态为 <strong>{statusFilter}</strong>
+          且状态为 <strong>{monitorStatusLabels[statusFilter] || statusFilter}</strong>
         {/if}
         从 {startDateTime} 到 {endDateTime} 的监控数据。 此操作无法撤销。
       </AlertDialog.Description>

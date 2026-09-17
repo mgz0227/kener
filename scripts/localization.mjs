@@ -37,11 +37,14 @@ function apply(patchPath) {
       checked(["read-tree", "HEAD"], { env });
       const result = git(["apply", "--cached", "--3way"], { env, input });
       if (result.status !== 0) {
-        throw new Error(`Localization conflicts with this upstream revision; no files were changed.\n${result.stderr.trim()}`);
+        throw new Error(
+          `Localization conflicts with this upstream revision; no files were changed.\n${result.stderr.trim()}`,
+        );
       }
-      input = git(["diff", "--quiet"], { env }).status === 0
-        ? ""
-        : checked(["diff", "--cached", "--binary", "--full-index", "--no-ext-diff", "HEAD"], { env });
+      input =
+        git(["diff", "--quiet"], { env }).status === 0
+          ? ""
+          : checked(["diff", "--cached", "--binary", "--full-index", "--no-ext-diff", "HEAD"], { env });
     } finally {
       rmSync(temporary, { recursive: true, force: true });
     }
@@ -62,8 +65,18 @@ function exportPatch(upstreamRef) {
   if (git(["merge-base", "--is-ancestor", upstreamCommit, "HEAD"]).status !== 0) {
     throw new Error("Merge the specified upstream revision before exporting localization.");
   }
-  const patch = checked(["diff", "--binary", "--full-index", "--no-ext-diff", upstreamCommit, "HEAD", "--", "src"]);
-  if (!patch.trim()) throw new Error("No committed localization changes found under src/.");
+  const patch = checked([
+    "diff",
+    "--binary",
+    "--full-index",
+    "--no-ext-diff",
+    upstreamCommit,
+    "HEAD",
+    "--",
+    "src",
+    "vite.config.ts",
+  ]);
+  if (!patch.trim()) throw new Error("No committed localization changes found.");
   mkdirSync("localization", { recursive: true });
   writeFileSync("localization/zh-CN.patch", patch);
   writeFileSync("localization/zh-CN.json", JSON.stringify({ upstreamRef, upstreamCommit }, null, 2) + "\n");

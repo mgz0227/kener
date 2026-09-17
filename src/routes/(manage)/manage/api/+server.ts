@@ -140,6 +140,7 @@ import serverResolver from "$lib/server/resolver.js";
 import { ACTION_PERMISSION_MAP } from "$lib/allPerms.js";
 import { TestOidcConnection, ClearOidcConfigCache } from "$lib/server/controllers/oidcController.js";
 import { MaskString } from "$lib/server/tool.js";
+import { localizeAdminError } from "$lib/server/admin-errors.js";
 
 export async function POST({ request, cookies }) {
   const payload = await request.json();
@@ -399,6 +400,9 @@ export async function POST({ request, cookies }) {
       };
       const serviceClient = new Service(monitorReducedType);
       resp = await serviceClient.execute();
+      if (typeof resp.error_message === "string") {
+        resp.error_message = localizeAdminError(resp.error_message);
+      }
     } else if (action == "uploadImage") {
       resp = await uploadImage(data);
     } else if (action == "deleteImage") {
@@ -721,8 +725,11 @@ export async function POST({ request, cookies }) {
   } catch (error: unknown) {
     console.log(error);
     const message = error instanceof Error ? error.message : String(error);
-    resp = { error: message };
+    resp = { error: localizeAdminError(message) };
     return json(resp, { status: 500 });
+  }
+  if (typeof resp?.error === "string") {
+    resp.error = localizeAdminError(resp.error);
   }
   return json(resp, { status: 200 });
 }

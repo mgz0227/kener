@@ -53,7 +53,7 @@
 
 <ProviderSettingsPanel
   initialProviders={captchaProviders}
-  description="Add your CAPTCHA provider Site Key/Secret Key here. Only one provider can be active at a time."
+  description="在此填写验证码服务的站点密钥和私密密钥，同一时间只能启用一个服务。"
   learnMoreUrl="https://kener.ing/docs/v4/captcha"
   enforceSingleActive
 />

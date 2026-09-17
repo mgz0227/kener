@@ -23,6 +23,7 @@
   import type { PageRecord, MonitorRecord, PageSettingsType } from "$lib/server/types/db.js";
   import { mode } from "mode-watcher";
   import CodeMirror from "svelte-codemirror-editor";
+  import { adminEditorExtensions } from "$lib/client/admin-editor.js";
   import { onMount } from "svelte";
   import { markdown } from "@codemirror/lang-markdown";
   import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
@@ -612,6 +613,7 @@
           <Label for="page-subheader">页面内容</Label>
           <div class="overflow-hidden rounded-md border">
             <CodeMirror
+              extensions={adminEditorExtensions}
               bind:value={formData.page_subheader}
               lang={markdown()}
               theme={mode.current === "dark" ? githubDark : githubLight}

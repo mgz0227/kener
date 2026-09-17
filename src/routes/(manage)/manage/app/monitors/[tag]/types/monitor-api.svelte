@@ -9,6 +9,7 @@
   import X from "@lucide/svelte/icons/x";
   import { DefaultAPIEval } from "$lib/anywhere.js";
   import CodeMirror from "svelte-codemirror-editor";
+  import { adminEditorExtensions } from "$lib/client/admin-editor.js";
   import { javascript } from "@codemirror/lang-javascript";
   import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
   import { mode } from "mode-watcher";
@@ -91,7 +92,7 @@
           <div class="flex items-center gap-2">
             <Input bind:value={header.key} placeholder="请求头名称" class="flex-1" />
             <Input bind:value={header.value} placeholder="请求头值" class="flex-1" />
-            <Button variant="ghost" size="icon" onclick={() => removeHeader(index)}>
+            <Button variant="ghost" size="icon" aria-label="移除请求头" onclick={() => removeHeader(index)}>
               <X class="size-4" />
             </Button>
           </div>
@@ -134,6 +135,7 @@
     <Label for="api-eval">自定义评估函数</Label>
     <div class="rounded-md border">
       <CodeMirror
+        extensions={adminEditorExtensions}
         bind:value={data.eval}
         lang={javascript()}
         theme={mode.current === "dark" ? githubDark : githubLight}

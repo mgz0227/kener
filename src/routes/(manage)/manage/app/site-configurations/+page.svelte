@@ -1511,7 +1511,7 @@
       </Card.Content>
       <Card.Footer class="flex justify-end gap-2">
         {#if sitemap.mode !== "off" && sitemapURL}
-          <CopyButton variant="outline" size="default" text={sitemapURL}>
+          <CopyButton variant="outline" size="default" text={sitemapURL} copiedLabel="已复制">
             <CopyIcon class="mr-2 h-4 w-4" />
             复制 URL
           </CopyButton>

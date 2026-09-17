@@ -4,6 +4,7 @@
   import * as Select from "$lib/components/ui/select/index.js";
   import * as InputGroup from "$lib/components/ui/input-group/index.js";
   import CodeMirror from "svelte-codemirror-editor";
+  import { adminEditorExtensions } from "$lib/client/admin-editor.js";
   import { javascript } from "@codemirror/lang-javascript";
   import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
   import { mode } from "mode-watcher";
@@ -109,6 +110,7 @@
     <Label for="sql-query">查询语句 <span class="text-destructive">*</span></Label>
     <div class="rounded-md border">
       <CodeMirror
+        extensions={adminEditorExtensions}
         bind:value={data.query}
         lang={javascript()}
         theme={mode.current === "dark" ? githubDark : githubLight}
@@ -120,6 +122,6 @@
         }}
       />
     </div>
-    <p class="text-muted-foreground mt-1 text-xs">要执行的查询。执行成功时，监控状态为 UP。</p>
+    <p class="text-muted-foreground mt-1 text-xs">要执行的查询。执行成功时，监控状态为正常。</p>
   </div>
 </div>

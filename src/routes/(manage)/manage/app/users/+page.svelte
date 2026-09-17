@@ -66,13 +66,13 @@
   }
 
   const roleDisplayNames: Record<string, string> = {
-    Administrator: "管理员",
-    Editor: "编辑者",
-    Member: "成员"
+    admin: "管理员",
+    editor: "编辑者",
+    member: "成员"
   };
 
-  function getRoleDisplayName(name: string): string {
-    return roleDisplayNames[name] ?? name;
+  function getRoleDisplayName(role: RoleRecord | undefined, fallback = ""): string {
+    return (role?.readonly === 1 && roleDisplayNames[role.id]) || role?.role_name || fallback;
   }
 
   // State
@@ -451,7 +451,14 @@
               </Table.Cell>
               <Table.Cell>
                 <Badge variant={getRoleBadgeVariant(user.role_ids)} class="uppercase">
-                  {user.role_ids.join(", ")}
+                  {user.role_ids
+                    .map((id) =>
+                      getRoleDisplayName(
+                        roles.find((role) => role.id === id),
+                        id
+                      )
+                    )
+                    .join("、")}
                 </Badge>
               </Table.Cell>
               <Table.Cell>
@@ -552,7 +559,7 @@
                     newUser.role_ids = toggleRole(role.id, newUser.role_ids);
                   }}
                 />
-                <span class="text-sm uppercase">{getRoleDisplayName(role.role_name)}</span>
+                <span class="text-sm uppercase">{getRoleDisplayName(role)}</span>
               </label>
             {/each}
             {#if activeRoles.length === 0}
@@ -648,7 +655,7 @@
                         toEditUser!.role_ids = toggleRole(role.id, toEditUser!.role_ids);
                       }}
                     />
-                    <span class="text-sm uppercase">{getRoleDisplayName(role.role_name)}</span>
+                    <span class="text-sm uppercase">{getRoleDisplayName(role)}</span>
                   </label>
                 {/each}
                 {#if activeRoles.length === 0}

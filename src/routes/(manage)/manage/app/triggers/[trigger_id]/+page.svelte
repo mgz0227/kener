@@ -28,6 +28,7 @@
   import { mode } from "mode-watcher";
   import { IsValidURL } from "$lib/clientTools";
   import CodeMirror from "svelte-codemirror-editor";
+  import { adminEditorExtensions } from "$lib/client/admin-editor.js";
   import { html } from "@codemirror/lang-html";
   import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
   import type { TriggerMeta } from "$lib/server/types/db";
@@ -320,12 +321,14 @@
               if (value) trigger.trigger_type = value;
             }}
           >
-            <Select.Trigger class="w-full max-w-sm capitalize">{trigger.trigger_type}</Select.Trigger>
+            <Select.Trigger class="w-full max-w-sm capitalize">
+              {trigger.trigger_type === "email" ? "电子邮件" : trigger.trigger_type}
+            </Select.Trigger>
             <Select.Content>
               <Select.Item value="webhook">Webhook</Select.Item>
               <Select.Item value="discord">Discord</Select.Item>
               <Select.Item value="slack">Slack</Select.Item>
-              <Select.Item value="email">Email</Select.Item>
+              <Select.Item value="email">电子邮件</Select.Item>
             </Select.Content>
           </Select.Root>
         </div>
@@ -498,6 +501,7 @@
             </p>
             <div class="overflow-hidden rounded-md border">
               <CodeMirror
+                extensions={adminEditorExtensions}
                 bind:value={trigger.trigger_meta.email_body}
                 lang={html()}
                 theme={mode.current === "dark" ? githubDark : githubLight}

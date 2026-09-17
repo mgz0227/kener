@@ -139,13 +139,13 @@
     "roles.assign_users": "为角色添加或移除用户"
   };
   const roleDisplayNames: Record<string, string> = {
-    Administrator: "管理员",
-    Editor: "编辑者",
-    Member: "成员"
+    admin: "管理员",
+    editor: "编辑者",
+    member: "成员"
   };
 
-  function getRoleDisplayName(name: string | null | undefined): string {
-    return (name && roleDisplayNames[name]) || name || "";
+  function getRoleDisplayName(role: RoleRecord | null | undefined): string {
+    return (role?.readonly === 1 && roleDisplayNames[role.id]) || role?.role_name || "";
   }
 
   async function apiCall(action: string, data: Record<string, unknown> = {}) {
@@ -467,7 +467,7 @@
             {#each roles as role (role.id)}
               <Table.Row>
                 <Table.Cell class="font-mono text-sm">{role.id}</Table.Cell>
-                <Table.Cell>{getRoleDisplayName(role.role_name)}</Table.Cell>
+                <Table.Cell>{getRoleDisplayName(role)}</Table.Cell>
                 <Table.Cell>
                   <Badge variant={role.status === "ACTIVE" ? "default" : "secondary"}>
                     {role.status === "ACTIVE" ? "已启用" : "已停用"}
@@ -542,7 +542,7 @@
     <Dialog.Header>
       <Dialog.Title>编辑角色</Dialog.Title>
       <Dialog.Description>
-        更新角色 <span class="font-semibold">{getRoleDisplayName(roleToEdit?.role_name)}</span>。
+        更新角色 <span class="font-semibold">{getRoleDisplayName(roleToEdit)}</span>。
       </Dialog.Description>
     </Dialog.Header>
     <div class="grid gap-4 py-4">
@@ -626,7 +626,7 @@
           >
             <option value="">选择角色...</option>
             {#each roles.filter((r) => r.status === "ACTIVE") as r (r.id)}
-              <option value={r.id}>{getRoleDisplayName(r.role_name)}</option>
+              <option value={r.id}>{getRoleDisplayName(r)}</option>
             {/each}
           </select>
         </div>
@@ -653,7 +653,7 @@
     <Dialog.Header>
       <Dialog.Title>删除角色</Dialog.Title>
       <Dialog.Description>
-        确定要删除角色 <span class="font-semibold">{getRoleDisplayName(roleToDelete?.role_name)}</span> 吗？
+        确定要删除角色 <span class="font-semibold">{getRoleDisplayName(roleToDelete)}</span> 吗？
       </Dialog.Description>
     </Dialog.Header>
     <div class="grid gap-4 py-4">
@@ -686,7 +686,7 @@
           >
             <option value="">选择角色...</option>
             {#each roles.filter((r) => r.id !== roleToDelete?.id && r.status === "ACTIVE") as r (r.id)}
-              <option value={r.id}>{getRoleDisplayName(r.role_name)}</option>
+              <option value={r.id}>{getRoleDisplayName(r)}</option>
             {/each}
           </select>
         </div>
@@ -713,7 +713,7 @@
   <Sheet.Content side="right" class="w-full overflow-y-auto sm:max-w-lg">
     <Sheet.Header>
       <Sheet.Title>
-        权限 - {getRoleDisplayName(permissionsRole?.role_name)}
+        权限 - {getRoleDisplayName(permissionsRole)}
       </Sheet.Title>
       <Sheet.Description>
         {#if permissionsRole?.readonly === 1}
@@ -793,7 +793,7 @@
   <Sheet.Content side="right" class="w-full overflow-y-auto sm:max-w-lg">
     <Sheet.Header>
       <Sheet.Title>
-        用户 - {getRoleDisplayName(usersRole?.role_name)}
+        用户 - {getRoleDisplayName(usersRole)}
       </Sheet.Title>
       <Sheet.Description>管理分配到此角色的用户。</Sheet.Description>
     </Sheet.Header>

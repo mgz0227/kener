@@ -125,7 +125,9 @@
               <Table.Cell class="font-medium">{trigger.name}</Table.Cell>
 
               <Table.Cell>
-                <Badge variant="outline" class="capitalize">{trigger.trigger_type}</Badge>
+                <Badge variant="outline" class="capitalize">
+                  {trigger.trigger_type === "email" ? "电子邮件" : trigger.trigger_type}
+                </Badge>
               </Table.Cell>
               <Table.Cell>
                 <Badge variant={trigger.trigger_status === "ACTIVE" ? "default" : "secondary"}>

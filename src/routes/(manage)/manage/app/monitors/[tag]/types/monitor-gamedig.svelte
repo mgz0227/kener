@@ -8,6 +8,7 @@
   import AllGamesListRaw from "$lib/all-games-list.json?raw";
   import * as Tooltip from "$lib/components/ui/tooltip/index.js";
   import CodeMirror from "svelte-codemirror-editor";
+  import { adminEditorExtensions } from "$lib/client/admin-editor.js";
   import { javascript } from "@codemirror/lang-javascript";
   import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
   import { mode } from "mode-watcher";
@@ -109,6 +110,7 @@
     <Label for="gamedig-eval">自定义评估函数</Label>
     <div class="rounded-md border">
       <CodeMirror
+        extensions={adminEditorExtensions}
         bind:value={data.eval}
         lang={javascript()}
         theme={mode.current === "dark" ? githubDark : githubLight}

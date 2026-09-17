@@ -15,10 +15,12 @@
   import { toast } from "svelte-sonner";
   import { mode } from "mode-watcher";
   import CodeMirror from "svelte-codemirror-editor";
+  import { adminEditorExtensions } from "$lib/client/admin-editor.js";
   import { html } from "@codemirror/lang-html";
   import { css } from "@codemirror/lang-css";
   import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
   import ColorPicker from "svelte-awesome-color-picker";
+  import { colorPickerTexts } from "$lib/client/admin-labels.js";
   import { resolve } from "$app/paths";
   import clientResolver from "$lib/client/resolver.js";
   import type { SiteAnnouncement, PageOrderingSettings } from "$lib/types/site.js";
@@ -470,6 +472,7 @@
         <div class="w-full">
           <div class="overflow-hidden rounded-md border">
             <CodeMirror
+              extensions={adminEditorExtensions}
               bind:value={footerHTML}
               lang={html()}
               theme={mode.current === "dark" ? githubDark : githubLight}
@@ -516,6 +519,7 @@
                 <Table.Cell class="font-medium">正常</Table.Cell>
                 <Table.Cell>
                   <ColorPicker
+                    texts={colorPickerTexts}
                     bind:hex={colors.UP}
                     position="responsive"
                     isAlpha={false}
@@ -527,6 +531,7 @@
                 </Table.Cell>
                 <Table.Cell>
                   <ColorPicker
+                    texts={colorPickerTexts}
                     bind:hex={colorsDark.UP}
                     position="responsive"
                     isAlpha={false}
@@ -541,6 +546,7 @@
                 <Table.Cell class="font-medium">性能下降</Table.Cell>
                 <Table.Cell>
                   <ColorPicker
+                    texts={colorPickerTexts}
                     bind:hex={colors.DEGRADED}
                     position="responsive"
                     isAlpha={false}
@@ -552,6 +558,7 @@
                 </Table.Cell>
                 <Table.Cell>
                   <ColorPicker
+                    texts={colorPickerTexts}
                     bind:hex={colorsDark.DEGRADED}
                     position="responsive"
                     isAlpha={false}
@@ -566,6 +573,7 @@
                 <Table.Cell class="font-medium">故障</Table.Cell>
                 <Table.Cell>
                   <ColorPicker
+                    texts={colorPickerTexts}
                     bind:hex={colors.DOWN}
                     position="responsive"
                     isAlpha={false}
@@ -577,6 +585,7 @@
                 </Table.Cell>
                 <Table.Cell>
                   <ColorPicker
+                    texts={colorPickerTexts}
                     bind:hex={colorsDark.DOWN}
                     position="responsive"
                     isAlpha={false}
@@ -591,6 +600,7 @@
                 <Table.Cell class="font-medium">维护中</Table.Cell>
                 <Table.Cell>
                   <ColorPicker
+                    texts={colorPickerTexts}
                     bind:hex={colors.MAINTENANCE}
                     position="responsive"
                     isAlpha={false}
@@ -602,6 +612,7 @@
                 </Table.Cell>
                 <Table.Cell>
                   <ColorPicker
+                    texts={colorPickerTexts}
                     bind:hex={colorsDark.MAINTENANCE}
                     position="responsive"
                     isAlpha={false}
@@ -616,6 +627,7 @@
                 <Table.Cell class="font-medium">强调色</Table.Cell>
                 <Table.Cell>
                   <ColorPicker
+                    texts={colorPickerTexts}
                     bind:hex={colors.ACCENT}
                     position="responsive"
                     isAlpha={false}
@@ -627,6 +639,7 @@
                 </Table.Cell>
                 <Table.Cell>
                   <ColorPicker
+                    texts={colorPickerTexts}
                     bind:hex={colorsDark.ACCENT}
                     position="responsive"
                     isAlpha={false}
@@ -641,6 +654,7 @@
                 <Table.Cell class="font-medium">强调色前景</Table.Cell>
                 <Table.Cell>
                   <ColorPicker
+                    texts={colorPickerTexts}
                     bind:hex={colors.ACCENT_FOREGROUND}
                     position="responsive"
                     isAlpha={false}
@@ -652,6 +666,7 @@
                 </Table.Cell>
                 <Table.Cell>
                   <ColorPicker
+                    texts={colorPickerTexts}
                     bind:hex={colorsDark.ACCENT_FOREGROUND}
                     position="responsive"
                     isAlpha={false}
@@ -964,6 +979,7 @@
         <div class="w-full">
           <div class="overflow-hidden rounded-md border">
             <CodeMirror
+              extensions={adminEditorExtensions}
               bind:value={customCSS}
               lang={css()}
               theme={mode.current === "dark" ? githubDark : githubLight}

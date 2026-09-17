@@ -18,7 +18,7 @@ test("localization round trip preserves upstream additions and refuses conflicts
   };
   const cli = (...args) => run(process.execPath, [script, ...args]);
   const commit = (message) => {
-    git("add", "src", "package.json");
+    git("add", "src", "package.json", "vite.config.ts");
     git("commit", "-qm", message);
     return git("rev-parse", "HEAD");
   };
@@ -32,19 +32,23 @@ test("localization round trip preserves upstream additions and refuses conflicts
     mkdirSync(join(cwd, "src"));
     writeFileSync(file, base);
     writeFileSync(join(cwd, "package.json"), "{}\n");
+    writeFileSync(join(cwd, "vite.config.ts"), "export default { optimizeDeps: { include: [] } };\n");
     const upstream = commit("upstream");
     writeFileSync(file, base.replace("Status", "状态"));
     writeFileSync(join(cwd, "package.json"), '{"name":"excluded"}\n');
+    writeFileSync(join(cwd, "vite.config.ts"), 'export default { optimizeDeps: { include: ["editor"] } };\n');
     commit("Chinese localization");
     const exported = cli("export", upstream);
     assert.equal(exported.status, 0, exported.stderr);
     const patch = join(cwd, "localization", "zh-CN.patch");
     assert.doesNotMatch(readFileSync(patch, "utf8"), /package\.json/);
+    assert.match(readFileSync(patch, "utf8"), /vite\.config\.ts/);
     assert.equal(JSON.parse(readFileSync(join(cwd, "localization", "zh-CN.json"), "utf8")).upstreamCommit, upstream);
 
     git("reset", "--hard", upstream);
     assert.equal(cli("apply").status, 0);
     assert.match(readFileSync(file, "utf8"), /状态/);
+    assert.match(readFileSync(join(cwd, "vite.config.ts"), "utf8"), /"editor"/);
     assert.match(cli("apply").stdout, /already applied/);
     git("reset", "--hard", upstream);
 

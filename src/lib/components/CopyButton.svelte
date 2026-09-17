@@ -13,9 +13,10 @@
     children?: Snippet;
     class?: string;
     title?: string;
+    copiedLabel?: string;
   }
 
-  let { variant = "outline", size = "icon-sm", text, onclick, children, class: className, title }: Props = $props();
+  let { variant = "outline", size = "icon-sm", text, onclick, children, class: className, title, copiedLabel }: Props = $props();
 
   const clipboard = new UseClipboard({ delay: 1000 });
 
@@ -51,6 +52,6 @@
       ? 'scale-100 opacity-100'
       : 'pointer-events-none scale-75 opacity-0'}"
   >
-    {$t("Copied")}
+    {copiedLabel ?? $t("Copied")}
   </span>
 </Button>

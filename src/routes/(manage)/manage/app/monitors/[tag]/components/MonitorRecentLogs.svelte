@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { monitorStatusLabels, monitoringDataTypeLabels } from "$lib/client/admin-labels.js";
   import { Badge } from "$lib/components/ui/badge/index.js";
   import { Spinner } from "$lib/components/ui/spinner/index.js";
   import * as Card from "$lib/components/ui/card/index.js";
@@ -93,7 +94,7 @@
         <Card.Description>最近 10 个监控数据点</Card.Description>
       </div>
       <div class="flex items-center gap-2">
-        <Button variant="ghost" size="icon" onclick={fetchLogs} disabled={loading}>
+        <Button variant="ghost" size="icon" aria-label="刷新最近日志" onclick={fetchLogs} disabled={loading}>
           <RefreshCwIcon class="size-4 {loading ? 'animate-spin' : ''}" />
         </Button>
         <Button variant="outline" size="sm" href={clientResolver(resolve, "/manage/app/monitoring-data")}>
@@ -130,19 +131,19 @@
                 </Table.Cell>
                 <Table.Cell>
                   <Badge variant={getStatusBadgeVariant(log.status)}>
-                    {log.status || "暂无"}
+                    {monitorStatusLabels[log.status ?? ""] ?? log.status ?? "暂无"}
                   </Badge>
                 </Table.Cell>
                 <Table.Cell>
                   {#if log.latency !== null}
-                    <span class="text-sm">{log.latency} ms</span>
+                    <span class="text-sm">{log.latency} 毫秒</span>
                   {:else}
                     <span class="text-muted-foreground text-sm">—</span>
                   {/if}
                 </Table.Cell>
                 <Table.Cell>
                   {#if log.type}
-                    <Badge variant="secondary" class="text-xs">{log.type}</Badge>
+                    <Badge variant="secondary" class="text-xs">{monitoringDataTypeLabels[log.type] ?? log.type}</Badge>
                   {:else}
                     <span class="text-muted-foreground text-sm">—</span>
                   {/if}

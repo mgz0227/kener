@@ -136,11 +136,11 @@
         }}
       >
         <Select.Trigger id="dns-matchtype" class="w-full">
-          {data.matchType}
+          {data.matchType === "ALL" ? "全部匹配" : "任意匹配"}
         </Select.Trigger>
         <Select.Content>
-          <Select.Item value="ANY">ANY - 至少一个值匹配</Select.Item>
-          <Select.Item value="ALL">ALL - 所有值都必须匹配</Select.Item>
+          <Select.Item value="ANY">任意匹配 — 至少一个值匹配</Select.Item>
+          <Select.Item value="ALL">全部匹配 — 所有值都必须匹配</Select.Item>
         </Select.Content>
       </Select.Root>
     </div>
@@ -163,7 +163,12 @@
             </InputGroup.Addon>
             <InputGroup.Input bind:value={data.values[index]} placeholder="预期的 DNS 值" />
             <InputGroup.Addon align="inline-end">
-              <InputGroup.Button variant="ghost" size="icon-xs" onclick={() => removeValue(index)}>
+              <InputGroup.Button
+                variant="ghost"
+                size="icon-xs"
+                aria-label="移除预期值 {index + 1}"
+                onclick={() => removeValue(index)}
+              >
                 <X class="size-4" />
               </InputGroup.Button>
             </InputGroup.Addon>

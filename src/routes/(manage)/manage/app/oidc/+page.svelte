@@ -95,7 +95,7 @@
     });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error((errorData as Record<string, string>).error || `Request failed with status ${response.status}`);
+      throw new Error((errorData as Record<string, string>).error || `请求失败，状态码：${response.status}`);
     }
     return await response.json();
   }
@@ -111,7 +111,7 @@
         originalMaskedSecret = settings.client_secret;
       }
     } catch {
-      toast.error("Failed to load OIDC settings");
+      toast.error("加载 OIDC 设置失败");
     } finally {
       loading = false;
     }
@@ -131,10 +131,10 @@
       if (result?.error) {
         toast.error(result.error);
       } else {
-        toast.success("OIDC settings saved");
+        toast.success("OIDC 设置已保存");
       }
     } catch {
-      toast.error("Failed to save OIDC settings");
+      toast.error("保存 OIDC 设置失败");
     } finally {
       saving = false;
     }
@@ -154,13 +154,13 @@
       };
       testResult = result;
       if (result.success) {
-        toast.success("Connection successful");
+        toast.success("连接成功");
       } else {
-        toast.error(result.error || "Connection failed");
+        toast.error(result.error || "连接失败");
       }
     } catch {
-      toast.error("Connection test failed");
-      testResult = { success: false, error: "Network error" };
+      toast.error("连接测试失败");
+      testResult = { success: false, error: "网络错误" };
     } finally {
       testing = false;
     }
@@ -176,7 +176,7 @@
         mappings = result;
       }
     } catch {
-      toast.error("Failed to load group mappings");
+      toast.error("加载用户组映射失败");
     } finally {
       loadingMappings = false;
     }
@@ -195,11 +195,11 @@
 
   async function addMapping() {
     if (!newMappingGroup.trim()) {
-      toast.error("Please enter an OIDC group name");
+      toast.error("请输入 OIDC 用户组名称");
       return;
     }
     if (!newMappingRoleId) {
-      toast.error("Please select a Kener role");
+      toast.error("请选择 Kener 角色");
       return;
     }
 
@@ -212,13 +212,13 @@
       if (result?.error) {
         toast.error(result.error);
       } else {
-        toast.success(`Mapping added: "${newMappingGroup}" → "${getRoleName(newMappingRoleId)}"`);
+        toast.success(`已添加映射：“${newMappingGroup}” → “${getRoleName(newMappingRoleId)}”`);
         newMappingGroup = "";
         newMappingRoleId = "";
         await loadMappings();
       }
     } catch {
-      toast.error("Failed to add mapping");
+      toast.error("添加映射失败");
     } finally {
       addingMapping = false;
     }
@@ -239,11 +239,11 @@
       if (result?.error) {
         toast.error(result.error);
       } else {
-        toast.success("Mapping deleted");
+        toast.success("映射已删除");
         await loadMappings();
       }
     } catch {
-      toast.error("Failed to delete mapping");
+      toast.error("删除映射失败");
     } finally {
       deletingMapping = false;
       deleteDialogOpen = false;
@@ -253,9 +253,11 @@
 
   // ============ Helpers ============
 
+  const roleDisplayNames: Record<string, string> = { admin: "管理员", editor: "编辑者", member: "成员" };
+
   function getRoleName(roleId: string): string {
     const role = roles.find((r) => r.id === roleId);
-    return role?.role_name || roleId;
+    return (role?.readonly === 1 && roleDisplayNames[role.id]) || role?.role_name || roleId;
   }
 
   // ============ Lifecycle ============
@@ -274,9 +276,9 @@
     <!-- ============ OIDC Settings Card ============ -->
     <Card.Root>
       <Card.Header>
-        <Card.Title>OpenID Connect Settings</Card.Title>
+        <Card.Title>OpenID Connect 设置</Card.Title>
         <Card.Description>
-          Configure an OIDC provider (e.g. Keycloak, Azure AD, Authentik) to allow single sign-on for your users.
+          配置 OIDC 身份提供方（例如 Keycloak、Azure AD、Authentik），让用户通过单点登录访问。
         </Card.Description>
       </Card.Header>
       <Card.Content>
@@ -284,10 +286,10 @@
           <!-- Enable/Disable -->
           <div class="flex items-center justify-between">
             <div>
-              <Label>Enable OpenID Connect</Label>
-              <p class="text-muted-foreground text-sm">Allow users to sign in using an external identity provider.</p>
+              <Label for="oidc_enabled">启用 OpenID Connect</Label>
+              <p class="text-muted-foreground text-sm">允许用户通过外部身份提供方登录。</p>
             </div>
-            <Switch bind:checked={settings.enabled} />
+            <Switch id="oidc_enabled" bind:checked={settings.enabled} />
           </div>
 
           <Separator />
@@ -295,40 +297,40 @@
           {#if settings.enabled}
             <!-- Provider Name -->
             <div class="grid gap-2">
-              <Label for="provider_name">Provider Name</Label>
+              <Label for="provider_name">身份提供方名称</Label>
               <Input
                 id="provider_name"
                 bind:value={settings.provider_name}
-                placeholder="e.g. Keycloak, Azure AD, Authentik"
+                placeholder="例如 Keycloak、Azure AD、Authentik"
               />
               <p class="text-muted-foreground text-xs">
-                Displayed on the login button: "Sign in with {settings.provider_name || "..."}"
+                登录按钮将显示：“使用 {settings.provider_name || "..."} 登录”
               </p>
             </div>
 
             <!-- Issuer URL -->
             <div class="grid gap-2">
-              <Label for="issuer_url">Issuer URL</Label>
+              <Label for="issuer_url">签发方 URL</Label>
               <Input
                 id="issuer_url"
                 bind:value={settings.issuer_url}
                 placeholder="https://keycloak.example.com/realms/myrealm"
               />
               <p class="text-muted-foreground text-xs">
-                The base URL of the OIDC provider. Must support
-                <code>.well-known/openid-configuration</code> discovery.
+                OIDC 身份提供方的基础 URL，必须支持
+                <code>.well-known/openid-configuration</code> 自动发现。
               </p>
             </div>
 
             <!-- Client ID -->
             <div class="grid gap-2">
-              <Label for="client_id">Client ID</Label>
+              <Label for="client_id">客户端 ID</Label>
               <Input id="client_id" bind:value={settings.client_id} placeholder="kener-client" />
             </div>
 
             <!-- Client Secret -->
             <div class="grid gap-2">
-              <Label for="client_secret">Client Secret</Label>
+              <Label for="client_secret">客户端密钥</Label>
               <div class="relative">
                 <Input
                   id="client_secret"
@@ -340,6 +342,7 @@
                   variant="ghost"
                   size="icon"
                   class="absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2"
+                  aria-label={showSecret ? "隐藏客户端密钥" : "显示客户端密钥"}
                   onclick={() => (showSecret = !showSecret)}
                 >
                   {#if showSecret}
@@ -353,21 +356,20 @@
 
             <!-- Scopes -->
             <div class="grid gap-2">
-              <Label for="scopes">Scopes</Label>
+              <Label for="scopes">授权范围</Label>
               <Input id="scopes" bind:value={settings.scopes} placeholder="openid profile email" />
               <p class="text-muted-foreground text-xs">
-                Space-separated list of OIDC scopes. Add your provider's group scope if needed (e.g. "openid profile
-                email groups").
+                使用空格分隔 OIDC 授权范围。按需添加身份提供方的用户组范围，例如 “openid profile email groups”。
               </p>
             </div>
 
             <!-- Groups Claim -->
             <div class="grid gap-2">
-              <Label for="groups_claim">Groups Claim Name</Label>
+              <Label for="groups_claim">用户组声明名称</Label>
               <Input id="groups_claim" bind:value={settings.groups_claim} placeholder="groups" />
               <p class="text-muted-foreground text-xs">
-                The claim in the ID token that contains the user's group memberships. Common values: "groups" (Keycloak,
-                Authentik), "roles", "cognito:groups" (AWS).
+                ID 令牌中包含用户所属用户组的声明字段。常见值：“groups”（Keycloak、Authentik）、“roles”、
+                “cognito:groups”（AWS）。
               </p>
             </div>
 
@@ -376,29 +378,28 @@
             <!-- Allow Local Login -->
             <div class="flex items-center justify-between">
               <div>
-                <Label>Allow local login</Label>
+                <Label for="allow_local_login">允许本地登录</Label>
                 <p class="text-muted-foreground text-sm">
-                  When disabled, users can only sign in via the OIDC provider. The password login form will be hidden.
+                  关闭后，用户只能通过 OIDC 身份提供方登录，密码登录表单将隐藏。
                 </p>
               </div>
-              <Switch bind:checked={settings.allow_local_login} />
+              <Switch id="allow_local_login" bind:checked={settings.allow_local_login} />
             </div>
 
             <!-- Auto-Create Users -->
             <div class="flex items-center justify-between">
               <div>
-                <Label>Auto-create users on first login</Label>
+                <Label for="auto_create_users">首次登录时自动创建用户</Label>
                 <p class="text-muted-foreground text-sm">
-                  When enabled, a new Kener user is created automatically on first OIDC login. When disabled, users must
-                  be pre-created.
+                  启用后，首次通过 OIDC 登录时自动创建 Kener 用户；关闭时，需要提前创建用户。
                 </p>
               </div>
-              <Switch bind:checked={settings.auto_create_users} />
+              <Switch id="auto_create_users" bind:checked={settings.auto_create_users} />
             </div>
 
             <!-- Default Role -->
             <div class="grid gap-2">
-              <Label>Default Role</Label>
+              <Label for="default_role_id">默认角色</Label>
               <Select.Root
                 type="single"
                 value={settings.default_role_id}
@@ -406,20 +407,18 @@
                   if (val) settings.default_role_id = val;
                 }}
               >
-                <Select.Trigger class="w-full">
-                  {getRoleName(settings.default_role_id) || "Select a role..."}
+                <Select.Trigger id="default_role_id" class="w-full">
+                  {getRoleName(settings.default_role_id) || "请选择角色..."}
                 </Select.Trigger>
                 <Select.Content>
                   {#each roles as role (role.id)}
                     <Select.Item value={role.id}>
-                      {role.role_name}
+                      {getRoleName(role.id)}
                     </Select.Item>
                   {/each}
                 </Select.Content>
               </Select.Root>
-              <p class="text-muted-foreground text-xs">
-                Assigned when a user's OIDC groups don't match any mapping below.
-              </p>
+              <p class="text-muted-foreground text-xs">用户的 OIDC 用户组未匹配下方任何映射时，将分配此角色。</p>
             </div>
 
             <Separator />
@@ -434,19 +433,19 @@
                 <div class="mb-2 flex items-center gap-2">
                   {#if testResult.success}
                     <CheckCircleIcon class="h-5 w-5 text-green-600 dark:text-green-400" />
-                    <span class="font-medium text-green-800 dark:text-green-200">Connection successful</span>
+                    <span class="font-medium text-green-800 dark:text-green-200">连接成功</span>
                   {:else}
                     <XCircleIcon class="h-5 w-5 text-red-600 dark:text-red-400" />
-                    <span class="font-medium text-red-800 dark:text-red-200">Connection failed</span>
+                    <span class="font-medium text-red-800 dark:text-red-200">连接失败</span>
                   {/if}
                 </div>
                 {#if testResult.success}
                   <div class="space-y-1 text-sm text-green-700 dark:text-green-300">
-                    <p>Issuer: <code class="text-xs">{testResult.issuer}</code></p>
-                    <p>Authorization: <code class="text-xs">{testResult.authorizationEndpoint}</code></p>
-                    <p>Token: <code class="text-xs">{testResult.tokenEndpoint}</code></p>
+                    <p>签发方：<code class="text-xs">{testResult.issuer}</code></p>
+                    <p>授权端点：<code class="text-xs">{testResult.authorizationEndpoint}</code></p>
+                    <p>令牌端点：<code class="text-xs">{testResult.tokenEndpoint}</code></p>
                     {#if testResult.userinfoEndpoint}
-                      <p>Userinfo: <code class="text-xs">{testResult.userinfoEndpoint}</code></p>
+                      <p>用户信息端点：<code class="text-xs">{testResult.userinfoEndpoint}</code></p>
                     {/if}
                   </div>
                 {:else}
@@ -469,7 +468,7 @@
             {:else}
               <PlayIcon class="mr-2 h-4 w-4" />
             {/if}
-            Test Connection
+            测试连接
           </Button>
         {:else}
           <div></div>
@@ -480,7 +479,7 @@
           {:else}
             <SaveIcon class="mr-2 h-4 w-4" />
           {/if}
-          Save Settings
+          保存设置
         </Button>
       </Card.Footer>
     </Card.Root>
@@ -489,21 +488,21 @@
     {#if settings.enabled}
       <Card.Root>
         <Card.Header>
-          <Card.Title>Group → Role Mapping</Card.Title>
+          <Card.Title>用户组 → 角色映射</Card.Title>
           <Card.Description>
-            Map OIDC group names to Kener roles. When a user signs in via OIDC, their group memberships determine which
-            roles they get in Kener. Roles are synchronized on every login.
+            将 OIDC 用户组名称映射到 Kener 角色。用户通过 OIDC 登录时，根据所属用户组分配 Kener 角色，
+            每次登录都会同步角色。
           </Card.Description>
         </Card.Header>
         <Card.Content>
           <!-- Add new mapping -->
           <div class="mb-6 flex items-end gap-3">
             <div class="grid flex-1 gap-2">
-              <Label for="new_group">OIDC Group</Label>
-              <Input id="new_group" bind:value={newMappingGroup} placeholder="e.g. Windows-Admins" />
+              <Label for="new_group">OIDC 用户组</Label>
+              <Input id="new_group" bind:value={newMappingGroup} placeholder="例如 Windows-Admins" />
             </div>
             <div class="grid flex-1 gap-2">
-              <Label>Kener Role</Label>
+              <Label for="new_mapping_role">Kener 角色</Label>
               <Select.Root
                 type="single"
                 value={newMappingRoleId}
@@ -511,13 +510,13 @@
                   if (val) newMappingRoleId = val;
                 }}
               >
-                <Select.Trigger class="w-full">
-                  {newMappingRoleId ? getRoleName(newMappingRoleId) : "Select a role..."}
+                <Select.Trigger id="new_mapping_role" class="w-full">
+                  {newMappingRoleId ? getRoleName(newMappingRoleId) : "请选择角色..."}
                 </Select.Trigger>
                 <Select.Content>
                   {#each roles as role (role.id)}
                     <Select.Item value={role.id}>
-                      {role.role_name}
+                      {getRoleName(role.id)}
                     </Select.Item>
                   {/each}
                 </Select.Content>
@@ -529,7 +528,7 @@
               {:else}
                 <PlusIcon class="mr-2 h-4 w-4" />
               {/if}
-              Add
+              添加映射
             </Button>
           </div>
 
@@ -540,16 +539,16 @@
             </div>
           {:else if mappings.length === 0}
             <div class="text-muted-foreground rounded-lg border border-dashed py-8 text-center">
-              <p>No group mappings configured yet.</p>
-              <p class="mt-1 text-sm">Add a mapping above to assign Kener roles based on OIDC groups.</p>
+              <p>尚未配置用户组映射。</p>
+              <p class="mt-1 text-sm">在上方添加映射，根据 OIDC 用户组分配 Kener 角色。</p>
             </div>
           {:else}
             <Table.Root>
               <Table.Header>
                 <Table.Row>
-                  <Table.Head class="pl-4">OIDC Group</Table.Head>
-                  <Table.Head>Kener Role</Table.Head>
-                  <Table.Head class="pr-4 text-right">Actions</Table.Head>
+                  <Table.Head class="pl-4">OIDC 用户组</Table.Head>
+                  <Table.Head>Kener 角色</Table.Head>
+                  <Table.Head class="pr-4 text-right">操作</Table.Head>
                 </Table.Row>
               </Table.Header>
               <Table.Body>
@@ -562,7 +561,12 @@
                       <Badge variant="outline">{getRoleName(mapping.role_id)}</Badge>
                     </Table.Cell>
                     <Table.Cell class="pr-4 text-right">
-                      <Button variant="destructive" size="sm" onclick={() => openDeleteMappingDialog(mapping)}>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        aria-label={`删除 ${mapping.oidc_group} 的映射`}
+                        onclick={() => openDeleteMappingDialog(mapping)}
+                      >
                         <TrashIcon class="h-4 w-4" />
                       </Button>
                     </Table.Cell>
@@ -577,27 +581,26 @@
       <!-- ============ Info Card ============ -->
       <Card.Root>
         <Card.Header>
-          <Card.Title>How it works</Card.Title>
+          <Card.Title>工作原理</Card.Title>
         </Card.Header>
         <Card.Content>
           <div class="text-muted-foreground space-y-3 text-sm">
             <p>
-              <strong>On every OIDC login</strong>, Kener reads the user's group memberships from the ID token (using
-              the claim name configured above) and updates their roles accordingly.
+              <strong>每次通过 OIDC 登录时</strong>，Kener 都会使用上方配置的声明名称，从 ID
+              令牌读取用户所属用户组，并据此更新角色。
             </p>
             <p>
-              <strong>Roles from OIDC mappings</strong> are fully synchronized: if a user is removed from an OIDC group, they
-              lose the corresponding Kener role on next login.
+              <strong>OIDC 映射分配的角色</strong>会完全同步：用户被移出 OIDC 用户组后，下次登录时会失去对应的 Kener
+              角色。
             </p>
             <p>
-              <strong>Manually assigned roles</strong> (roles that don't appear in any mapping above) are preserved and not
-              affected by OIDC sync.
+              <strong>手动分配的角色</strong>（未出现在上述映射中，且未设为默认角色）会保留，不受 OIDC 同步影响。
             </p>
             <p>
-              <strong>If no groups match</strong>, the default role (configured above) is assigned.
+              <strong>没有匹配的用户组时</strong>，将分配上方配置的默认角色。
             </p>
             <p>
-              <strong>Callback URL</strong> to configure in your OIDC provider:<br />
+              请在 OIDC 身份提供方中配置以下<strong>回调 URL</strong>：<br />
               <code class="bg-muted rounded px-2 py-1 text-xs">
                 {typeof window !== "undefined" ? window.location.origin : "https://your-kener-domain"}{resolve(
                   "/account/oidc/callback"
@@ -615,19 +618,20 @@
 <AlertDialog.Root bind:open={deleteDialogOpen}>
   <AlertDialog.Content>
     <AlertDialog.Header>
-      <AlertDialog.Title>Delete Group Mapping</AlertDialog.Title>
+      <AlertDialog.Title>删除用户组映射</AlertDialog.Title>
       <AlertDialog.Description>
-        Remove the mapping for OIDC group "{mappingToDelete?.oidc_group}"? Users in this group will no longer receive
-        the "{mappingToDelete ? getRoleName(mappingToDelete.role_id) : ""}" role on their next login.
+        确定删除 OIDC 用户组“{mappingToDelete?.oidc_group}”的映射吗？该组用户下次登录时，将不再通过此映射获得 “{mappingToDelete
+          ? getRoleName(mappingToDelete.role_id)
+          : ""}”角色。
       </AlertDialog.Description>
     </AlertDialog.Header>
     <AlertDialog.Footer>
-      <AlertDialog.Cancel disabled={deletingMapping}>Cancel</AlertDialog.Cancel>
+      <AlertDialog.Cancel disabled={deletingMapping}>取消</AlertDialog.Cancel>
       <AlertDialog.Action onclick={deleteMapping} disabled={deletingMapping}>
         {#if deletingMapping}
           <Spinner class="h-4 w-4" />
         {/if}
-        Delete
+        删除
       </AlertDialog.Action>
     </AlertDialog.Footer>
   </AlertDialog.Content>

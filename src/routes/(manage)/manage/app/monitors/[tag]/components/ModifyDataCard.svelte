@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { monitorStatusLabels } from "$lib/client/admin-labels.js";
   import { Button } from "$lib/components/ui/button/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
   import { Label } from "$lib/components/ui/label/index.js";
@@ -120,12 +121,12 @@
             }}
           >
             <Select.Trigger id="new_status" class="w-full">
-              {modifyDataForm.newStatus}
+              {monitorStatusLabels[modifyDataForm.newStatus] ?? modifyDataForm.newStatus}
             </Select.Trigger>
             <Select.Content>
-              <Select.Item value="UP">UP</Select.Item>
-              <Select.Item value="DEGRADED">DEGRADED</Select.Item>
-              <Select.Item value="DOWN">DOWN</Select.Item>
+              <Select.Item value="UP">正常</Select.Item>
+              <Select.Item value="DEGRADED">性能下降</Select.Item>
+              <Select.Item value="DOWN">故障</Select.Item>
             </Select.Content>
           </Select.Root>
         </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { monitorStatusLabels } from "$lib/client/admin-labels.js";
   import { Button } from "$lib/components/ui/button/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
   import { Label } from "$lib/components/ui/label/index.js";
@@ -206,7 +207,7 @@
               disabled={uploadingImage}
             />
             {#if monitor.image}
-              <Button variant="ghost" size="icon" onclick={clearImage}>
+              <Button variant="ghost" size="icon" aria-label="移除监控项图片" onclick={clearImage}>
                 <XIcon class="h-4 w-4" />
               </Button>
             {/if}
@@ -232,13 +233,13 @@
           }}
         >
           <Select.Trigger id="monitor-default-status" class="w-full">
-            {monitor.default_status}
+            {monitorStatusLabels[monitor.default_status] ?? monitor.default_status}
           </Select.Trigger>
           <Select.Content>
-            <Select.Item value="UP">UP</Select.Item>
-            <Select.Item value="DOWN">DOWN</Select.Item>
-            <Select.Item value="DEGRADED">DEGRADED</Select.Item>
-            <Select.Item value="MAINTENANCE">MAINTENANCE</Select.Item>
+            <Select.Item value="UP">正常</Select.Item>
+            <Select.Item value="DOWN">故障</Select.Item>
+            <Select.Item value="DEGRADED">性能下降</Select.Item>
+            <Select.Item value="MAINTENANCE">维护中</Select.Item>
           </Select.Content>
         </Select.Root>
       </div>

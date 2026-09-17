@@ -163,10 +163,12 @@
             }
           }}
         >
-          <Select.Trigger class="w-[180px]">{status}</Select.Trigger>
+          <Select.Trigger class="w-[180px]" aria-label="监控项状态"
+            >{status === "ACTIVE" ? "启用" : "停用"}</Select.Trigger
+          >
           <Select.Content>
-            <Select.Item value="ACTIVE">ACTIVE</Select.Item>
-            <Select.Item value="INACTIVE">INACTIVE</Select.Item>
+            <Select.Item value="ACTIVE">启用</Select.Item>
+            <Select.Item value="INACTIVE">停用</Select.Item>
           </Select.Content>
         </Select.Root>
         <Button onclick={updateStatus} disabled={updatingStatus || status === (monitor.status || "INACTIVE")}>

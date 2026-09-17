@@ -475,7 +475,7 @@
                   <Label>嵌入 URL</Label>
                   <div class="flex gap-2">
                     <Input readonly value={previewUrl} class="font-mono text-xs" />
-                    <CopyButton variant="outline" size="icon" text={previewUrl}>
+                    <CopyButton variant="outline" size="icon" text={previewUrl} copiedLabel="已复制">
                       <CopyIcon class="h-4 w-4" />
                     </CopyButton>
                   </div>
@@ -486,7 +486,7 @@
                   <Label>嵌入代码</Label>
                   <div class="flex gap-2">
                     <Input readonly value={htmlSnippet} class="font-mono text-xs" />
-                    <CopyButton variant="outline" size="icon" text={htmlSnippet}>
+                    <CopyButton variant="outline" size="icon" text={htmlSnippet} copiedLabel="已复制">
                       <CopyIcon class="h-4 w-4" />
                     </CopyButton>
                   </div>

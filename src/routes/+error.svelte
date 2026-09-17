@@ -5,24 +5,37 @@
   // database is unreachable), so it must not depend on app CSS or any server
   // data — everything here is self-contained.
   const isServerFailure = $derived(page.status >= 500);
+  const isAdmin = $derived(page.route.id?.startsWith("/(manage)") ?? false);
 </script>
 
 <svelte:head>
-  <title>{page.status} — {isServerFailure ? "Status page temporarily unavailable" : "Something went wrong"}</title>
+  <title>
+    {page.status} — {isAdmin
+      ? isServerFailure
+        ? "管理后台暂时不可用"
+        : "页面出错"
+      : isServerFailure
+        ? "Status page temporarily unavailable"
+        : "Something went wrong"}
+  </title>
   {#if isServerFailure}
     <meta http-equiv="refresh" content="30" />
   {/if}
 </svelte:head>
 
-<div class="error-wrap">
+<div class="error-wrap" lang={isAdmin ? "zh-CN" : undefined}>
   <div class="error-card">
     {#if isServerFailure}
-      <h1>This status page is temporarily unavailable</h1>
-      <p>We are having trouble serving this page right now. It usually resolves on its own.</p>
-      <p>This page will retry automatically in 30 seconds.</p>
+      <h1>{isAdmin ? "管理后台暂时不可用" : "This status page is temporarily unavailable"}</h1>
+      <p>
+        {isAdmin
+          ? "当前无法加载管理页面，通常稍后会自动恢复。"
+          : "We are having trouble serving this page right now. It usually resolves on its own."}
+      </p>
+      <p>{isAdmin ? "页面将在 30 秒后自动重试。" : "This page will retry automatically in 30 seconds."}</p>
     {:else}
-      <h1>Something went wrong</h1>
-      <p>{page.error?.message || "The page you requested could not be loaded."}</p>
+      <h1>{isAdmin ? "页面出错" : "Something went wrong"}</h1>
+      <p>{page.error?.message || (isAdmin ? "无法加载请求的页面。" : "The page you requested could not be loaded.")}</p>
     {/if}
     <div class="error-code">{page.status}</div>
   </div>
