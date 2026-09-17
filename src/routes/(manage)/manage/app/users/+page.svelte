@@ -25,8 +25,7 @@
   import EyeOpenIcon from "@lucide/svelte/icons/eye";
   import * as Tooltip from "$lib/components/ui/tooltip/index.js";
   import { toast } from "svelte-sonner";
-  import { format } from "date-fns";
-  import { zhCN } from "date-fns/locale";
+  import LocalTime from "$lib/components/LocalTime.svelte";
   import { onMount } from "svelte";
   import type { UserRecordDashboard, UserRecordPublic, RoleRecord } from "$lib/server/types/db.js";
   import { resolve } from "$app/paths";
@@ -312,18 +311,6 @@
     fetchUsers();
   }
 
-  // Format date
-  function formatDate(dateStr: string | Date): string {
-    if (dateStr instanceof Date) {
-      return format(dateStr, "yyyy年M月d日 HH:mm", { locale: zhCN });
-    }
-    try {
-      return format(new Date(dateStr), "yyyy年M月d日 HH:mm", { locale: zhCN });
-    } catch {
-      return dateStr;
-    }
-  }
-
   // Role badge variant by precedence: admin > editor > others
   function getRoleBadgeVariant(roleIds: string[]): "default" | "secondary" | "outline" {
     if (roleIds.includes("admin")) return "default";
@@ -400,7 +387,9 @@
         {#if !canSendEmail}
           <p class="text-muted-foreground max-w-xs text-xs">
             邮件服务尚未配置，无法邀请新用户。请前往
-            <a href={`${GC.DOCS_URL}/setup/email-setup`} target="_blank" class="text-blue-500 underline"> 配置邮件 </a>
+            <a href={`${GC.DOCS_URL}/v4/setup/email-setup`} target="_blank" class="text-blue-500 underline">
+              配置邮件
+            </a>
             查看详情。
           </p>
         {/if}
@@ -419,6 +408,7 @@
         <Table.Row>
           <Table.Head>姓名</Table.Head>
           <Table.Head>邮箱</Table.Head>
+          <Table.Head class="text-center">登录方式</Table.Head>
           <Table.Head class="text-center">已验证</Table.Head>
           <Table.Head>角色</Table.Head>
           <Table.Head>状态</Table.Head>
@@ -428,7 +418,7 @@
       <Table.Body>
         {#if loading && users.length === 0}
           <Table.Row>
-            <Table.Cell colspan={6} class="py-8 text-center">
+            <Table.Cell colspan={7} class="py-8 text-center">
               <div class="flex items-center justify-center gap-2">
                 <Spinner class="size-4" />
                 <span class="text-muted-foreground text-sm">正在加载用户...</span>
@@ -437,7 +427,7 @@
           </Table.Row>
         {:else if users.length === 0}
           <Table.Row>
-            <Table.Cell colspan={6} class="text-muted-foreground py-8 text-center">暂无用户。</Table.Cell>
+            <Table.Cell colspan={7} class="text-muted-foreground py-8 text-center">暂无用户。</Table.Cell>
           </Table.Row>
         {:else}
           {#each users as user (user.id)}
@@ -448,7 +438,12 @@
               >
               <Table.Cell>{user.email}</Table.Cell>
               <Table.Cell class="text-center">
-                {#if user.is_verified}
+                <Badge variant={user.auth_provider === GC.AUTH_PROVIDER_OIDC ? "default" : "outline"}>
+                  {user.auth_provider === GC.AUTH_PROVIDER_OIDC ? "OIDC" : "本地"}
+                </Badge>
+              </Table.Cell>
+              <Table.Cell class="text-center">
+                {#if user.is_verified || user.auth_provider === GC.AUTH_PROVIDER_OIDC}
                   <CheckCheckIcon class="mx-auto h-4 w-4 text-blue-500" />
                 {:else}
                   <MailWarningIcon class="mx-auto h-4 w-4 text-yellow-500" />
@@ -596,11 +591,11 @@
           <div class="space-y-2 text-sm">
             <p>
               <strong>创建时间：</strong>
-              {formatDate(toEditUser.created_at)}
+              <LocalTime value={toEditUser.created_at} format="yyyy年M月d日 HH:mm" />
             </p>
             <p>
               <strong>更新时间：</strong>
-              {formatDate(toEditUser.updated_at)}
+              <LocalTime value={toEditUser.updated_at} format="yyyy年M月d日 HH:mm" />
             </p>
             <p>
               <strong>姓名：</strong>
@@ -608,7 +603,7 @@
             </p>
           </div>
           <!-- Resend Invitation -->
-          {#if !toEditUser.has_password}
+          {#if !toEditUser.has_password && toEditUser.auth_provider !== GC.AUTH_PROVIDER_OIDC}
             <Card.Root>
               <Card.Content class="">
                 <p class="mb-3 text-sm">

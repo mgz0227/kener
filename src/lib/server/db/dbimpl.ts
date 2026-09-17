@@ -126,6 +126,7 @@ class DbImpl {
   updateUserIsActive!: UsersRepository["updateUserIsActive"];
   updateUserPasswordById!: UsersRepository["updateUserPasswordById"];
   updateIsVerified!: UsersRepository["updateIsVerified"];
+  updateUserProfile!: UsersRepository["updateUserProfile"];
 
   // ============ Roles ============
   getRoleById!: UsersRepository["getRoleById"];
@@ -145,6 +146,14 @@ class DbImpl {
   getUserPermissionIds!: UsersRepository["getUserPermissionIds"];
   getUserRoleIds!: UsersRepository["getUserRoleIds"];
 
+  // ============ OIDC ============
+  getUserByOidcSub!: UsersRepository["getUserByOidcSub"];
+  getAllOidcGroupRoleMappings!: UsersRepository["getAllOidcGroupRoleMappings"];
+  getOidcGroupRoleMappingByGroup!: UsersRepository["getOidcGroupRoleMappingByGroup"];
+  upsertOidcGroupRoleMapping!: UsersRepository["upsertOidcGroupRoleMapping"];
+  deleteOidcGroupRoleMapping!: UsersRepository["deleteOidcGroupRoleMapping"];
+  getOidcRoleIdsForGroups!: UsersRepository["getOidcRoleIdsForGroups"];
+
   // ============ API Keys ============
   createNewApiKey!: UsersRepository["createNewApiKey"];
   updateApiKeyStatus!: UsersRepository["updateApiKeyStatus"];
@@ -158,6 +167,7 @@ class DbImpl {
   getSiteData!: SiteDataRepository["getSiteData"];
   getSiteDataByKey!: SiteDataRepository["getSiteDataByKey"];
   getAllSiteDataAnalytics!: SiteDataRepository["getAllSiteDataAnalytics"];
+  getAllSiteDataByPrefix!: SiteDataRepository["getAllSiteDataByPrefix"];
 
   // ============ Incidents ============
   getIncidentsPaginated!: IncidentsRepository["getIncidentsPaginated"];
@@ -500,6 +510,7 @@ class DbImpl {
     this.deleteApiKey = this.users.deleteApiKey.bind(this.users);
     this.getApiKeyByHashedKey = this.users.getApiKeyByHashedKey.bind(this.users);
     this.getAllApiKeys = this.users.getAllApiKeys.bind(this.users);
+    this.updateUserProfile = this.users.updateUserProfile.bind(this.users);
 
     // Roles
     this.getRoleById = this.users.getRoleById.bind(this.users);
@@ -518,6 +529,14 @@ class DbImpl {
     this.removeUserFromRole = this.users.removeUserFromRole.bind(this.users);
     this.getUserPermissionIds = this.users.getUserPermissionIds.bind(this.users);
     this.getUserRoleIds = this.users.getUserRoleIds.bind(this.users);
+
+    // OIDC
+    this.getUserByOidcSub = this.users.getUserByOidcSub.bind(this.users);
+    this.getAllOidcGroupRoleMappings = this.users.getAllOidcGroupRoleMappings.bind(this.users);
+    this.getOidcGroupRoleMappingByGroup = this.users.getOidcGroupRoleMappingByGroup.bind(this.users);
+    this.upsertOidcGroupRoleMapping = this.users.upsertOidcGroupRoleMapping.bind(this.users);
+    this.deleteOidcGroupRoleMapping = this.users.deleteOidcGroupRoleMapping.bind(this.users);
+    this.getOidcRoleIdsForGroups = this.users.getOidcRoleIdsForGroups.bind(this.users);
   }
 
   private bindSiteDataMethods(): void {
@@ -526,6 +545,7 @@ class DbImpl {
     this.getSiteData = this.siteData.getSiteData.bind(this.siteData);
     this.getSiteDataByKey = this.siteData.getSiteDataByKey.bind(this.siteData);
     this.getAllSiteDataAnalytics = this.siteData.getAllSiteDataAnalytics.bind(this.siteData);
+    this.getAllSiteDataByPrefix = this.siteData.getAllSiteDataByPrefix.bind(this.siteData);
   }
 
   private bindIncidentsMethods(): void {

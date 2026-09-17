@@ -23,6 +23,8 @@
   import KeyIcon from "@lucide/svelte/icons/key";
   import UsersIcon from "@lucide/svelte/icons/users";
   import ShieldIcon from "@lucide/svelte/icons/shield";
+  import ShieldCheckIcon from "@lucide/svelte/icons/shield-check";
+  import FingerprintIcon from "@lucide/svelte/icons/fingerprint";
   import Columns3CogIcon from "@lucide/svelte/icons/columns-3-cog";
   import SiteHeader from "./manage/site-header.svelte";
   import TemplateIcon from "@lucide/svelte/icons/layout-template";
@@ -41,6 +43,7 @@
     { title: "多语言设置", url: "/manage/app/internationalization", icon: GlobeIcon },
     { title: "外观定制", url: "/manage/app/customizations", icon: Columns3CogIcon },
     { title: "统计服务", url: "/manage/app/analytics-providers", icon: ChartSplineIcon },
+    { title: "验证码服务", url: "/manage/app/captcha-providers", icon: ShieldCheckIcon },
     { title: "页面", url: "/manage/app/pages", icon: BookOpenIcon },
     { title: "监控项", url: "/manage/app/monitors", icon: BlendIcon },
     { title: "监控数据", url: "/manage/app/monitoring-data", icon: DatabaseIcon },
@@ -50,6 +53,7 @@
     { title: "订阅", url: "/manage/app/subscriptions", icon: BellIcon },
     { title: "用户", url: "/manage/app/users", icon: UsersIcon },
     { title: "角色", url: "/manage/app/roles", icon: ShieldIcon },
+    { title: "单点登录", url: "/manage/app/oidc", icon: FingerprintIcon },
     { title: "触发器", url: "/manage/app/triggers", icon: MailboxIcon },
     { title: "通知模板", url: "/manage/app/templates", icon: TemplateIcon },
     { title: "状态徽章", url: "/manage/app/badges", icon: BadgeIcon },

@@ -10,7 +10,7 @@
   import * as Dialog from "$lib/components/ui/dialog/index.js";
   import * as Alert from "$lib/components/ui/alert/index.js";
   import { toast } from "svelte-sonner";
-  import { format } from "date-fns";
+  import LocalTime from "$lib/components/LocalTime.svelte";
   import { resolve } from "$app/paths";
   import clientResolver from "$lib/client/resolver.js";
   import { page as pageData } from "$app/state";
@@ -531,7 +531,7 @@
                     />
                   </Table.Cell>
                   <Table.Cell>
-                    {format(new Date(subscriber.created_at), "yyyy-MM-dd")}
+                    <LocalTime value={subscriber.created_at} format="yyyy-MM-dd" />
                   </Table.Cell>
                   <Table.Cell class="text-center">
                     <Button

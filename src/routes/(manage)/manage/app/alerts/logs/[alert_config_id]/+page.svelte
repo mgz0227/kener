@@ -15,8 +15,8 @@
   import ExternalLinkIcon from "@lucide/svelte/icons/external-link";
   import BellOffIcon from "@lucide/svelte/icons/bell-off";
   import TrashIcon from "@lucide/svelte/icons/trash";
-  import { format } from "date-fns";
   import { toast } from "svelte-sonner";
+  import LocalTime from "$lib/components/LocalTime.svelte";
   import type { MonitorAlertConfigWithTriggers, MonitorAlertV2WithConfig } from "$lib/server/types/db";
   import { resolve } from "$app/paths";
   import clientResolver from "$lib/client/resolver.js";
@@ -155,16 +155,6 @@
     }
   }
 
-  // Format date
-  function formatDate(dateStr: string | Date): string {
-    try {
-      const date = typeof dateStr === "string" ? new Date(dateStr) : dateStr;
-      return format(date, "yyyy-MM-dd HH:mm:ss");
-    } catch {
-      return String(dateStr);
-    }
-  }
-
   // Handle filter change
   function handleStatusChange(value: string | undefined) {
     if (value) {
@@ -283,8 +273,8 @@
                   <span class="text-muted-foreground text-sm">—</span>
                 {/if}
               </Table.Cell>
-              <Table.Cell class="text-muted-foreground text-sm">{formatDate(alert.created_at)}</Table.Cell>
-              <Table.Cell class="text-muted-foreground text-sm">{formatDate(alert.updated_at)}</Table.Cell>
+              <Table.Cell class="text-muted-foreground text-sm"><LocalTime value={alert.created_at} /></Table.Cell>
+              <Table.Cell class="text-muted-foreground text-sm"><LocalTime value={alert.updated_at} /></Table.Cell>
               <Table.Cell class="text-right">
                 <Button variant="destructive" size="sm" class="text-xs" onclick={() => openDeleteDialog(alert)}>
                   <TrashIcon class="size-3" /> 删除

@@ -28,7 +28,8 @@
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { toast } from "svelte-sonner";
-  import { format, formatDistanceToNow, isPast, isFuture, isWithinInterval, addDays } from "date-fns";
+  import { format, formatDistanceToNow, isPast, isFuture, isWithinInterval } from "date-fns";
+  import LocalTime from "$lib/components/LocalTime.svelte";
   import { zhCN } from "date-fns/locale";
   import { rrulestr } from "rrule";
   import { resolve } from "$app/paths";
@@ -200,9 +201,16 @@
       const dtstart = new Date(startDateTimeLocal);
       const fullRrule = `DTSTART:${dtstart.toISOString().replace(/[-:]/g, "").split(".")[0]}Z\nRRULE:${customRrule}`;
       const rule = rrulestr(fullRrule);
-      const now = new Date();
-      const windowEnd = addDays(now, 30);
-      const occurrences = rule.between(now, windowEnd, true).slice(0, 5);
+      const occurrences: Date[] = [];
+      let searchFrom = new Date();
+
+      for (let i = 0; i < 5; i++) {
+        const next = rule.after(searchFrom, i === 0);
+        if (!next) break;
+        occurrences.push(next);
+        searchFrom = next;
+      }
+
       return occurrences.map((d) => format(d, "yyyy-MM-dd HH:mm"));
     } catch (e) {
       return [];
@@ -919,9 +927,9 @@
                         <Badge variant={displayStatus.variant}>{displayStatus.label}</Badge>
                       </div>
                       <p class="text-muted-foreground text-sm">
-                        {format(new Date(event.start_date_time * 1000), "yyyy-MM-dd HH:mm")}
+                        <LocalTime value={event.start_date_time} format="yyyy-MM-dd HH:mm" />
                         →
-                        {format(new Date(event.end_date_time * 1000), "yyyy-MM-dd HH:mm")}
+                        <LocalTime value={event.end_date_time} format="yyyy-MM-dd HH:mm" />
                       </p>
                     </div>
                   </div>
